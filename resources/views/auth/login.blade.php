@@ -17,7 +17,7 @@
             <div class="error-message">{{ session('error') }}</div>
         @endif
 
-        <form action="" method="POST">
+        <form action="{{ route('login.post') }}" method="POST">
             @csrf
 
             <!-- Email Input -->

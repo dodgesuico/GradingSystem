@@ -1,6 +1,6 @@
 @extends("layouts.default")
 
-@section("Title", "Login")
+@section("Title", "Register")
 
 @section("content")
 
@@ -17,7 +17,7 @@
             <div class="error-message">{{ session('error') }}</div>
         @endif
 
-        <form action="" method="POST">
+        <form action="{{ route('register.post') }}" method="POST">
             @csrf
 
             <!-- Email Input -->
