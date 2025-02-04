@@ -11,7 +11,7 @@
 
 <div class="container">
     <div class="login-box">
-        <h2>Login</h2>
+        <h2>Register</h2>
 
         @if (session('error'))
             <div class="error-message">{{ session('error') }}</div>
