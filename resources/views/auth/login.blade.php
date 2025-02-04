@@ -43,7 +43,7 @@
 
             <!-- Register & Forgot Password Links -->
             <div class="links">
-                <a href="{{ route('register') }}">Create an account</a> | 
+                <a href="{{ route('register') }}">Create an account here</a> | 
                 <a href="#">Forgot password?</a> 
             </div>
         </form>
