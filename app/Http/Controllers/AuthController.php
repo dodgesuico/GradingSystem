@@ -18,27 +18,35 @@ class AuthController extends Controller
         return view("auth.register");
     }
 
-    function LoginPost(Request $resquest)
+    function LoginPost(Request $request)
     {
-        $resquest->validate([
-            "email" => "required",
+        $request->validate([
+            "email" => "required|email",
             "password" => "required",
         ]);
-
-        $cred = $resquest->only("email", "password");
-        if(Auth::attempt($cred)){
-            $user = Auth::user();
-
-            if ($user->role === 'registrar') {
-                return redirect(route('registrar'))->with('success', 'Welcome, Registrar!');
-            }
-            
-            return redirect(route("welcome"))->with("success", "Login Success");
-        }
-
-        return redirect(route("login"))->with("error", "Login Failed");
-
         
+        // Check if the email exists first
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return redirect()->back()->withErrors(['email' => 'The email does not exist.']);
+        }
+        
+        // Check if the password is correct
+        if (!\Hash::check($request->password, $user->password)) {
+            return redirect()->back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+        
+        // Attempt to log in
+        if (Auth::attempt($request->only('email', 'password'))) {
+            // if ($user->role === 'registrar') {
+            //     return redirect(route('registrar'))->with('success', 'Welcome, Registrar!');
+            // }
+        
+            return redirect(route('welcome'))->with('success', 'Login Success');
+        }
+        
+        return redirect(route('login'))->withErrors(['error' => 'Login failed. Please try again.']);
       
     }
 
