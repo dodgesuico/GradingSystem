@@ -1,11 +1,11 @@
 @extends("layouts.default")
 
-@section("Title", "Register")
 
 @section("content")
 
 
 <head>
+    <title>Register</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 
@@ -54,7 +54,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn">Submit</button>
 
             <!-- Register & Forgot Password Links -->
             <div class="links">
@@ -84,7 +84,7 @@
                 </ul>
             </div>
         @endif
-        
+
     </div>
 </div>
 @endsection
