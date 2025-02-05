@@ -2,13 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TeacherController;
 
 Route::middleware("auth")->group(function (){
-    Route::view("/", "welcome")->name("welcome");
+    Route::view("/", "index")->name("index");
 });
 
-Route::view("/", "welcome")->name("welcome");
+Route::view("/", "index")->name("index");
 
+Route::get("/teacher_dashboard", [TeacherController::class, "teacher"])->name('teacher');
 Route::get("/login", [AuthController::class, "login"])->name('login');
 Route::get("/register", [AuthController::class, 'register'])->name('register');
 

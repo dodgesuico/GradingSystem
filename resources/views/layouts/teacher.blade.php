@@ -41,6 +41,13 @@
 
             </div>
 
+            @if (Auth::check())
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">Logout</button>
+                </form>
+            @endif
+
             <div class="teacher-nav-footer">
                 <h4>POWERED BY CKCM TECH</h4>
                 <p>&copy; {{ date('Y') }} CKCM Technologies, LLC</p>

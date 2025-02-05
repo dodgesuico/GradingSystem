@@ -44,7 +44,13 @@
 
             <!-- Password Input -->
             <div class="input-group">
-                <input type="hidden" name="role" value="student" required>
+                <label for="role">Select Role</label>
+                <select name="role" id="role" required>
+                    <option value="student">Student</option>
+                    <option value="registrar">Registrar</option>
+                    <option value="dean">Dean</option>
+                    <option value="instructor">Instructor</option>
+                </select>
             </div>
 
             <!-- Remember Me -->

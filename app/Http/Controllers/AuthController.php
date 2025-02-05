@@ -39,11 +39,11 @@ class AuthController extends Controller
         
         // Attempt to log in
         if (Auth::attempt($request->only('email', 'password'))) {
-            // if ($user->role === 'registrar') {
-            //     return redirect(route('registrar'))->with('success', 'Welcome, Registrar!');
-            // }
+            if ($user->role === 'instructor') {
+                return redirect(route('teacher'))->with('success', 'Welcome, Registrar!');
+            }
         
-            return redirect(route('welcome'))->with('success', 'Login Success');
+            return redirect(route('index'))->with('success', 'Login Success');
         }
         
         return redirect(route('login'))->withErrors(['error' => 'Login failed. Please try again.']);
