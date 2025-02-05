@@ -9,12 +9,31 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 
+
 <div class="container">
     <div class="login-box">
         <h2>Register</h2>
 
-        @if (session('error'))
-            <div class="error-message">{{ session('error') }}</div>
+        @if (session()->has("success"))
+            <div class="alert alert-success">
+                {{ session()->get("success") }}
+            </div>
+        @endif
+
+        @if (session()->has("error"))
+            <div class="alert alert-danger">
+                {{ session()->get("error") }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
         <form action="{{ route('register.post') }}" method="POST">
