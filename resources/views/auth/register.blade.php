@@ -66,7 +66,7 @@
 
             <!-- Password Input -->
             <div class="input-group">
-                <input type="hidden" name="role" value="registrar" required>
+                <input type="hidden" name="role" value="student" required>
             </div>
 
             <!-- Remember Me -->

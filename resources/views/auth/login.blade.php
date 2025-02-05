@@ -57,7 +57,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn">Submit</button>
 
             <!-- Register & Forgot Password Links -->
             <div class="links">

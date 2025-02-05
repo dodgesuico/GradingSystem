@@ -27,6 +27,12 @@ class AuthController extends Controller
 
         $cred = $resquest->only("email", "password");
         if(Auth::attempt($cred)){
+            $user = Auth::user();
+
+            if ($user->role === 'registrar') {
+                return redirect(route('registrar'))->with('success', 'Welcome, Registrar!');
+            }
+            
             return redirect(route("welcome"))->with("success", "Login Success");
         }
 
