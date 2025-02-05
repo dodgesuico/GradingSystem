@@ -64,6 +64,11 @@
                 <input type="password" id="password" name="confirm_password" required>
             </div>
 
+            <!-- Password Input -->
+            <div class="input-group">
+                <input type="hidden" name="role" value="registrar" required>
+            </div>
+
             <!-- Remember Me -->
             <div class="remember-me">
                 <input type="checkbox" id="remember" name="remember">

@@ -36,20 +36,22 @@ class AuthController extends Controller
       
     }
 
-    function RegisterPost(Request $resquest)
+    function RegisterPost(Request $request)
     {
-        $resquest->validate([
+        $request->validate([
             "name" => "required",
             "email" => "required|email",
             "password" => "required|min:4",
             "confirm_password" => "required|same:password",
+            "role" => "required",
         ]);
 
         $user = new User();
-        $user->name = $resquest->name;
-        $user->email = $resquest->email;
-        $user->password = $resquest->password;
-        
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->role = $request->role;
+
         if($user->save()){
             return redirect(route("login"))->with("success", "Account Created Successfully");
         }
