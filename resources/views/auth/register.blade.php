@@ -30,10 +30,14 @@
                 <input type="email" id="email" name="email" required>
             </div>
 
-            <!-- Email Input -->
             <div class="input-group">
-                <label for="email">Program</label>
-                <input type="text" id="email" name="email" required>
+                <label for="department">Program</label>
+                <select id="department" name="department" required>
+                    <option value="" disabled selected>Select a Department</option>
+                    @foreach ($departments as $department)
+                        <option value="{{ $department->department_name }}">{{ $department->department_name }}</option>
+                    @endforeach
+                </select>
             </div>
 
 

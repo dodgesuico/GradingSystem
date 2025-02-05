@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,8 @@ class AuthController extends Controller
 
     public function register()
     {
-        return view("auth.register");
+        $departments = Department::all(); // Fetch all departments from the departments table
+        return view('auth.register', compact('departments')); // Pass the departments to the register view
     }
 
     function LoginPost(Request $request)
@@ -55,6 +57,7 @@ class AuthController extends Controller
         $request->validate([
             "name" => "required",
             "email" => "required|email",
+            "department" => "required",
             "password" => "required|min:4",
             "confirm_password" => "required|same:password",
             "role" => "required",
@@ -63,6 +66,7 @@ class AuthController extends Controller
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->department = $request->department;
         $user->password = $request->password;
         $user->role = $request->role;
 
