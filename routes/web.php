@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\RegistrarController;
 
 Route::view("/", "index")->name('index');
 
