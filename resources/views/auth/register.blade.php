@@ -30,6 +30,13 @@
                 <input type="email" id="email" name="email" required>
             </div>
 
+            <!-- Email Input -->
+            <div class="input-group">
+                <label for="email">Program</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+
+
             <!-- Password Input -->
             <div class="input-group">
                 <label for="password">Password</label>
