@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+
+:root {
+    font-size: 65%;
+
+
+    /* color palette */
+
+    --color1: #F8F9FA;
+    --color2: #E9ECEF;
+    --color3: #DEE2E6;
+    --color4: #CED4DA;
+    --color5: #ADB5BD;
+    --color6: #6C757D;
+    --color7: #343A40;
+    --color8: #212529;
+    --color9: #121416;
+
+
+    /* ckcm color */
+    --ckcm-color1: #0F172A;
+    --ckcm-color2: #1E293B;
+    --ckcm-color3: #F48812;
+    --ckcm-color4: #C7570C;
+
+}
+
+
+/* Scrollbar width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Scrollbar track (background) */
+::-webkit-scrollbar-track {
+    background: var(--ckcm-color1); 
+  
+}
+
+/* Scrollbar handle */
+::-webkit-scrollbar-thumb {
+    background: var(--ckcm-color2);  
+
+}
+
+/* Scrollbar handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #2980b9, #9b59b6); 
+}

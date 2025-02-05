@@ -1,0 +1,34 @@
+Admin:
+-Maka add of Registrar 
+-and so on
+
+
+Registrar:
+abilities
+-Maka add student
+-Maka add og Teachers
+-Maka add of Dean
+-maka add og subjects
+-maka view sa grades sa student 
+-maka lock sa grades sa student 
+-maka print sa grades
+
+
+Dean
+-maka view sa student under sa iyang department
+-maka lock in sa grades sa student nga gi hatag sa teacher(inig lock in sa grades ma view na dayun si registrar)
+-maka view sa grades sa student, maka print sa grades sa student
+
+Instructor:
+-maka view sa student's under niya
+-maka view sa iyang classes
+-maka add og grades
+-maka lock og grades (dayun inig lock na sa grades ma view na dayun ni dean ang grades)
+
+Students:
+-maka login
+-maka view sa ilang grades(kung passed or fail)
+-logout
+
+
+
