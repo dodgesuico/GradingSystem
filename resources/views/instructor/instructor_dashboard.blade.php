@@ -1,5 +1,5 @@
-@extends("layouts.dean")
-<title>@yield("title", "CKCM Grading | Dean Home")</title>
+@extends("layouts.instructor")
+<title>@yield("title", "CKCM Grading | Instructor Home")</title>
 @section("content")
 
 <div class="dashboard">

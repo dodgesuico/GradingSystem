@@ -42,7 +42,7 @@ class AuthController extends Controller
         // Attempt to log in
         if (Auth::attempt($request->only('email', 'password'))) {
             if ($user->role === 'instructor') {
-                return redirect(route('teacher'))->with('success', 'Welcome, Instructor!');
+                return redirect(route('instructor'))->with('success', 'Welcome, Instructor!');
             }
 
             if ($user->role === 'registrar') {
