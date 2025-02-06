@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield("title", "Grading System")</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 
 <body>
@@ -17,46 +17,56 @@
     <script>
         window.location.href = "{{ route('login') }}";
     </script>
+    @else
+    @if (Auth::user()->role !== 'instructor')
+    <script>
+        window.location.href = "{{ route('index') }}";
+    </script>
     @endif
-    
-    
+    @endif
+
     <div class="container">
-
         <div class="nav-bar">
-
-            <div clas="teacher-nav-contents">
-
-
+            <div class="teacher-nav-contents">
                 <div class="nav-header">
                     <img src="system_images/icon.png" alt="">
                     <label class="gradient-text">CKCM Grading <em>v.1</em></label>
                 </div>
 
+                <!-- Profile Section with Logout Dropdown -->
                 <div class="nav-profile">
                     <img src="system_images/profile.png" alt="">
                     <div class="profile">
-                        <label for="">Teacher Name</label>
-                        <p>ID#: 0000</p>
+                        <label for="">{{ Auth::user()->name ?? 'Teacher Name' }}</label>
+                        <p>ID#: {{ Auth::user()->id ?? '0000' }}</p>
                     </div>
-                    <i class="fa-solid fa-arrow-turn-down"></i>
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                    <!-- Hidden Logout Dropdown -->
+                    <div class="logout-container">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket fa-flip-horizontal"></i> Logout</button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="nav-links">
-                    <a href=""><i class="fa-solid fa-house"></i>Home</a>
-
+                    <label for="" style="margin-top:20px;">DASHBOARD</label>
+                    <a href="{{ route('teacher') }}" class="{{ Request::is('teacher_dashboard') ? 'active' : '' }}">
+                        
+                        <i class="fa-solid fa-house"></i> Home
+                    </a>
                     <label for="" style="margin-top:20px;">OPERATION</label>
-                    <a href=""><i class="fa-solid fa-clipboard"></i>Classes</a>
+                 
+                    <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
+                    <i class="fa-solid fa-clipboard"></i> Classes
+                    </a>
                 </div>
+               
 
 
             </div>
-
-            @if (Auth::check())
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn btn-danger">Logout</button>
-            </form>
-            @endif
 
             <div class="teacher-nav-footer">
                 <h4>POWERED BY CKCM TECH</h4>
@@ -65,20 +75,20 @@
             </div>
         </div>
 
-
         <div class="main-content">
             <div class="content-header">
                 <i id="fullscreen-icon" class="fa-solid fa-expand" title="Expand"></i>
             </div>
 
-
-
             <div class="content">
                 @yield("content")
             </div>
-
         </div>
     </div>
+
+
+
+
 
 
 
@@ -110,6 +120,82 @@
     </script>
 
 
+    <!-- for logout -->
+
+    <script>
+        $(document).ready(function() {
+            $(".nav-profile").click(function(event) {
+                event.stopPropagation();
+                $(".logout-container").toggleClass("show");
+            });
+
+            $(document).click(function(event) {
+                if (!$(event.target).closest(".nav-profile").length) {
+                    $(".logout-container").removeClass("show");
+                }
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+    <style>
+        /* Navigation profile styles */
+
+
+
+        /* Logout dropdown */
+        .logout-container {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ckcm-color2);
+            width: 90%;
+            text-align: center;
+            padding: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform-origin: top center;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            border-bottom: 1px solid var(--color7);
+        }
+
+        .logout-container.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .logout-btn {
+            background: var(--ckcm-color1);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: var(--color9);
+        }
+    </style>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -127,7 +213,7 @@
         }
 
         .nav-bar {
-            width: 35vh;
+            width: 280px;
             height: 100%;
             background-color: var(--ckcm-color2);
             display: flex;
@@ -164,7 +250,7 @@
             flex-direction: row;
             padding: 20px;
             gap: 10px;
-            justify-content: left;
+            justify-content: center;
             align-items: center;
         }
 
@@ -195,16 +281,24 @@
 
 
         .nav-profile {
+            cursor: pointer;
+            position: relative;
+            gap: 10px;
+            padding: 10px;
+            transition: background 0.3s ease-in-out;
             display: flex;
             flex-direction: row;
             padding: 20px;
             gap: 10px;
             justify-content: left;
             align-items: center;
-            border: 1px solid var(--color6);
+            background-color: var(--ckcm-color1);
             border-left: 0;
             border-right: 0;
+        }
 
+        .nav-profile:hover {
+            background: var(--color9);
         }
 
         .nav-profile img {
@@ -222,6 +316,7 @@
             color: var(--color1);
             font-size: 1.2rem;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
         .profile p {
@@ -254,6 +349,11 @@
         }
 
         .nav-links a:hover {
+            color: var(--color1);
+            background-color: var(--ckcm-color1);
+        }
+
+        .nav-links a.active {
             color: var(--color1);
             background-color: var(--ckcm-color1);
         }
@@ -312,6 +412,7 @@
 
         }
     </style>
+
 
 </body>
 
