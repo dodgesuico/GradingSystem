@@ -37,7 +37,7 @@
                 <div class="nav-profile">
                     <img src="system_images/profile.png" alt="">
                     <div class="profile">
-                        <label for="">{{ Auth::user()->name ?? 'Teacher Name' }}</label>
+                        <label for="">{{ Auth::user()->name ?? 'Instructor Name' }}</label>
                         <p>ID#: {{ Auth::user()->id ?? '0000' }}</p>
                     </div>
                     <i class="fa-solid fa-chevron-down"></i>
@@ -53,17 +53,19 @@
 
                 <div class="nav-links">
                     <label for="" style="margin-top:20px;">DASHBOARD</label>
-                    <a href="{{ route('teacher') }}" class="{{ Request::is('teacher_dashboard') ? 'active' : '' }}">
-                        
+
+                    <a href="{{ route('instructor') }}" class="{{ Request::is('instructor_dashboard') ? 'active' : '' }}">
                         <i class="fa-solid fa-house"></i> Home
                     </a>
+
                     <label for="" style="margin-top:20px;">OPERATION</label>
-                 
-                    <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
-                    <i class="fa-solid fa-clipboard"></i> Classes
+
+                    <a href="{{ route('classes') }}" class="{{ Request::is('instructor_classes') ? 'active' : '' }}">
+                        <i class="fa-solid fa-clipboard"></i> Classes
                     </a>
+
                 </div>
-               
+
 
 
             </div>
