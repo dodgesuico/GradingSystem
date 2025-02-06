@@ -30,6 +30,8 @@ Route::get("/admin_dashboard", [AdminController::class, "index"])->name('admin')
 // for registrar
 Route::get("/registrar_dashboard", [RegistrarController::class, "index"])->name('registrar');
 Route::get("/registrar_classes", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
+Route::post("/registrar_classes", [RegistrarController::class, "CreateClass"])->name('classes.create');
+Route::put("/registrar_dashboard/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
 
 // for dean
 Route::get("/dean_dashboard", [DeanController::class, "index"])->name('dean');
