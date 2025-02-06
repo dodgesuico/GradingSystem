@@ -32,7 +32,7 @@
 
             <div class="input-group">
                 <label for="department">Program</label>
-                <select id="department" name="department" required>
+                <select id="department" name="department">
                     <option value="" disabled selected>Select a Department</option>
                     @foreach ($departments as $department)
                         <option value="{{ $department->department_name }}">{{ $department->department_name }}</option>

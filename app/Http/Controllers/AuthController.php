@@ -42,8 +42,21 @@ class AuthController extends Controller
         // Attempt to log in
         if (Auth::attempt($request->only('email', 'password'))) {
             if ($user->role === 'instructor') {
-                return redirect(route('teacher'))->with('success', 'Welcome, Registrar!');
+                return redirect(route('teacher'))->with('success', 'Welcome, Instructor!');
             }
+
+            if ($user->role === 'registrar') {
+                return redirect(route('registrar'))->with('success', 'Welcome, Registrar!');
+            }
+
+            if ($user->role === 'dean') {
+                return redirect(route('dean'))->with('success', 'Welcome, Registrar!');
+            }
+
+            if ($user->role === 'admin') {
+                return redirect(route('admin'))->with('success', 'Welcome, Registrar!');
+            }
+        
         
             return redirect(route('index'))->with('success', 'Login Success');
         }
@@ -57,7 +70,7 @@ class AuthController extends Controller
         $request->validate([
             "name" => "required",
             "email" => "required|email",
-            "department" => "required",
+            "department" => "",
             "password" => "required|min:4",
             "confirm_password" => "required|same:password",
             "role" => "required",
