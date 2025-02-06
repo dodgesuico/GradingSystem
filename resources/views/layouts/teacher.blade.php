@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +12,14 @@
 </head>
 
 <body>
+
+    @if (!Auth::check())
+    <script>
+        window.location.href = "{{ route('login') }}";
+    </script>
+    @endif
+    
+    
     <div class="container">
 
         <div class="nav-bar">
@@ -42,10 +52,10 @@
             </div>
 
             @if (Auth::check())
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-danger">Logout</button>
-                </form>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
             @endif
 
             <div class="teacher-nav-footer">
@@ -53,7 +63,6 @@
                 <p>&copy; {{ date('Y') }} CKCM Technologies, LLC</p>
                 <p>All Rights Reserved</p>
             </div>
-
         </div>
 
 
@@ -297,7 +306,7 @@
 
         /* dynamic content */
         .content {
-          
+
             overflow-y: scroll;
 
 
