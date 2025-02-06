@@ -59,9 +59,9 @@
                     </a>
                     <label for="" style="margin-top:20px;">OPERATION</label>
                  
-                    <!-- <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
+                    <a href="{{ route('registrar_classes') }}" class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
                     <i class="fa-solid fa-clipboard"></i> Classes
-                    </a> -->
+                    </a>
                 </div>
                
 

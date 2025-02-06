@@ -29,6 +29,7 @@ Route::get("/admin_dashboard", [AdminController::class, "index"])->name('admin')
 
 // for registrar
 Route::get("/registrar_dashboard", [RegistrarController::class, "index"])->name('registrar');
+Route::get("/registrar_classes", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
 
 // for dean
 Route::get("/dean_dashboard", [DeanController::class, "index"])->name('dean');
