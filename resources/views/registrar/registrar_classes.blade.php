@@ -3,110 +3,57 @@
 @section("content")
 
 <div class="dashboard">
-    @if (session()->has("success"))
-        <div class="alert alert-success">
-            {{ session()->get("success") }}
-        </div>
-    @endif
 
-    @if (session()->has("error"))
-        <div class="alert alert-danger">
-            {{ session()->get("error") }}
-        </div>
-    @endif
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <div class="classes-header">
+        <input type="text" id="searchInput" placeholder="🔎 Search...">
+        <button class="add-btn" id="openModal"><i class="fa-solid fa-plus"></i> Add Classes</button>
 
-    <button class="btn" id="openModal">Add Classes</button>
-
-        <!-- Modal -->
-    <div class="modal" id="classModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add a New Class</h2>
-                <button class="close-btn" id="closeModal">&times;</button>
-            </div>
-            
-            <form action="{{ route('classes.create') }}" method="POST">
-                @csrf
-                <div>
-                    <label for="subject_code">Subject Code:</label>
-                    <input type="text" id="subject_code" name="subject_code" required>
-                </div>
-                <div>
-                    <label for="descriptive_title">Descriptive Title:</label>
-                    <input type="text" id="descriptive_title" name="descriptive_title" required>
-                </div>
-                <div class="input-group">
-                    <label for="instructor">Instructor</label>
-                    <select id="instructor" name="instructor">
-                        <option value="" disabled selected>Select a Department</option>
-                        @foreach ($instructors as $instructor)
-                            <option value="{{ $instructor->name }}">{{ $instructor->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="academic_period">Academic Period</label>
-                    <select id="academic_period" name="academic_period">
-                        <option value="" disabled selected>Select Academic Period</option>
-                        <option value="1st Semester">1st Semester</option>
-                        <option value="2nd Semester">2nd Semester</option>
-                        <option value="Summer">Summer</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="schedule">Schedule:</label>
-                    <input type="text" id="schedule" name="schedule" required>
-                </div>
-                <div>
-                    <label for="status">Status:</label>
-                    <input type="status" id="status" name="status" value="Active" readonly>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn">Add Class</button>
-                    <button type="button" class="close-btn" id="cancelModal">Cancel</button>
-                </div>
-            </form>
-        </div>
     </div>
 
+
+
     <script>
-        const modal = document.getElementById('classModal');
-        const openModalBtn = document.getElementById('openModal');
-        const closeModalBtn = document.getElementById('closeModal');
-        const cancelModalBtn = document.getElementById('cancelModal');
+        document.getElementById('searchInput').addEventListener('input', function() {
+            let filter = this.value.toLowerCase();
+            let rows = document.querySelectorAll("table tbody tr");
 
-        openModalBtn.addEventListener('click', () => {
-            modal.style.display = 'block';
-        });
-
-        closeModalBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-
-        cancelModalBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
         });
     </script>
 
 
+    <div class="message-container">
+        @if (session()->has("success"))
+        <div class="alert alert-success">
+            {{ session()->get("success") }}
+        </div>
+        @endif
 
-    <table border="1" cellpadding="10">
+        @if (session()->has("error"))
+        <div class="alert alert-danger">
+            {{ session()->get("error") }}
+        </div>
+        @endif
+
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+    </div>
+
+
+
+    <!-- table -->
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -120,189 +67,104 @@
 
             </tr>
         </thead>
-        <tbody>
-            @foreach ($classes as $class)
-                <tr>
-                    <td>{{ $class->id }}</td>
-                    <td>{{ $class->subject_code}}</td>
-                    <td>{{ $class->descriptive_title}}</td>
-                    <td>{{ $class->instructor }}</td>
-                    <td>{{ $class->academic_period }}</td>
-                    <td>{{ $class->schedule }}</td>
-                    <td>{{ $class->status }}</td>
-                    <td>
-                        <!-- Edit Button -->
-                        <button class="btn" onclick="openEditClassModal({{ $class->id }})">Edit</button> |
-                        <button class="btn" onclick="openDeleteClassModal({{ $class->id }})">Delete</button>
-                    </td>
-                </tr>
+        @foreach ($classes as $class)
+        <tr>
+            <td>{{ $class->id }}</td>
+            <td>{{ $class->subject_code}}</td>
+            <td>{{ $class->descriptive_title}}</td>
+            <td>{{ $class->instructor }}</td>
+            <td>{{ $class->academic_period }}</td>
+            <td>{{ $class->schedule }}</td>
+            <td>{{ $class->status }}</td>
+            <td style="text-align:center">
+                <!-- Edit Button -->
+                <a href="{{ route('class.show', $class->id) }}">View Class</a> |
+                <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
+                <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
+            </td>
+        </tr>
 
-                <!-- Edit Class Modal -->
-                <div id="editClassModal{{ $class->id }}" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5>Edit Class - {{ $class->subject_code }}</h5>
-                            <button type="button" class="close" onclick="closeEditClassModal({{ $class->id }})">&times;</button>
-                        </div>
-                        <form action="{{ route('classes.update', $class->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label for="subject_code">Subject Code</label>
-                                    <input type="text" class="form-control" id="subject_code" name="subject_code" value="{{ $class->subject_code }}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="descriptive_title">Descriptive Title</label>
-                                    <input type="text" class="form-control" id="descriptive_title" name="descriptive_title" value="{{ $class->descriptive_title }}" required>
-                                </div>
-                                <div class="input-group">
-                                    <label for="instructor">Instructor</label>
-                                    <select id="instructor" name="instructor">
-                                        <option value="" disabled selected>Select a Department</option>
-                                        @foreach ($instructors as $instructor)
-                                            <option value="{{ $instructor->name }}">{{ $instructor->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="academic_period">Academic Period</label>
-                                    <select id="academic_period" name="academic_period">
-                                        <option value="" disabled selected>Select Academic Period</option>
-                                        <option value="1st Semester">1st Semester</option>
-                                        <option value="2nd Semester">2nd Semester</option>
-                                        <option value="Summer">Summer</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="schedule">Schedule</label>
-                                    <input type="text" class="form-control" id="schedule" name="schedule" value="{{ $class->schedule }}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="status">Status</label>
-                                    <select class="form-control" id="status" name="status" required>
-                                        <option value="Active" {{ $class->status == 'Active' ? 'selected' : '' }}>Active</option>
-                                        <option value="Inactive" {{ $class->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" onclick="closeEditClassModal({{ $class->id }})">Close</button>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+        @include('registrar.registrar_classes_edit_and_delete')
 
-                <!-- Delete Modal for each class -->
-                <div id="deleteClassModal{{ $class->id }}" class="modal">
-                    <div class="modal-content">
-                        <h2>Delete Class</h2>
-                        <p>Are you sure you want to delete this class?</p>
-                        <p>Class ID: {{ $class->id }}</p>
-                        <div class="modal-footer">
-                            <button class="btn-cancel" onclick="closeDeleteClassModal({{ $class->id }})">Cancel</button>
-                            <form method="POST" action="{{ route('classes.destroy', $class->id) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-delete">Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
 
-                <script>
-                    // Open the Edit Class modal
-                    function openEditClassModal(classId) {
-                        // Select the modal using the classId
-                        var modal = document.getElementById('editClassModal' + classId);
-                        modal.style.display = 'flex'; // Show the modal
-                    }
-
-                    // Close the Edit Class modal
-                    function closeEditClassModal(classId) {
-                        // Select the modal using the classId
-                        var modal = document.getElementById('editClassModal' + classId);
-                        modal.style.display = 'none'; // Hide the modal
-                    }
-
-                    function openDeleteClassModal(classId) {
-                        const modal = document.getElementById('deleteClassModal' + classId);
-                        modal.style.display = 'flex';
-                    }
-
-                    function closeDeleteClassModal(classId) {
-                        const modal = document.getElementById('deleteClassModal' + classId);
-                        modal.style.display = 'none';
-                    }
-
-                    // Close the modal when clicking outside of it
-                    window.onclick = function(event) {
-                        var modals = document.querySelectorAll('.modal');
-                        modals.forEach(function(modal) {
-                            if (event.target == modal) {
-                                modal.style.display = 'none';
-                            }
-                        });
-                    }
-                </script>
-
-            @endforeach
+        @endforeach
         </tbody>
     </table>
+
+
+
 </div>
 
+
+@include('registrar.registrar_classes_add')
 
 
 @endsection
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <style>
-    .dashboard {
-        margin-top: 100px;
+    .message-container {
         display: flex;
-        justify-content: center;
+        justify-content: left;
         align-items: center;
-        flex-direction: column;
-        gap: 10px;
-        
-    }
-
-    .dashboard h1 {
-        color: var(--ckcm-color4)
-    }
-
-    .dashboard h2 {
-        color: var(--color6);
-    }
-
-    table {
         width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
     }
 
-    thead th {
-        background-color: #f4f4f4;
-        text-align: left;
-        padding: 10px;
+    .message-container .alert {
+        font-size: 1.2rem;
     }
 
-    tbody td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
+    .alert-success {
+        color: var(--color-green);
     }
 
-    tbody tr:hover {
-        background-color: #f1f1f1;
+    .alert-danger {
+        color: var(--color-red);
+    }
+</style>
+
+
+<style>
+    .classes-header input {
+        padding: 7px;
+        background-color: var(--ckcm-color2);
+        width: 200px;
+        color: var(--color1);
+        border: 1px solid var(--color6);
+        outline: none;
+        /* Removes default focus outline */
+        transition: border 0.3s ease-in-out;
+        border-radius: 5px;
     }
 
-    .empty-message {
-        text-align: center;
-        color: red;
-        padding: 10px;
+    .classes-header input:focus {
+        border: 1px solid var(--ckcm-color1);
+        box-shadow: 0 0 5px var(--color-blue);
     }
 
+    .add-btn {
+        background-color: transparent;
+    }
+</style>
+
+
+<!-- style for add class -->
+<style>
     /* Modal Background */
     .modal {
         display: none;
@@ -313,27 +175,72 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.6);
     }
-    
+
     /* Modal Content */
     .modal-content {
-        background-color: white;
+        height: fit-content;
+        border: 1px solid var(--color5);
+        background-color: var(--ckcm-color1);
         margin: 10% auto;
         padding: 20px;
         border-radius: 10px;
-        width: 50%;
+        width: 30%;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     }
-    
-    .modal-header, .modal-footer {
+
+    .modal-header {
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+        color: var(--color1);
+    }
+
+    .modal-header,
+    .modal-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-    
+
+
+
+    .info-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .info-container label {
+        color: var(--color3);
+        font-size: 1.2rem;
+    }
+
+    .info-container label em {
+        color: var(--color4);
+        font-size: 1rem;
+    }
+
+    .info-container input,
+    .info-container select {
+        padding: 5px;
+        background-color: var(--color1);
+        border-radius: 5px;
+        border: 1px solid var(--color6);
+    }
+
     .modal-footer {
         text-align: right;
+        margin-top: 10px;
+    }
+
+    .modal-add-btn:hover {
+        background-color: var(--color-blue);
     }
 
     .close-btn .close {
@@ -344,13 +251,65 @@
         border-radius: 5px;
         cursor: pointer;
     }
+</style>
 
-    .btn {
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    .classes-header {
+        display: flex;
+        margin-top: 10px;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: red;
+        padding: 10px;
+    }
+
+    .add-btn {
+        background: transparent;
+        border: 0;
+    }
+
+    .add-btn:hover {
+        background: transparent;
+        text-decoration: underline;
+    }
+
+    .dashboard {
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+
+    }
+
+    .dashboard h1 {
+        color: var(--ckcm-color4)
+    }
+
+    .dashboard h2 {
+        color: var(--color6);
     }
 </style>

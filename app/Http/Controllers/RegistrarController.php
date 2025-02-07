@@ -8,17 +8,20 @@ use Illuminate\Http\Request;
 
 class RegistrarController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return view("registrar.registrar_dashboard");
     }
 
-    public function registrar_classes(){
+    public function registrar_classes()
+    {
         $classes = Classes::all();
         $instructors = User::where('role', 'instructor')->get(); // Fetch all class data
         return view("registrar.registrar_classes", compact('classes'), compact('instructors'));
     }
 
-    public function CreateClass(Request $request){
+    public function CreateClass(Request $request)
+    {
         $request->validate([
             "subject_code" => "required",
             "descriptive_title" => "required",
@@ -26,7 +29,7 @@ class RegistrarController extends Controller
             "academic_period" => "required",
             "schedule" => "required",
             "status" => "required",
-        ]); 
+        ]);
 
         $class = new Classes();
         $class->subject_code = $request->subject_code;
@@ -36,14 +39,15 @@ class RegistrarController extends Controller
         $class->schedule = $request->schedule;
         $class->status = $request->status;
 
-        if($class->save()){
+        if ($class->save()) {
             return redirect(route("registrar_classes"))->with("success", "Class Created Successfully");
         }
 
         return redirect(route("registrar_classes"))->with("error", "Class Creation Failed");
     }
 
-    public function EditClass(Request $request, Classes $class){
+    public function EditClass(Request $request, Classes $class)
+    {
         $request->validate([
             "subject_code" => "required",
             "descriptive_title" => "required",
@@ -60,14 +64,15 @@ class RegistrarController extends Controller
         $class->schedule = $request->schedule;
         $class->status = $request->status;
 
-        if($class->save()){
+        if ($class->save()) {
             return redirect(route("registrar_classes"))->with("success", "Class Edited Successfully");
         }
 
         return redirect(route("registrar_classes"))->with("error", "Class Edition Failed");
     }
 
-    public function DeleteClass(Request $request, Classes $class){
+    public function DeleteClass(Request $request, Classes $class)
+    {
         try {
             $class->delete(); // Delete the class from the database
             return redirect()->route('registrar_classes')->with('success', 'Class deleted successfully.');
@@ -76,5 +81,9 @@ class RegistrarController extends Controller
         }
     }
 
-    
+    public function show(Classes $class)
+    {
+        $class = Classes::all();  // Fetch the class by ID
+        return view('registrar.registrar_classes_view', compact('class'));  // Return the view with class details
+    }
 }

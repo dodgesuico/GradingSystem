@@ -9,6 +9,12 @@
 :root {
     font-size: 65%;
 
+    /* basic color with modification */
+    --color-red: #f44336;
+    --color-red-hover:#d32f2f;
+    --color-blue: #023e8a;
+    --color-green: #4CAF50;
+    --color-green-hover: #45a049;
 
     /* color palette */
 
@@ -21,6 +27,7 @@
     --color7: #343A40;
     --color8: #212529;
     --color9: #121416;
+
 
 
     /* ckcm color */
@@ -39,17 +46,107 @@
 
 /* Scrollbar track (background) */
 ::-webkit-scrollbar-track {
-    background: var(--ckcm-color1); 
-  
+    background: var(--ckcm-color1);
+
 }
 
 /* Scrollbar handle */
 ::-webkit-scrollbar-thumb {
-    background: var(--ckcm-color2);  
+    background: var(--ckcm-color2);
 
 }
 
 /* Scrollbar handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, #2980b9, #9b59b6); 
+    background: linear-gradient(45deg, #2980b9, #9b59b6);
+}
+
+
+button {
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--color2);
+    border: 1px solid var(--color8);
+    padding: 5px 10px;
+    background-color: var(--ckcm-color1);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+button:hover {
+    background-color: var(--ckcm-color2);
+}
+
+
+button i{
+    margin-right: 2px;
+}
+
+
+
+
+
+table {
+    border: 1px solid var(--color8);
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+thead th {
+    border: 1px solid var(--color7);
+    background-color: var(--color9);
+    text-align: left;
+    padding: 10px;
+    color: var(--color1);
+    font-size: 1.2rem;
+    border-bottom: 2px solid var(--color1);
+    text-align: center;
+}
+
+tbody td {
+    border: 1px solid var(--color7);
+    padding: 5px;
+    color: var(--color1);
+    background-color: var(--ckcm-color1);
+    font-size: 1.1rem;
+  
+}
+
+tr:nth-child(odd) {
+    background-color: var(--ckcm-color2);
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.add-btn {
+    background-color: var(--color-blue);
+    color: white;
+}
+
+
+
+.edit-btn {
+    background-color: var(--color-green);
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: var(--color-green-hover);
+}
+
+.delete-btn {
+    background-color: var(--color-red);
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: var(--color-red-hover);
 }
