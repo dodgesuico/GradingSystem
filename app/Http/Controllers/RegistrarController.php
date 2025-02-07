@@ -61,10 +61,10 @@ class RegistrarController extends Controller
         $class->status = $request->status;
 
         if($class->save()){
-            return redirect(route("registrar_classes"))->with("success", "Class Created Successfully");
+            return redirect(route("registrar_classes"))->with("success", "Class Edited Successfully");
         }
 
-        return redirect(route("registrar_classes"))->with("error", "Class Creation Failed");
+        return redirect(route("registrar_classes"))->with("error", "Class Edition Failed");
     }
 
     public function DeleteClass(Request $request, Classes $class){
