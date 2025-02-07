@@ -26,7 +26,7 @@ class RegistrarController extends Controller
             "academic_period" => "required",
             "schedule" => "required",
             "status" => "required",
-        ]);
+        ]); 
 
         $class = new Classes();
         $class->subject_code = $request->subject_code;
