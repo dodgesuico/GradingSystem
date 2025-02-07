@@ -67,5 +67,14 @@ class RegistrarController extends Controller
         return redirect(route("registrar_classes"))->with("error", "Class Creation Failed");
     }
 
+    public function DeleteClass(Request $request, Classes $class){
+        try {
+            $class->delete(); // Delete the class from the database
+            return redirect()->route('registrar_classes')->with('success', 'Class deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('registrar_classes')->with('error', 'Failed to delete class. Please try again.');
+        }
+    }
+
     
 }

@@ -3,7 +3,27 @@
 @section("content")
 
 <div class="dashboard">
-    <h1>Create your Registrar classes here!</h1>
+    @if (session()->has("success"))
+        <div class="alert alert-success">
+            {{ session()->get("success") }}
+        </div>
+    @endif
+
+    @if (session()->has("error"))
+        <div class="alert alert-danger">
+            {{ session()->get("error") }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <button class="btn" id="openModal">Add Classes</button>
 
@@ -34,9 +54,14 @@
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label for="academic_period">Academic Period:</label>
-                    <input type="text" id="academic_period" name="academic_period" required>
+                <div class="form-group">
+                    <label for="academic_period">Academic Period</label>
+                    <select id="academic_period" name="academic_period">
+                        <option value="" disabled selected>Select Academic Period</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                        <option value="Summer">Summer</option>
+                    </select>
                 </div>
                 <div>
                     <label for="schedule">Schedule:</label>
@@ -107,7 +132,8 @@
                     <td>{{ $class->status }}</td>
                     <td>
                         <!-- Edit Button -->
-                        <button class="btn" onclick="openEditClassModal({{ $class->id }})">Edit</button>
+                        <button class="btn" onclick="openEditClassModal({{ $class->id }})">Edit</button> |
+                        <button class="btn" onclick="openDeleteClassModal({{ $class->id }})">Delete</button>
                     </td>
                 </tr>
 
@@ -141,7 +167,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="academic_period">Academic Period</label>
-                                    <input type="text" class="form-control" id="academic_period" name="academic_period" value="{{ $class->academic_period }}" required>
+                                    <select id="academic_period" name="academic_period">
+                                        <option value="" disabled selected>Select Academic Period</option>
+                                        <option value="1st Semester">1st Semester</option>
+                                        <option value="2nd Semester">2nd Semester</option>
+                                        <option value="Summer">Summer</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="schedule">Schedule</label>
@@ -163,6 +194,23 @@
                     </div>
                 </div>
 
+                <!-- Delete Modal for each class -->
+                <div id="deleteClassModal{{ $class->id }}" class="modal">
+                    <div class="modal-content">
+                        <h2>Delete Class</h2>
+                        <p>Are you sure you want to delete this class?</p>
+                        <p>Class ID: {{ $class->id }}</p>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" onclick="closeDeleteClassModal({{ $class->id }})">Cancel</button>
+                            <form method="POST" action="{{ route('classes.destroy', $class->id) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <script>
                     // Open the Edit Class modal
                     function openEditClassModal(classId) {
@@ -176,6 +224,16 @@
                         // Select the modal using the classId
                         var modal = document.getElementById('editClassModal' + classId);
                         modal.style.display = 'none'; // Hide the modal
+                    }
+
+                    function openDeleteClassModal(classId) {
+                        const modal = document.getElementById('deleteClassModal' + classId);
+                        modal.style.display = 'flex';
+                    }
+
+                    function closeDeleteClassModal(classId) {
+                        const modal = document.getElementById('deleteClassModal' + classId);
+                        modal.style.display = 'none';
                     }
 
                     // Close the modal when clicking outside of it
