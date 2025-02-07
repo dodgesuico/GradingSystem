@@ -83,7 +83,6 @@ class RegistrarController extends Controller
 
     public function show(Classes $class)
     {
-        $class = Classes::all();  // Fetch the class by ID
-        return view('registrar.registrar_classes_view', compact('class'));  // Return the view with class details
+        return view('registrar.registrar_classes_view', compact('class')); // Pass the single class instance
     }
 }
