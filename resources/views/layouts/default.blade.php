@@ -8,7 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('system_images/icon.png') }}">
 
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -44,16 +51,16 @@
                 <div class="nav-links">
                     <label for="" style="margin-top:20px;">DASHBOARD</label>
                     <a href="{{ route('registrar') }}" class="{{ Request::is('registrar_dashboard') ? 'active' : '' }}">
-                        
+
                         <i class="fa-solid fa-house"></i> Home
                     </a>
                     <label for="" style="margin-top:20px;">OPERATION</label>
-                 
+
                     <a href="{{ route('registrar_classes') }}" class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
-                    <i class="fa-solid fa-clipboard"></i> Classes
+                        <i class="fa-solid fa-clipboard"></i> Classes
                     </a>
                 </div>
-               
+
 
 
             </div>
