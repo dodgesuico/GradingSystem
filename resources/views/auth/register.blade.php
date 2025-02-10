@@ -15,6 +15,7 @@
         <h2>Register</h2>
 
         <form action="{{ route('register.post') }}" method="POST">
+            
             @csrf
 
             <!-- Email Input -->
