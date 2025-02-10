@@ -24,8 +24,8 @@ Route::view("/index",  [IndexController::class, "index"])->name("index");
 Route::get("/index", [AdminController::class, "index"])->name('admin');
 
 // for registrar
-Route::get("/index", [RegistrarController::class, "index"])->name('registrar');
-Route::get("/index", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
+Route::get("/registrar_dashboard", [RegistrarController::class, "index"])->name('registrar');
+Route::get("/registrar_classes", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
 Route::post("/index", [RegistrarController::class, "CreateClass"])->name('classes.create');
 Route::put("/index/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
 Route::delete("/index/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
@@ -61,6 +61,7 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login')->with('success', 'You have been logged out successfully.');
 })->name('logout');
+
 
 
 

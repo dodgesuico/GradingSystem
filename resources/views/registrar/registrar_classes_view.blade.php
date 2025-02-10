@@ -1,4 +1,4 @@
-@extends("layouts.registrar")
+@extends("layouts.default")
 
 <title>@yield("title", "CKCM Grading | View Class Details")</title>
 
