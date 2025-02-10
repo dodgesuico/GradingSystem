@@ -1,5 +1,5 @@
-@extends("layouts.registrar")
-<title>@yield("title", "CKCM Grading | Registrar Classes")</title>
+@extends("layouts.default")
+
 @section("content")
 
 <div class="dashboard">
