@@ -6,7 +6,7 @@
 
 
     <div class="classes-header">
-        <input type="text" id="searchInput" placeholder="🔎 Search...">
+        <input type="text" id="searchInput" class="search" placeholder="🔎 Quick Search...">
         <button class="add-btn" id="openModal"><i class="fa-solid fa-plus"></i> Add Classes</button>
 
     </div>
@@ -75,10 +75,12 @@
             <td>{{ $class->instructor }}</td>
             <td>{{ $class->academic_period }}</td>
             <td>{{ $class->schedule }}</td>
-            <td>{{ $class->status }}</td>
+
+            <td class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
+
             <td style="text-align:center">
                 <!-- Edit Button -->
-                <a href="{{ route('class.show', $class->id) }}">View Class</a> |
+                <a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a> |
                 <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
                 <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
             </td>
@@ -117,141 +119,9 @@
 
 
 
-<style>
-    .message-container {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        width: 100%;
-    }
-
-    .message-container .alert {
-        font-size: 1.2rem;
-    }
-
-    .alert-success {
-        color: var(--color-green);
-    }
-
-    .alert-danger {
-        color: var(--color-red);
-    }
-</style>
-
-
-<style>
-    .classes-header input {
-        padding: 7px;
-        background-color: var(--ckcm-color2);
-        width: 200px;
-        color: var(--color1);
-        border: 1px solid var(--color6);
-        outline: none;
-        /* Removes default focus outline */
-        transition: border 0.3s ease-in-out;
-        border-radius: 5px;
-    }
-
-    .classes-header input:focus {
-        border: 1px solid var(--ckcm-color1);
-        box-shadow: 0 0 5px var(--color-blue);
-    }
-
-    .add-btn {
-        background-color: transparent;
-    }
-</style>
-
-
-<!-- style for add class -->
-<style>
-    /* Modal Background */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.6);
-    }
-
-    /* Modal Content */
-    .modal-content {
-        height: fit-content;
-        border: 1px solid var(--color5);
-        background-color: var(--ckcm-color1);
-        margin: 10% auto;
-        padding: 20px;
-        border-radius: 10px;
-        width: 30%;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-header {
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-
-    .modal-header h2 {
-        color: var(--color1);
-    }
-
-    .modal-header,
-    .modal-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
 
 
 
-    .info-container {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        margin-top: 5px;
-    }
-
-    .info-container label {
-        color: var(--color3);
-        font-size: 1.2rem;
-    }
-
-    .info-container label em {
-        color: var(--color4);
-        font-size: 1rem;
-    }
-
-    .info-container input,
-    .info-container select {
-        padding: 5px;
-        background-color: var(--color1);
-        border-radius: 5px;
-        border: 1px solid var(--color6);
-    }
-
-    .modal-footer {
-        text-align: right;
-        margin-top: 10px;
-    }
-
-    .modal-add-btn:hover {
-        background-color: var(--color-blue);
-    }
-
-    .close-btn .close {
-        background: #f44336;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-</style>
 
 
 
@@ -292,7 +162,7 @@
 
     .add-btn:hover {
         background: transparent;
-        text-decoration: underline;
+
     }
 
     .dashboard {

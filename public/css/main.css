@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
 
-   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 
 }
 
@@ -13,8 +13,8 @@
 
     font-style: normal;
     font-variation-settings:
-      "wdth" 100;
-  }
+        "wdth" 100;
+}
 
 
 :root {
@@ -22,11 +22,11 @@
 
     /* basic color with modification */
     --color-red: #f44336;
-    --color-red-hover:#d32f2f;
+    --color-red-hover: #d32f2f;
     --color-blue: #023e8a;
     --color-green: #4CAF50;
     --color-green-hover: #45a049;
-
+    --hover-background-color: rgba(255, 255, 255, 0.16);
     /* color palette */
 
     --color1: #F8F9FA;
@@ -48,7 +48,7 @@
     --ckcm-color4: #C7570C;
 
 
-    
+
 }
 
 
@@ -91,12 +91,12 @@ button:hover {
 }
 
 
-button i{
+button i {
     margin-right: 2px;
 }
 
 
-h1{
+h1 {
     font-family: "Roboto", serif;
 }
 
@@ -123,47 +123,220 @@ thead th {
 
 tbody td {
     border: 1px solid var(--color7);
-    padding: 5px;
+    padding: 10px;
     color: var(--color1);
     background-color: var(--ckcm-color1);
     font-size: 1.1rem;
-  
+
 }
 
 tr:nth-child(odd) {
     background-color: var(--ckcm-color2);
 }
 
+
+/* status color */
+.status.active {
+    color: green;
+    font-weight: bold;
+}
+
+.status.ended {
+    color: gray;
+    font-weight: bold;
+}
+
+.status.dropped {
+    color: red;
+    font-weight: bold;
+}
+
+
+/* message */
+.message-container {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+}
+
+.message-container .alert {
+    font-size: 1.2rem;
+}
+
+.alert-success {
+    color: var(--color-green);
+}
+
+.alert-danger {
+    color: var(--color-red);
+}
+
+
+
+
+
+
+
+
 .edit-btn,
 .delete-btn {
-    padding: 8px 12px;
     border: none;
-    border-radius: 5px;
+    background-color: transparent;
     cursor: pointer;
     font-size: 1rem;
+    padding: none;
+}
+
+
+.view-btn {
+    color: var(--color1);
+    text-decoration: none;
+}
+
+.view-btn:hover {
+    color: var(--ckcm-color3);
+    background-color: transparent;
 }
 
 .add-btn {
-    background-color: var(--color-blue);
     color: white;
+    border: none;
 }
 
+.add-btn:hover {
+    color: var(--ckcm-color3);
+    background-color: transparent;
+}
 
 
 .edit-btn {
-    background-color: var(--color-green);
     color: white;
+
 }
 
 .edit-btn:hover {
-    background-color: var(--color-green-hover);
+    color: var(--color-green);
+    background-color: transparent;
 }
 
 .delete-btn {
-    background-color: var(--color-red);
     color: white;
 }
 
 .delete-btn:hover {
-    background-color: var(--color-red-hover);
+    color: var(--color-red);
+    background-color: transparent;
+}
+
+.search {
+    padding: 7px;
+    background-color: var(--ckcm-color2);
+    width: 200px;
+    color: var(--color1);
+    border: 1px solid var(--color6);
+    /* Removes default focus outline */
+    transition: border 0.3s ease-in-out;
+    border-radius: 5px;
+}
+
+.search:focus {
+    outline: 1px solid var(--color-blue);
+}
+
+
+
+
+
+
+
+
+
+
+/* Modal Background */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Modal Content */
+.modal-content {
+    height: fit-content;
+    border: 1px solid var(--color5);
+    background-color: var(--ckcm-color1);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 30%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    color: var(--color1);
+}
+
+.modal-header,
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.info-container label {
+    color: var(--color3);
+    font-size: 1.2rem;
+}
+
+.info-container label em {
+    color: var(--color4);
+    font-size: 1rem;
+}
+
+.info-container input,
+.info-container select {
+    padding: 5px;
+    background-color: var(--ckcm-color2);
+    border-radius: 5px;
+    border: 1px solid var(--ckcm-color2);
+    color: var(--color1);
+}
+
+.modal-footer {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.modal-add-btn:hover {
+    background-color: var(--color-blue);
+}
+
+.close-btn .close {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
 }
