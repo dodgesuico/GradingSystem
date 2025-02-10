@@ -127,7 +127,7 @@
         padding: 150px 20px 0 20px;
         width: 350px;
         background-color: var(--ckcm-color1);
-        border: 1px solid var(--ckcm-color2);
+        border: 1px solid var(--ckcm-color2 );
     }
 
     .login-box img {

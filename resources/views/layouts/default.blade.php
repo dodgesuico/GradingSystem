@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="nav-links">
-                    <label for="" style="margin-top:20px;">DASHBOARD</label>
+                    <label for="" >DASHBOARD</label>
                     <a href="{{ route('registrar') }}" class="{{ Request::is('registrar_dashboard') ? 'active' : '' }}">
 
                         <i class="fa-solid fa-house"></i> Home
@@ -148,18 +148,19 @@
         /* Logout dropdown */
         .logout-container {
             position: absolute;
-            top: 100%;
+            top: 110%;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--ckcm-color2);
-            width: 90%;
+            background: var(--ckcm-color1);
+            width: 100%;
             text-align: center;
-            padding: 10px;
+            
+            border-radius: 5px;
             opacity: 0;
             visibility: hidden;
             transform-origin: top center;
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            border-bottom: 1px solid var(--color7);
+            border: 1px solid var(--color6);
         }
 
         .logout-container.show {
@@ -171,6 +172,7 @@
         .logout-btn {
             background: var(--ckcm-color1);
             color: white;
+       
             padding: 10px;
             border: none;
             border-radius: 5px;
@@ -181,7 +183,7 @@
         }
 
         .logout-btn:hover {
-            background: var(--color9);
+            background: var(--hover-background-color);
         }
     </style>
 
@@ -281,21 +283,23 @@
             cursor: pointer;
             position: relative;
             gap: 10px;
-            padding: 10px;
+            margin: 0 10px;
             transition: background 0.3s ease-in-out;
             display: flex;
             flex-direction: row;
-            padding: 20px;
+            padding: 10px;
             gap: 10px;
-            justify-content: left;
+            justify-content: space-between;
             align-items: center;
             background-color: var(--ckcm-color1);
             border-left: 0;
             border-right: 0;
+            border-radius: 5px;
+            border: 1px solid var(--color6);
         }
 
         .nav-profile:hover {
-            background: var(--color9);
+            background-color: var(--hover-background-color);
         }
 
         .nav-profile img {
@@ -313,7 +317,7 @@
             color: var(--color1);
             font-size: 1.2rem;
             font-weight: bold;
-            text-transform: uppercase;
+            text-transform: capitalize;
         }
 
         .profile p {
@@ -347,12 +351,13 @@
 
         .nav-links a:hover {
             color: var(--color1);
-            background-color: var(--ckcm-color1);
+            background-color: var(--hover-background-color);
         }
 
         .nav-links a.active {
             color: var(--color1);
             background-color: var(--ckcm-color1);
+            border: 1px solid var(--color6);
         }
 
         .nav-links i {
