@@ -26,11 +26,11 @@ Route::get("/index", [AdminController::class, "index"])->name('admin');
 // for registrar
 Route::get("/registrar_dashboard", [RegistrarController::class, "index"])->name('registrar');
 Route::get("/registrar_classes", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
-Route::post("/index", [RegistrarController::class, "CreateClass"])->name('classes.create');
-Route::put("/index/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
-Route::delete("/index/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
-Route::get('/index/{class}', [RegistrarController::class, 'show'])->name('class.show');
-
+Route::post("/registrar_classes", [RegistrarController::class, "CreateClass"])->name('classes.create');
+Route::put("/registrar_dashboard/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
+Route::delete("/registrar_dashboard/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
+Route::get('/registrar_dashboard_view/{class}', [RegistrarController::class, 'show'])->name('class.show');
+Route::post('/registrar_dashboard_view/{class}', [RegistrarController::class, 'addstudent'])->name('class.addstudent');
 
 // for dean
 Route::get("/dean_dashboard", [DeanController::class, "index"])->name('dean');
@@ -45,13 +45,6 @@ Route::get("/login", [AuthController::class, "login"])->name('login');
 
 // for register
 Route::get("/register", [AuthController::class, 'register'])->name('register');
-
-
-
-
-
-
-
 
 
 

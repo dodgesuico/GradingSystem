@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
-            $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
+            $table->string('subject_code');
+            $table->string('descriptive_title');
+            $table->string('instructor');
+            $table->string('academic_period');
+            $table->string('schedule');
+            $table->string('status');
             $table->timestamps();
         });
     }
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classes');
+        //
     }
 };
