@@ -19,11 +19,11 @@ return new class extends Migration
         });
 
         DB::table('departments')->insert([
-            ['name' => 'College of Arts and Social Sciences', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'College of Business Administration', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'College of Computer Science', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'College of Criminology', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'College of Education', 'created_at' => now(), 'updated_at' => now()],
+            ['department_name' => 'College of Arts and Social Sciences', 'created_at' => now(), 'updated_at' => now()],
+            ['department_name' => 'College of Business Administration', 'created_at' => now(), 'updated_at' => now()],
+            ['department_name' => 'College of Computer Science', 'created_at' => now(), 'updated_at' => now()],
+            ['department_name' => 'College of Criminology', 'created_at' => now(), 'updated_at' => now()],
+            ['department_name' => 'College of Education', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 

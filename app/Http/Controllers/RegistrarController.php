@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classes_Student;
 use App\Models\Classes;
 use App\Models\User;
 use Illuminate\Http\Request;
+
 
 class RegistrarController extends Controller
 {
@@ -83,6 +85,34 @@ class RegistrarController extends Controller
 
     public function show(Classes $class)
     {
-        return view('registrar.registrar_classes_view', compact('class')); // Pass the single class instance
+        $students = User::where('role', 'student')->get();  // Fetch all student users
+        $classes_student = Classes_Student::All();  // Fetch students for this class only
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student'));
     }
+
+    public function addstudent(Request $request, Classes $class)
+    {
+        $request->validate([
+            "student_id" => "required",
+            "name" => "required",
+            "email" => "required|email",
+            "department" => "required",
+        ]);
+
+        // Create a new instance of Classes_Student and assign the values
+        $classStudent = new Classes_Student();
+        $classStudent->classId = $class->id;  // Use the existing class ID
+        $classStudent->studentID = $request->student_id;
+        $classStudent->name = $request->name;
+        $classStudent->email = $request->email;
+        $classStudent->department = $request->department;
+
+        // Save the instance of Classes_Student
+        if ($classStudent->save()) {
+            return redirect()->route("class.show", $class->id)->with("success", "Student added successfully.");
+        }
+
+        return redirect()->route("class.show",$class->id)->with("error", "Failed to add student. Please try again.");
+    }
+
 }
