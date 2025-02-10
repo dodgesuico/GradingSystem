@@ -7,6 +7,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DeanController;
 use App\Http\Controllers\RegistrarController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ForgotPasswordController;
 
 
@@ -14,30 +15,21 @@ use App\Http\Controllers\ForgotPasswordController;
 Route::middleware("auth")->group(function () {
     Route::view("/", "index")->name("index");
 });
+
 // for users
-Route::view("/", "index")->name("index");
-
-
-
-
-
-
+Route::view("/index",  [IndexController::class, "index"])->name("index");
 
 
 // for admin
-Route::get("/admin_dashboard", [AdminController::class, "index"])->name('admin');
+Route::get("/index", [AdminController::class, "index"])->name('admin');
 
 // for registrar
-Route::get("/registrar_dashboard", [RegistrarController::class, "index"])->name('registrar');
-Route::get("/registrar_classes", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
-Route::post("/registrar_classes", [RegistrarController::class, "CreateClass"])->name('classes.create');
-Route::put("/registrar_dashboard/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
-Route::delete("/registrar_dashboard/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
-Route::get('/registrar_classes_view/{class}', [RegistrarController::class, 'show'])->name('class.show');
-Route::post('/class/{class}/add-student', [RegistrarController::class, 'addStudent'])->name('class.addStudent');
-Route::delete('/class/{class}/remove-student/{student}', [RegistrarController::class, 'removeStudent'])->name('class.removeStudent');
-
-
+Route::get("/index", [RegistrarController::class, "index"])->name('registrar');
+Route::get("/index", [RegistrarController::class, "registrar_classes"])->name('registrar_classes');
+Route::post("/index", [RegistrarController::class, "CreateClass"])->name('classes.create');
+Route::put("/index/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
+Route::delete("/index/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
+Route::get('/index/{class}', [RegistrarController::class, 'show'])->name('class.show');
 
 
 // for dean

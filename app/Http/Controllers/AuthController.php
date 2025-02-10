@@ -14,12 +14,6 @@ class AuthController extends Controller
         return view("auth.login");
     }
 
-    public function register()
-    {
-        $departments = Department::all(); // Fetch all departments from the departments table
-        return view('auth.register', compact('departments')); // Pass the departments to the register view
-    }
-
     function LoginPost(Request $request)
     {
         $request->validate([
@@ -41,28 +35,17 @@ class AuthController extends Controller
         
         // Attempt to log in
         if (Auth::attempt($request->only('email', 'password'))) {
-            if ($user->role === 'instructor') {
-                return redirect(route('instructor'))->with('success', 'Welcome, Instructor!');
-            }
-
-            if ($user->role === 'registrar') {
-                return redirect(route('registrar'))->with('success', 'Welcome, Registrar!');
-            }
-
-            if ($user->role === 'dean') {
-                return redirect(route('dean'))->with('success', 'Welcome, Registrar!');
-            }
-
-            if ($user->role === 'admin') {
-                return redirect(route('admin'))->with('success', 'Welcome, Registrar!');
-            }
-        
-        
             return redirect(route('index'))->with('success', 'Login Success');
         }
         
         return redirect(route('login'))->withErrors(['error' => 'Login failed. Please try again.']);
       
+    }
+
+    public function register()
+    {
+        $departments = Department::all(); // Fetch all departments from the departments table
+        return view('auth.register', compact('departments')); // Pass the departments to the register view
     }
 
     function RegisterPost(Request $request)
