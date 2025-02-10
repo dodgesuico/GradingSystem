@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
-            $table->integer('subject_code');
+            $table->string('subject_code');
             $table->string('descriptive_title');
             $table->string('instructor');
             $table->string('academic_period');
-            $table->timestamp('schedule')->nullable();
+            $table->string('schedule');
             $table->string('status');
             $table->timestamps();
         });

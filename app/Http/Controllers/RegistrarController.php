@@ -85,8 +85,14 @@ class RegistrarController extends Controller
 
     public function show(Classes $class)
     {
-        $students = User::where('role', 'student')->get();  // Fetch all student users
-        $classes_student = Classes_Student::All();  // Fetch students for this class only
+        // Get all student IDs already in the class
+        $enrolledStudentIds = Classes_Student::where('classId', $class->id)->pluck('studentID')->toArray();
+
+        // Get students who are not already enrolled in the class
+        $students = User::where('role', 'student')->whereNotIn('id', $enrolledStudentIds)->get();
+
+        $classes_student = Classes_Student::where('classId', $class->id)->get();
+
         return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student'));
     }
 
