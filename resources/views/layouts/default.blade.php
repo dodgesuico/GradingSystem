@@ -74,7 +74,7 @@
         </div>
 
         <div class="main-content">
-            <div class="content-header">
+            <div class="content-header" style="position: sticky; top: 0; z-index: 100;">
                 <i id="fullscreen-icon" class="fa-solid fa-expand" title="Expand"></i>
             </div>
 
