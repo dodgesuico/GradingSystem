@@ -1,8 +1,3 @@
-@extends("layouts.auth_default")
-
-
-@section("content")
-
 
 <head>
     <title>Register</title>
@@ -105,6 +100,6 @@
 
     </div>
 </div>
-@endsection
+
 
 

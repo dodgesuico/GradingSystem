@@ -12,10 +12,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('system_images/icon.png') }}">
 
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
@@ -258,23 +258,7 @@
 
         }
 
-        .gradient-text {
-            font-weight: bold;
-            /* Makes the text bold */
-            font-size: 1.6rem;
-            /* Adjust size as needed */
-            background: linear-gradient(90deg, var(--ckcm-color4), var(--ckcm-color3), var(--ckcm-color3));
-            /* Red → Green → Blue */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-
-        .gradient-text em {
-            -webkit-text-fill-color: var(--color4);
-            font-weight: 100;
-            font-size: 1.1rem;
-        }
+      
 
 
 
