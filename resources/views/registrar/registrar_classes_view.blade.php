@@ -47,10 +47,6 @@
     </div>
 
 
-
-
-
-
     <script>
         function openAddStudentModal() {
             document.getElementById('addStudentModal').style.display = 'block';
@@ -164,7 +160,7 @@
                         <div class="modal-footer">
                             <button class="btn-cancel" onclick="closeDeleteClassModal({{ $classes_students->id }})">Cancel</button>
 
-                            <form method="POST" action="{{ route('class.removestudent', ['class' => $class->id, 'student' => $classes_students->studentID]) }}">
+                            <form method="POST" action="{{ route('class.removestudent', ['class' => $class->id, 'student' => $classes_students->studentID, 'quizzesscores' => $classes_students->studentID]) }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="delete-btn disabled-btn" id="deleteBtn{{ $classes_students->id }}" disabled>
@@ -306,6 +302,47 @@
 </div>
 
 
+    <div class="container">
+        @if ($quizzesandscores->isEmpty())
+        <p style="color:gray">No students have been added to this class yet.</p>
+        @else
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <!-- <th>ID</th> -->
+                    <th>Class ID</th>
+                    <th>Student ID</th>
+                    <th>Quizzes</th>
+                    <th>Attendace/Behavior</th>
+                    <th>Assignments/Participations/Project</th>
+                    <th>Exam</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($quizzesandscores as $quizzesandscore)
+                    @php
+                        $student = $classes_student->firstWhere('studentID', $quizzesandscore->studentID);
+                    @endphp
+                <tr>
+                    <!-- <td>{{ $classes_students->id }}</td> -->
+                    <td>{{ $quizzesandscore->classID }}</td>
+                    <td>{{ $student ? $student->name : 'N/A' }}</td>
+                    <td>{{ $quizzesandscore->quizzes }}</td>
+                    <td>{{ $quizzesandscore->attendance_behavior }}</td>
+                    <td>{{ $classes_students->assignments_participations_project }}</td>
+                    <td>{{ $classes_students->exam }}</td>
+                    <td style="text-align:center;">
+                        <a href="" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Student </a> |
+                        <button href="" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
+                        <button class="delete-btn" onclick="openDeleteClassModal({{ $classes_students->id }})"><i class="fa-solid fa-trash"></i>Remove</button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
+    </div>
 
 @endsection
 

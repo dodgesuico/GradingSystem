@@ -31,7 +31,7 @@ Route::put("/registrar_dashboard/{class}", [RegistrarController::class, "EditCla
 Route::delete("/registrar_dashboard/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
 Route::get('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'show'])->name('class.show');
 Route::post('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'addstudent'])->name('class.addstudent');
-Route::delete('/registrar_dashboard_view/class={class}/student={student}', [RegistrarController::class, 'removestudent'])->name('class.removestudent');
+Route::delete('/registrar_dashboard_view/class={class}/student={student}/quizzesscores={quizzesscores}', [RegistrarController::class, 'removestudent'])->name('class.removestudent');
 
 
 // for dean
