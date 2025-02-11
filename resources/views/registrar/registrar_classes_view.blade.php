@@ -139,13 +139,41 @@
                     <td style="text-align:center;">
                         <a href="" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Student </a> |
                         <button href="" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
-                        <form action="" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this student?')"><i class="fa-solid fa-trash"></i>Delete</button>
-                        </form>
+                        <button class="delete-btn" onclick="openDeleteClassModal({{ $classes_students->id }})"><i class="fa-solid fa-trash"></i>Remove</button>
                     </td>
                 </tr>
+
+
+                <!-- Delete Modal for each student -->
+                <div id="deleteClassModal{{ $classes_students->id }}" class="modal">
+                    <div class="modal-content">
+                        <h2 style="color:var(--color1); text-align:center;margin-bottom:1.5rem;">Remove Student</h2>
+                        <p style="color:var(--color-red);font-size:1.5rem; text-align:center;">
+                            Are you sure you want to remove this student?
+                        </p>
+                        <p style="color:var(--color5);font-size:1.2rem; text-align:center;">
+                            Student Name: {{ $classes_students->name }}
+                        </p>
+
+                        <!-- Checkbox to confirm deletion -->
+                        <div style="display:flex;justify-content:center; text-align:center; margin: 10px 0; align-items:center; gap:10px;">
+                            <input type="checkbox" id="confirmDelete{{ $classes_students->id }}" onchange="toggleDeleteButton({{ $classes_students->id }})">
+                            <label style="color:var(--color6);" for="confirmDelete{{ $classes_students->id }}">I am sure to delete this</label>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn-cancel" onclick="closeDeleteClassModal({{ $classes_students->id }})">Cancel</button>
+
+                            <form method="POST" action="{{ route('class.removestudent', ['class' => $class->id, 'student' => $classes_students->studentID]) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="delete-btn disabled-btn" id="deleteBtn{{ $classes_students->id }}" disabled>
+                                    <i class="fa-solid fa-trash"></i> Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 @endforeach
             </tbody>
         </table>
@@ -156,13 +184,70 @@
 
 
 
+        <!-- JavaScript to enable/disable delete button -->
+        <script>
+            function toggleDeleteButton(classId) {
+                const checkbox = document.getElementById("confirmDelete" + classId);
+                const deleteBtn = document.getElementById("deleteBtn" + classId);
 
+                if (checkbox.checked) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.classList.remove("disabled-btn");
+                } else {
+                    deleteBtn.disabled = true;
+                    deleteBtn.classList.add("disabled-btn");
+                }
+            }
+        </script>
 
+        <!-- CSS for the disabled delete button -->
+        <style>
+            .disabled-btn {
+                background-color: #ccc !important;
+                /* Greyed out */
+                cursor: not-allowed !important;
+                /* Unclickable */
+                opacity: 0.6;
+                /* Lower visibility */
+            }
+        </style>
+        
 
+        <script>
+            // Open the Edit Class modal
+            function openEditClassModal(classId) {
+                // Select the modal using the classId
+                var modal = document.getElementById('editClassModal' + classId);
+                modal.style.display = 'flex'; // Show the modal
+            }
 
+            // Close the Edit Class modal
+            function closeEditClassModal(classId) {
+                // Select the modal using the classId
+                var modal = document.getElementById('editClassModal' + classId);
+                modal.style.display = 'none'; // Hide the modal
+            }
 
+            function openDeleteClassModal(classId) {
+                const modal = document.getElementById('deleteClassModal' + classId);
+                modal.style.display = 'flex';
+            }
 
+            function closeDeleteClassModal(classId) {
+                const modal = document.getElementById('deleteClassModal' + classId);
+                modal.style.display = 'none';
+            }
 
+            // Close the modal when clicking outside of it
+            window.onclick = function(event) {
+                var modals = document.querySelectorAll('.modal');
+                modals.forEach(function(modal) {
+                    if (event.target == modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+        </script>
 
 
 
@@ -219,6 +304,9 @@
         </form>
     </div>
 </div>
+
+
+
 @endsection
 
 

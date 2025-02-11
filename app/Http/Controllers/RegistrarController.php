@@ -121,4 +121,22 @@ class RegistrarController extends Controller
         return redirect()->route("class.show",$class->id)->with("error", "Failed to add student. Please try again.");
     }
 
+    public function removestudent(Request $request, $class, $student)
+    {
+        // Find the student in the class
+        $classStudent = Classes_Student::where('classId', $class)
+                                    ->where('studentID', $student)
+                                    ->first();
+
+        // Check if the student exists in the class
+        if ($classStudent) {
+            // Delete the student record
+            $classStudent->delete();
+            return redirect()->route("class.show", $class)->with("success", "Student removed successfully.");
+        }
+
+        return redirect()->route("class.show", $class)->with("error", "Student not found or already removed.");
+    }
+
+
 }
