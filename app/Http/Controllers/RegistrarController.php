@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QuizzesAndScores;
 use App\Models\Classes_Student;
 use App\Models\Classes;
 use App\Models\User;
@@ -93,7 +94,9 @@ class RegistrarController extends Controller
 
         $classes_student = Classes_Student::where('classId', $class->id)->get();
 
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student'));
+        $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
+
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores'));
     }
 
     public function addstudent(Request $request, Classes $class)
@@ -113,28 +116,42 @@ class RegistrarController extends Controller
         $classStudent->email = $request->email;
         $classStudent->department = $request->department;
 
+        $quizzesandscores = new QuizzesAndScores();
+        $quizzesandscores->classID = $class->id; 
+        $quizzesandscores->studentID = $request->student_id;
+
         // Save the instance of Classes_Student
-        if ($classStudent->save()) {
+        if ($classStudent->save() && $quizzesandscores->save()) {
             return redirect()->route("class.show", $class->id)->with("success", "Student added successfully.");
         }
 
         return redirect()->route("class.show",$class->id)->with("error", "Failed to add student. Please try again.");
     }
 
-    public function removestudent(Request $request, $class, $student)
+    public function removestudent(Request $request, $class, $student, $quizzesscores)
     {
         // Find the student in the class
         $classStudent = Classes_Student::where('classId', $class)
                                     ->where('studentID', $student)
                                     ->first();
 
-        // Check if the student exists in the class
-        if ($classStudent) {
-            // Delete the student record
-            $classStudent->delete();
+        $quizzesscores = QuizzesAndScores::where('classID', $class)
+                                    ->where('studentID', $student)
+                                    ->first();
+        
+                                    
+        if ($classStudent || $quizzesscores) {
+            if ($classStudent) {
+                $classStudent->delete();
+            }
+        
+            if ($quizzesscores) {
+                $quizzesscores->delete();
+            }
+        
             return redirect()->route("class.show", $class)->with("success", "Student removed successfully.");
         }
-
+        
         return redirect()->route("class.show", $class)->with("error", "Student not found or already removed.");
     }
 
