@@ -19,7 +19,7 @@
         <img src="system_images/icon.png" alt="">
         <p style="margin-bottom: 10px; color:var(--color5); font-size: 1.2rem;">Grading System | CKCM Inc. <em>v.1</em></p>
 
-        <h1>Sign in your Account</h1>
+        <h1 >Sign in your Account</h1>
         <form action="{{ route('login.post') }}" method="POST">
             @csrf
 
@@ -53,7 +53,7 @@
             <button type="submit" class="btn">Sign in</button>
 
 
-            <div class="message-container">
+            <div class="message-container" >
                 @if (session()->has("success"))
                 <div class="alert alert-success">
                     {{ session()->get("success") }}
@@ -139,8 +139,6 @@
     h1 {
         margin-bottom: 20px;
         color: var(--ckcm-color3);
-
-
 
     }
 
@@ -238,6 +236,7 @@
         font-size: 1.2rem;
         text-decoration: none;
         color: var(--color-red);
+
     }
 </style>
 
