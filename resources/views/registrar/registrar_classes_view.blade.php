@@ -188,20 +188,52 @@
         <h2 style="margin-top:20px;">Calculation</h2>
 
         <div class="calculation-base-container">
-            @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
+            @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $index => $category)
                 <div class="calculation-container">
                     <h4>{{ $category }}</h4>
-                    @foreach (['Percentage (%)' => [0, 100], 'Total Score' => [0, null]] as $label => $range)
-                        <div class="calculation-content">
-                            <label>{{ $label }}</label>
-                            <input type="number" min="{{ $range[0] }}" {{ $range[1] ? "max=$range[1]" : '' }}
-                                oninput="this.value = Math.max(this.value, 0)">
-                        </div>
-                    @endforeach
+
+                    <!-- Percentage Input -->
+                    <div class="calculation-content">
+                        <label>Percentage (%)</label>
+                        <input type="number" min="0" max="100" value="0" class="percentage-input" data-index="{{ $index }}" oninput="adjustPercentages(this)">
+                    </div>
+
+                    <!-- Total Score Input -->
+                    <div class="calculation-content">
+                        <label>Total Score</label>
+                        <input type="number" min="0" value="0" class="total-score-input">
+                    </div>
                 </div>
             @endforeach
         </div>
 
+        <p id="error-message" style="color: red; display: none;">Total percentage must equal 100%.</p>
+
+        <script>
+            function adjustPercentages(input) {
+                const percentageInputs = document.querySelectorAll('.percentage-input');
+                let totalPercentage = 0;
+
+                percentageInputs.forEach(inp => totalPercentage += parseFloat(inp.value) || 0);
+
+                const remainingPercentage = 100 - totalPercentage;
+                const errorMessage = document.getElementById('error-message');
+
+                if (remainingPercentage < 0) {
+                    input.value = parseFloat(input.value) + remainingPercentage;
+                    errorMessage.style.display = 'block';
+                } else {
+                    errorMessage.style.display = 'none';
+                }
+
+                if (remainingPercentage === 0) {
+                    percentageInputs.forEach(inp => inp.disabled = true);
+                    input.disabled = false;  // Allow current input to be changed
+                } else {
+                    percentageInputs.forEach(inp => inp.disabled = false);
+                }
+            }
+        </script>
 
 
 
