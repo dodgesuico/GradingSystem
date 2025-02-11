@@ -2,20 +2,31 @@
     margin: 0;
     padding: 0;
 
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: "Roboto Flex", serif;
 
 }
 
 
-.roboto-font {
-    font-family: "Roboto", serif;
+
+.roboto-flex-bold {
+    font-family: "Roboto Flex", serif;
     font-optical-sizing: auto;
-
+    font-weight: bold;
     font-style: normal;
+    font-size: 2.5rem;
     font-variation-settings:
-        "wdth" 100;
-}
-
+      "slnt" 0,
+      "wdth" 100,
+      "GRAD" 0,
+      "XOPQ" 96,
+      "XTRA" 468,
+      "YOPQ" 79,
+      "YTAS" 750,
+      "YTDE" -203,
+      "YTFI" 738,
+      "YTLC" 514,
+      "YTUC" 712;
+  }
 
 :root {
     font-size: 65%;
@@ -161,12 +172,25 @@ tr:nth-child(odd) {
     font-size: 1.2rem;
 }
 
+.alert {
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    text-align: center;
+
+}
+
 .alert-success {
-    color: var(--color-green);
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .alert-danger {
-    color: var(--color-red);
+    background-color: #f8d7da;
+    color: #962631;
+    border: 1px solid #f5c6cb;
 }
 
 
@@ -240,6 +264,35 @@ tr:nth-child(odd) {
 .search:focus {
     outline: 1px solid var(--color-blue);
 }
+
+
+
+
+/* for gradient text */
+.gradient-text {
+    font-weight: bold;
+    /* Makes the text bold */
+    font-size: 1.6rem;
+    /* Adjust size as needed */
+    background: linear-gradient(90deg, var(--ckcm-color4), var(--ckcm-color3), var(--ckcm-color3));
+    /* Red → Green → Blue */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.gradient-text em {
+    -webkit-text-fill-color: var(--color4);
+    font-weight: 100;
+    font-size: 1.1rem;
+}
+
+
+
+
+
+
+
 
 
 
