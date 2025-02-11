@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('system_images/icon.png') }}">
 
@@ -26,16 +26,20 @@
         <div class="nav-bar">
             <div class="teacher-nav-contents">
                 <div class="nav-header">
-                    <img src="system_images/icon.png" alt="">
+                    <img src="{{ asset('system_images/icon.png') }}" alt="">
                     <label class="gradient-text">CKCM Grading <em>v.1</em></label>
                 </div>
 
                 <!-- Profile Section with Logout Dropdown -->
                 <div class="nav-profile">
-                    <img src="system_images/profile.png" alt="">
-                    <div class="profile">
-                        <label for="">{{ Auth::user()->name ?? 'Registrar Name' }}</label>
-                        <p>ID#: {{ Auth::user()->id ?? '0000' }}</p>
+
+                    <div style="display: flex; gap:10px;">
+                        <img src="{{ asset('system_images/profile.png') }}" alt="">
+
+                        <div class="profile">
+                            <label for="">{{ Auth::user()->name ?? 'Registrar Name' }}</label>
+                            <p>ID#: {{ Auth::user()->id ?? '0000' }}</p>
+                        </div>
                     </div>
                     <i class="fa-solid fa-chevron-down"></i>
 
@@ -49,8 +53,8 @@
                 </div>
 
                 <div class="nav-links">
-                    <label for="" >DASHBOARD</label>
-                    <a href="{{ route('registrar') }}" class="{{ Request::is('registrar_dashboard') ? 'active' : '' }}">
+                    <label for="">DASHBOARD</label>
+                    <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
 
                         <i class="fa-solid fa-house"></i> Home
                     </a>
@@ -60,9 +64,6 @@
                         <i class="fa-solid fa-clipboard"></i> Classes
                     </a>
                 </div>
-
-
-
             </div>
 
             <div class="teacher-nav-footer">
@@ -154,13 +155,13 @@
             background: var(--ckcm-color1);
             width: 100%;
             text-align: center;
-            
+
             border-radius: 5px;
             opacity: 0;
             visibility: hidden;
             transform-origin: top center;
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            border: 1px solid var(--color6);
+            border: 1px solid var(--color7);
         }
 
         .logout-container.show {
@@ -172,8 +173,7 @@
         .logout-btn {
             background: var(--ckcm-color1);
             color: white;
-       
-            padding: 10px;
+            padding: 5px 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -295,7 +295,7 @@
             border-left: 0;
             border-right: 0;
             border-radius: 5px;
-            border: 1px solid var(--color6);
+            /* border: 1px solid var(--color6); */
         }
 
         .nav-profile:hover {
@@ -357,7 +357,7 @@
         .nav-links a.active {
             color: var(--color1);
             background-color: var(--ckcm-color1);
-            border: 1px solid var(--color6);
+            /* border: 1px solid var(--color6); */
         }
 
         .nav-links i {

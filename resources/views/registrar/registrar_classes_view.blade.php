@@ -44,7 +44,6 @@
 
     <div class="search-container">
         <input type="text" class="search" name="" id="" placeholder="🔎 Quick Search...">
-
     </div>
 
 

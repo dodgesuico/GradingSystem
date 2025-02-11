@@ -4,10 +4,22 @@
 
 <div class="dashboard">
 
+    <div class="header-container">
+
+        <h1>Classes</h1>
+    </div>
+
+    <style>
+        .header-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+    </style>
 
     <div class="classes-header">
         <input type="text" id="searchInput" class="search" placeholder="🔎 Quick Search...">
-        <button class="add-btn" id="openModal"><i class="fa-solid fa-plus"></i> Add Classes</button>
+       
 
     </div>
 
@@ -50,6 +62,10 @@
         @endif
     </div>
 
+    <div style="display:flex; flex-direction:row; justify-content:space-between;width:100%;">
+        <h2 style="margin:10px 0; ">Class List</h2>
+        <button class="add-btn" id="openModal"><i class="fa-solid fa-plus"></i> Add Classes</button>
+    </div>
 
 
     <!-- table -->
@@ -171,7 +187,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        gap: 10px;
+   
 
     }
 
@@ -180,6 +196,6 @@
     }
 
     .dashboard h2 {
-        color: var(--color6);
+        color: var(--color5);
     }
 </style>

@@ -96,12 +96,9 @@ button i {
 }
 
 
-h1 {
-    font-family: "Roboto", serif;
+h1{
+   
 }
-
-
-
 
 table {
     border: 1px solid var(--color8);
