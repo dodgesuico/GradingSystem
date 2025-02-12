@@ -57,6 +57,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'show'])->name('class.show');
     Route::post('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'addstudent'])->name('class.addstudent');
     Route::delete('/registrar_dashboard_view/class={class}/student={student}/quizzesscores={quizzesscores}', [RegistrarController::class, 'removestudent'])->name('class.removestudent');
+    Route::put('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'addPercentageAndScores'])->name('class.addPercentageAndScores');
+
 
     // Dean
     Route::get("/dean_dashboard", [DeanController::class, "index"])->name('dean');

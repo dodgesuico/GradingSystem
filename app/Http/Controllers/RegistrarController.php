@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Percentage;
 use App\Models\QuizzesAndScores;
 use App\Models\Classes_Student;
 use App\Models\Classes;
@@ -96,7 +97,10 @@ class RegistrarController extends Controller
 
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
 
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores'));
+        $percentage = Percentage::where('classID', $class->id)->first();
+
+
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
     }
 
     public function addstudent(Request $request, Classes $class)
@@ -117,7 +121,7 @@ class RegistrarController extends Controller
         $classStudent->department = $request->department;
 
         $quizzesandscores = new QuizzesAndScores();
-        $quizzesandscores->classID = $class->id; 
+        $quizzesandscores->classID = $class->id;
         $quizzesandscores->studentID = $request->student_id;
 
         // Save the instance of Classes_Student
@@ -128,7 +132,7 @@ class RegistrarController extends Controller
         return redirect()->route("class.show",$class->id)->with("error", "Failed to add student. Please try again.");
     }
 
-    public function removestudent(Request $request, $class, $student, $quizzesscores)
+    public function removestudent($class, $student, $quizzesscores)
     {
         // Find the student in the class
         $classStudent = Classes_Student::where('classId', $class)
@@ -138,22 +142,66 @@ class RegistrarController extends Controller
         $quizzesscores = QuizzesAndScores::where('classID', $class)
                                     ->where('studentID', $student)
                                     ->first();
-        
-                                    
+
+
         if ($classStudent || $quizzesscores) {
             if ($classStudent) {
                 $classStudent->delete();
             }
-        
+
             if ($quizzesscores) {
                 $quizzesscores->delete();
             }
-        
+
             return redirect()->route("class.show", $class)->with("success", "Student removed successfully.");
         }
-        
+
         return redirect()->route("class.show", $class)->with("error", "Student not found or already removed.");
     }
 
+    public function addPercentageAndScores(Request $request, Classes $class)
+    {
+            // Validate the request
+        $request->validate([
+            'quiz_percentage' => 'required|integer|min:0|max:100',
+            'quiz_total_score' => 'nullable|integer|min:0',
+            'attendance_percentage' => 'required|integer|min:0|max:100',
+            'attendance_total_score' => 'nullable|integer|min:0',
+            'assignment_participation_project_percentage' => 'required|integer|min:0|max:100',
+            'assignment_participation_project_total_score' => 'nullable|integer|min:0',
+            'exam_percentage' => 'required|integer|min:0|max:100',
+            'exam_total_score' => 'nullable|integer|min:0',
+        ]);
 
+        // Calculate the total percentage
+        $totalPercentage = $request->input('quiz_percentage') +
+                        $request->input('attendance_percentage') +
+                        $request->input('assignment_participation_project_percentage') +
+                        $request->input('exam_percentage');
+
+        // Check if total percentage is exactly 100
+        if ($totalPercentage !== 100) {
+            return redirect()->route("class.show", $class)
+                            ->withErrors(['The total percentage must equal 100%.']);
+        }
+
+        // Save or update the record in your `percentage` table
+        Percentage::updateOrCreate(
+            ['classID' => $class->id], // Condition to check if it already exists for this class
+            [
+                'classID' => $class->id,  // Ensure classID is set in case a new record is created
+                'quiz_percentage' => $request->input('quiz_percentage'),
+                'quiz_total_score' => $request->input('quiz_total_score'),
+                'attendance_percentage' => $request->input('attendance_percentage'),
+                'attendance_total_score' => $request->input('attendance_total_score'),
+                'assignment_participation_project_percentage' => $request->input('assignment_participation_project_percentage'),
+                'assignment_participation_project_total_score' => $request->input('assignment_participation_project_total_score'),
+                'exam_percentage' => $request->input('exam_percentage'),
+                'exam_total_score' => $request->input('exam_total_score'),
+            ]
+        );
+
+
+        return redirect()->route("class.show", $class)->with('success', 'Data saved successfully.');
+    }
 }

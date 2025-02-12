@@ -78,28 +78,28 @@
 
 
         <div class="message-container">
-            @if (session()->has('success'))
-                <div class="alert alert-success">
-                    {{ session()->get('success') }}
-                </div>
-            @endif
-
-            @if (session()->has('error'))
-                <div class="alert alert-danger">
-                    {{ session()->get('error') }}
-                </div>
-            @endif
-
-            @if ($errors->any())
+            @if ($errors->percentageForm->any())
                 <div class="alert alert-danger">
                     <ul>
-                        @foreach ($errors->all() as $error)
+                        @foreach ($errors->percentageForm->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if ($errors->studentForm->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->studentForm->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
         </div>
+
+
 
 
         <div style="display:flex; flex-direction:row; justify-content:space-between">
@@ -187,56 +187,33 @@
 
         <h2 style="margin-top:20px;">Calculation</h2>
 
-        <div class="calculation-base-container">
-            @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $index => $category)
-                <div class="calculation-container">
-                    <h4>{{ $category }}</h4>
+        <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
+            @csrf
+            @method("PUT")
+            <div class="calculation-base-container">
+                @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment_participation_project' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
+                    <div class="calculation-container">
+                        <h4>{{ $category }}</h4>
 
-                    <!-- Percentage Input -->
-                    <div class="calculation-content">
-                        <label>Percentage (%)</label>
-                        <input type="number" min="0" max="100" value="0" class="percentage-input" data-index="{{ $index }}" oninput="adjustPercentages(this)">
+                        <!-- Percentage Input -->
+                        <div class="calculation-content">
+                            <label>Percentage (%)</label>
+                            <input type="number" name="{{ $key }}_percentage" min="0" max="100" value="{{ old($key . '_percentage', $percentage->{$key . '_percentage'} ?? 0) }}" required>
+                        </div>
+
+                        <!-- Total Score Input -->
+                        <div class="calculation-content">
+                            <label>Total Score</label>
+                            <input type="number" name="{{ $key }}_total_score" min="0" value="{{ old($key . '_total_score', $percentage->{$key . '_total_score'} ?? 0) }}">
+                        </div>
                     </div>
+                @endforeach
+            </div>
 
-                    <!-- Total Score Input -->
-                    <div class="calculation-content">
-                        <label>Total Score</label>
-                        <input type="number" min="0" value="0" class="total-score-input">
-                    </div>
-                </div>
-            @endforeach
-        </div>
-
-        <p id="error-message" style="color: red; display: none;">Total percentage must equal 100%.</p>
-
-        <script>
-            function adjustPercentages(input) {
-                const percentageInputs = document.querySelectorAll('.percentage-input');
-                let totalPercentage = 0;
-
-                percentageInputs.forEach(inp => totalPercentage += parseFloat(inp.value) || 0);
-
-                const remainingPercentage = 100 - totalPercentage;
-                const errorMessage = document.getElementById('error-message');
-
-                if (remainingPercentage < 0) {
-                    input.value = parseFloat(input.value) + remainingPercentage;
-                    errorMessage.style.display = 'block';
-                } else {
-                    errorMessage.style.display = 'none';
-                }
-
-                if (remainingPercentage === 0) {
-                    percentageInputs.forEach(inp => inp.disabled = true);
-                    input.disabled = false;  // Allow current input to be changed
-                } else {
-                    percentageInputs.forEach(inp => inp.disabled = false);
-                }
-            }
-        </script>
-
-
-
+            <div style="margin-top: 10px; display: flex; width: 100%; justify-content: right;">
+                <button type="submit">Update</button>
+            </div>
+        </form>
 
 
 
