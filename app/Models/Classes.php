@@ -18,9 +18,4 @@ class Classes extends Model
         'Instructor',
     ];
 
-    // You can also define relationships if needed (optional)
-    public function students()
-    {
-        return $this->hasMany(Student::class);
-    }
 }

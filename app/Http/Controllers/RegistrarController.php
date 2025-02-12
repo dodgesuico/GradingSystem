@@ -21,7 +21,7 @@ class RegistrarController extends Controller
     {
         $classes = Classes::all();
         $instructors = User::where('role', 'instructor')->get(); // Fetch all class data
-        return view("registrar.registrar_classes", compact('classes'), compact('instructors'));
+        return view('registrar.registrar_classes', compact('classes', 'instructors'));
     }
 
     public function CreateClass(Request $request)
@@ -204,4 +204,6 @@ class RegistrarController extends Controller
 
         return redirect()->route("class.show", $class)->with('success', 'Data saved successfully.');
     }
+
+
 }

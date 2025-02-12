@@ -54,10 +54,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/registrar_classes", [RegistrarController::class, "CreateClass"])->name('classes.create');
     Route::put("/registrar_dashboard/{class}", [RegistrarController::class, "EditClass"])->name('classes.update');
     Route::delete("/registrar_dashboard/{class}", [RegistrarController::class, "DeleteClass"])->name('classes.destroy');
-    Route::get('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'show'])->name('class.show');
-    Route::post('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'addstudent'])->name('class.addstudent');
-    Route::delete('/registrar_dashboard_view/class={class}/student={student}/quizzesscores={quizzesscores}', [RegistrarController::class, 'removestudent'])->name('class.removestudent');
-    Route::put('/registrar_dashboard_view/class={class}', [RegistrarController::class, 'addPercentageAndScores'])->name('class.addPercentageAndScores');
+    Route::get('/classes/class={class}', [RegistrarController::class, 'show'])->name('class.show');
+    Route::post('/classes/class={class}', [RegistrarController::class, 'addstudent'])->name('class.addstudent');
+    Route::delete('/classes/class={class}/student={student}/quizzesscores={quizzesscores}', [RegistrarController::class, 'removestudent'])->name('class.removestudent');
+    Route::put('/classes/class={class}', [RegistrarController::class, 'addPercentageAndScores'])->name('class.addPercentageAndScores');
+    Route::get('/quizzesadded/class={class}', [RegistrarController::class, 'show'])->name('class.quizzes');
+    Route::put('/quizzesadded/class={class}', [RegistrarController::class, 'addQuizAndScore'])->name('class.addquizandscore');
 
 
     // Dean

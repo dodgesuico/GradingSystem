@@ -78,28 +78,23 @@
 
 
         <div class="message-container">
-            @if ($errors->percentageForm->any())
+            @if ($errors->any())
                 <div class="alert alert-danger">
+                    <strong>Error!</strong> Please check the following issues:
                     <ul>
-                        @foreach ($errors->percentageForm->all() as $error)
+                        @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
 
-            @if ($errors->studentForm->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->studentForm->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    <strong>Success!</strong> {{ session('success') }}
                 </div>
             @endif
         </div>
-
-
 
 
         <div style="display:flex; flex-direction:row; justify-content:space-between">
@@ -189,7 +184,7 @@
 
         <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
             @csrf
-            @method("PUT")
+            @method('PUT')
             <div class="calculation-base-container">
                 @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment_participation_project' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
                     <div class="calculation-container">
@@ -198,13 +193,15 @@
                         <!-- Percentage Input -->
                         <div class="calculation-content">
                             <label>Percentage (%)</label>
-                            <input type="number" name="{{ $key }}_percentage" min="0" max="100" value="{{ old($key . '_percentage', $percentage->{$key . '_percentage'} ?? 0) }}" required>
+                            <input type="number" name="{{ $key }}_percentage" min="0" max="100"
+                                value="{{ old($key . '_percentage', $percentage->{$key . '_percentage'} ?? 0) }}" required>
                         </div>
 
                         <!-- Total Score Input -->
                         <div class="calculation-content">
                             <label>Total Score</label>
-                            <input type="number" name="{{ $key }}_total_score" min="0" value="{{ old($key . '_total_score', $percentage->{$key . '_total_score'} ?? 0) }}">
+                            <input type="number" name="{{ $key }}_total_score" min="0"
+                                value="{{ old($key . '_total_score', $percentage->{$key . '_total_score'} ?? 0) }}">
                         </div>
                     </div>
                 @endforeach
@@ -220,56 +217,63 @@
 
         <div class="grades-container">
             @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $period)
-                <h3 style="margin-top:50px;">{{ $period }} (Raw)</h3>
-                <div class="container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
-                                    <th>{{ $category }}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                @for ($i = 0; $i < 4; $i++)
-                                    <td>
-                                        <div class="content-container">
-                                            @foreach (['Accumulated Score', 'Transmuted Grade', 'Grade'] as $label)
-                                                <div class="cell-content">{{ $label }}</div>
-                                            @endforeach
-                                        </div>
-                                    </td>
-                                @endfor
-                            </tr>
-                            @foreach ($quizzesandscores as $quizzesandscore)
-                                @php
-                                    $student = $classes_student->firstWhere('studentID', $quizzesandscore->studentID);
-                                @endphp
+                <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
+                    @csrf
+                    @method('PUT')
+                    <h3 style="margin-top:50px;">{{ $period }} (Raw)</h3>
+                    <div class="container">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
+                                    <th>Student Name</th>
+                                    @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
+                                        <th>{{ $category }}</th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
                                     @for ($i = 0; $i < 4; $i++)
-                                        <td class="cell-content-container">
+                                        <td>
                                             <div class="content-container">
-                                                <div class="cell-content"><input type="number" min="0"></div>
-                                                @for ($j = 0; $j < 2; $j++)
-                                                    <div class="cell-content">
-                                                        <p></p>
-                                                    </div>
-                                                @endfor
+                                                @foreach (['Accumulated Score', 'Transmuted Grade', 'Grade'] as $label)
+                                                    <div class="cell-content">{{ $label }}</div>
+                                                @endforeach
                                             </div>
                                         </td>
                                     @endfor
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div style="margin-top: 10px; display:flex; width: 100%; justify-content:right;">
-                    <button>Update</button>
-                </div>
+                                @foreach ($quizzesandscores as $quizzesandscore)
+                                    @php
+                                        $student = $classes_student->firstWhere(
+                                            'studentID',
+                                            $quizzesandscore->studentID,
+                                        );
+                                    @endphp
+                                    <tr>
+                                        <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
+                                        @for ($i = 0; $i < 4; $i++)
+                                            <td class="cell-content-container">
+                                                <div class="content-container">
+                                                    <div class="cell-content"><input type="number" min="0"></div>
+                                                    @for ($j = 0; $j < 2; $j++)
+                                                        <div class="cell-content">
+                                                            <p></p>
+                                                        </div>
+                                                    @endfor
+                                                </div>
+                                            </td>
+                                        @endfor
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 10px; display:flex; width: 100%; justify-content:right;">
+                        <button type="submit">Update</button>
+                    </div>
+                </form>
             @endforeach
         </div>
 
