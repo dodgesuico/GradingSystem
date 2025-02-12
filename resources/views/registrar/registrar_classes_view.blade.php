@@ -26,6 +26,7 @@
             .header-container {
                 display: flex;
                 flex-direction: column;
+                margin-bottom: 20px;
             }
 
             .sub-header-container {
@@ -185,7 +186,7 @@
         </div>
 
 
-        <h2 style="margin-top:20px;">Calculation</h2>
+        <h2 style="margin-top:20px;">Grading Basis</h2>
 
         <div class="calculation-base-container">
             @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $index => $category)
@@ -195,7 +196,8 @@
                     <!-- Percentage Input -->
                     <div class="calculation-content">
                         <label>Percentage (%)</label>
-                        <input type="number" min="0" max="100" value="0" class="percentage-input" data-index="{{ $index }}" oninput="adjustPercentages(this)">
+                        <input type="number" min="0" max="100" value="0" class="percentage-input"
+                            data-index="{{ $index }}" oninput="adjustPercentages(this)">
                     </div>
 
                     <!-- Total Score Input -->
@@ -207,7 +209,7 @@
             @endforeach
         </div>
 
-        <p id="error-message" style="color: red; display: none;">Total percentage must equal 100%.</p>
+        <p id="error-message" style="color:red; display: none;">Total percentage must equal 100%.</p>
 
         <script>
             function adjustPercentages(input) {
@@ -228,7 +230,7 @@
 
                 if (remainingPercentage === 0) {
                     percentageInputs.forEach(inp => inp.disabled = true);
-                    input.disabled = false;  // Allow current input to be changed
+                    input.disabled = false; // Allow current input to be changed
                 } else {
                     percentageInputs.forEach(inp => inp.disabled = false);
                 }
@@ -239,11 +241,11 @@
 
 
 
-
+        <h2 style="margin-top:20px;">Scores</h2>
 
         <div class="grades-container">
             @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $period)
-                <h3 style="margin-top:50px;">{{ $period }} (Raw)</h3>
+                <h3 style="margin-top:10px;">{{ $period }} (Raw)</h3>
                 <div class="container">
                     <table class="table">
                         <thead>
