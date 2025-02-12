@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield("title", "Grading System")</title>
+    <title>@yield('title', 'Grading System')</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -14,7 +14,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap"
+        rel="stylesheet">
 
 </head>
 
@@ -23,8 +24,8 @@
 
 
     <div class="container">
-        <div class="nav-bar">
-            <div class="teacher-nav-contents">
+        <div class="nav-bar" id="navBar">
+            <div class="main-nav-contents">
                 <div class="nav-header">
                     <img src="{{ asset('system_images/icon.png') }}" alt="">
                     <label class="gradient-text">CKCM Grading <em>v.1</em></label>
@@ -47,7 +48,8 @@
                     <div class="logout-container">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket fa-flip-horizontal"></i> Logout</button>
+                            <button type="submit" class="logout-btn">
+                                <i class="fa-solid fa-arrow-right-from-bracket fa-flip-horizontal"></i> Logout</button>
                         </form>
                     </div>
                 </div>
@@ -55,31 +57,32 @@
                 <div class="nav-links">
                     <label for="">DASHBOARD</label>
                     <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
-
-                        <i class="fa-solid fa-house"></i> Home
+                        <i class="fa-solid fa-house"></i><span>Home</span>
                     </a>
                     <label for="" style="margin-top:20px;">OPERATION</label>
 
-                    <a href="{{ route('registrar_classes') }}" class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
-                        <i class="fa-solid fa-clipboard"></i> Classes
+                    <a href="{{ route('registrar_classes') }}"
+                        class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
+                        <i class="fa-solid fa-clipboard"></i> <span>Classes</span>
                     </a>
                 </div>
             </div>
 
-            <div class="teacher-nav-footer">
-                <h4>POWERED BY CKCM TECH</h4>
+            <div class="main-nav-footer">
+                <h4 class="footer-title">POWERED BY CKCM TECH</h4>
                 <p>&copy; {{ date('Y') }} CKCM Technologies, LLC</p>
                 <p>All Rights Reserved</p>
             </div>
         </div>
 
         <div class="main-content">
-            <div class="content-header" style="position: sticky; top: 0; z-index: 100;">
+            <div class="content-header">
+                <i class="fa-solid fa-bars" id="menuToggle"></i>
                 <i id="fullscreen-icon" class="fa-solid fa-expand" title="Expand"></i>
             </div>
 
             <div class="content">
-                @yield("content")
+                @yield('content')
             </div>
         </div>
     </div>
@@ -88,34 +91,105 @@
 
 
 
+    {{-- minimized style --}}
+    <style>
+        .nav-bar {
+
+            transition: width 0.3s ease;
+        }
+
+        .nav-bar.minimized {
+            width: 60px;
+        }
+
+
+        .nav-bar.minimized .nav-links a span,
+        .nav-bar.minimized .nav-header label,
+        .nav-bar.minimized .profile,
+        .nav-bar.minimized .nav-profile i,
+        .nav-bar.minimized .nav-links label,
+        .nav-bar.minimized .main-nav-footer p {
+            display: none;
+        }
+
+
+
+        .nav-bar.minimized .nav-links {
+            gap: 10px;
+        }
+
+        .nav-bar.minimized .nav-links a {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .nav-bar.minimized .nav-header {
+            padding: 20px 10px;
+        }
+
+        .nav-bar.minimized .main-nav-footer h4 {
+            font-size: .8rem;
+        }
+
+        .nav-bar.minimized img {
+            width: 25px;
+        }
+
+        .nav-bar.minimized .logout-btn {
+            font-size: 1rem;
+            margin: 0;
+            padding: 5px;
+        }
+
+
+
+        .nav-bar.minimized .nav-profile {
+            margin: 0;
+            justify-content: center;
+        }
+    </style>
 
 
 
 
 
-
-
-
-
-
-
-    <!-- scripts -->
-    <!-- for expand -->
     <script>
-        const icon = document.getElementById("fullscreen-icon");
-
-        icon.addEventListener("click", () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen(); // Enter fullscreen
-                icon.classList.replace("fa-expand", "fa-compress"); // Change icon
-                icon.setAttribute("title", "Compress"); // Change tooltip text
-            } else {
-                document.exitFullscreen(); // Exit fullscreen
-                icon.classList.replace("fa-compress", "fa-expand"); // Change icon back
-                icon.setAttribute("title", "Expand"); // Change tooltip text back
+        $(document).ready(function() {
+            // Handle navbar state from localStorage
+            if (localStorage.getItem('navMinimized') === 'true') {
+                $('#navBar').addClass('minimized');
             }
+
+            $('#menuToggle').click(function() {
+                $('#navBar').toggleClass('minimized');
+                localStorage.setItem('navMinimized', $('#navBar').hasClass('minimized'));
+            });
+
+            // Handle fullscreen mode with localStorage
+            const icon = document.getElementById("fullscreen-icon");
+
+            if (localStorage.getItem('fullscreen') === 'true') {
+                document.documentElement.requestFullscreen();
+                icon.classList.replace("fa-expand", "fa-compress");
+                icon.setAttribute("title", "Compress");
+            }
+
+            icon.addEventListener("click", () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                    icon.classList.replace("fa-expand", "fa-compress");
+                    icon.setAttribute("title", "Compress");
+                    localStorage.setItem('fullscreen', 'true');
+                } else {
+                    document.exitFullscreen();
+                    icon.classList.replace("fa-compress", "fa-expand");
+                    icon.setAttribute("title", "Expand");
+                    localStorage.setItem('fullscreen', 'false');
+                }
+            });
         });
     </script>
+
 
 
     <!-- for logout -->
@@ -221,7 +295,7 @@
             border-right: 1px solid var(--color7);
         }
 
-        .teacher-nav-footer {
+        .main-nav-footer {
             text-align: left;
             padding: 10px;
             color: var(--color1);
@@ -229,16 +303,16 @@
             border-top: var(--color6) 1px solid;
         }
 
-        .teacher-nav-footer h4 {
+        .main-nav-footer h4 {
             margin-bottom: 2px;
             font-size: 1.1rem;
         }
 
-        .teacher-nav-footer p {
+        .main-nav-footer p {
             color: var(--color5);
         }
 
-        .teacher-nav-contents {
+        .main-nav-contents {
             display: flex;
             flex-direction: column;
 
@@ -258,7 +332,7 @@
 
         }
 
-      
+
 
 
 
@@ -275,7 +349,7 @@
             gap: 10px;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--ckcm-color1);
+            background-color: var(--ckcm-color2);
             border-left: 0;
             border-right: 0;
             border-radius: 5px;
@@ -320,7 +394,6 @@
         .nav-links {
             display: flex;
             flex-direction: column;
-
             padding: 10px;
 
         }
@@ -362,14 +435,17 @@
 
         .content-header {
             display: flex;
-            padding: 15px;
+            padding: 12px;
             background-color: var(--ckcm-color1);
             border-bottom: 1px solid var(--color8);
-            justify-content: right;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .content-header i {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             color: var(--color6);
             cursor: pointer;
             transition: transform 0.2s ease, color 0.2s ease;
@@ -379,7 +455,6 @@
 
 
         .content-header i:hover {
-            transform: scale(1.1);
             color: #3498db;
             /* Change color on hover */
         }
