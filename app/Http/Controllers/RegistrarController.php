@@ -141,25 +141,27 @@ class RegistrarController extends Controller
     }
 
 
-    public function removestudent($class, $student, $quizzesscores)
+    public function removestudent($class, $student)
     {
         // Find the student in the class
         $classStudent = Classes_Student::where('classID', $class)
                                     ->where('studentID', $student)
                                     ->first();
 
-        $quizzesscores = QuizzesAndScores::where('classID', $class)
-                                    ->where('studentID', $student)
-                                    ->first();
+        // Find all related quizzes and scores for this student in the class
+        $quizzesScores = QuizzesAndScores::where('classID', $class)
+                                        ->where('studentID', $student)
+                                        ->get();  // Get all records instead of first()
 
-
-        if ($classStudent || $quizzesscores) {
+        if ($classStudent || $quizzesScores->isNotEmpty()) {
             if ($classStudent) {
                 $classStudent->delete();
             }
 
-            if ($quizzesscores) {
-                $quizzesscores->delete();
+            if ($quizzesScores->isNotEmpty()) {
+                foreach ($quizzesScores as $score) {
+                    $score->delete();  // Delete each record individually
+                }
             }
 
             return redirect()->route("class.show", $class)->with("success", "Student removed successfully.");
@@ -217,25 +219,51 @@ class RegistrarController extends Controller
     public function addQuizAndScore(Request $request, $class)
     {
         $scores = $request->input('scores');
-        $periodicTerm = $request->input('periodic_term');  // 'Prelim', 'Midterm', etc.
+        $periodicTerm = $request->input('periodic_term');
+
+        // Retrieve total scores from the percentage table for the specific class
+        $percentage = Percentage::where('classID', $class)->first();
+
+        if (!$percentage) {
+            return redirect()->back()->with('error', 'Percentage data not found for this class.');
+        }
 
         foreach ($scores as $studentId => $fields) {
+            $classStudent = Classes_Student::where('classID', $class)
+                                   ->where('studentID', $studentId)
+                                   ->first();
+
+            $studentName = $classStudent->name ?? "Student ID $studentId";// Fetch the student record
+
+            // Validate scores against total scores from percentage table
+            if (($fields['quizzez'] ?? 0) > $percentage->quiz_total_score) {
+                return redirect()->back()->with('error', "Quiz score for {$studentName} exceeds the total score.");
+            }
+            if (($fields['attendance_behavior'] ?? 0) > $percentage->attendance_total_score) {
+                return redirect()->back()->with('error', "Attendance score for {$studentName} exceeds the total score.");
+            }
+            if (($fields['assignments'] ?? 0) > $percentage->assignment_participation_project_total_score) {
+                return redirect()->back()->with('error', "Assignment score for {$studentName} exceeds the total score.");
+            }
+            if (($fields['exam'] ?? 0) > $percentage->exam_total_score) {
+                return redirect()->back()->with('error', "Exam score for {$studentName} exceeds the total score.");
+            }
+
+            // Check for existing record
             $existingRecord = QuizzesAndScores::where('classID', $class)
-                                            ->where('studentID', $studentId)
-                                            ->where('periodic_term', $periodicTerm)
-                                            ->first();  // Check for existing record with the same periodic term
+                ->where('studentID', $studentId)
+                ->where('periodic_term', $periodicTerm)
+                ->first();
 
             if ($existingRecord) {
-                // Update the existing record
                 $existingRecord->update([
                     'quizzez' => $fields['quizzez'] ?? $existingRecord->quizzez,
                     'attendance_behavior' => $fields['attendance_behavior'] ?? $existingRecord->attendance_behavior,
-                    'assignments' => $fields['assignments'] ?? $existingRecord->assignments_participations_project,
+                    'assignments_participations_project' => $fields['assignments_participations_project'] ?? $existingRecord->assignments_participations_project,
                     'exam' => $fields['exam'] ?? $existingRecord->exam,
                     'updated_at' => now(),
                 ]);
             } else {
-                // Create a new record for the specific periodic term
                 QuizzesAndScores::create([
                     'classID' => $class,
                     'studentID' => $studentId,

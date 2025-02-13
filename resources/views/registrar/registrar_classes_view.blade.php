@@ -78,6 +78,12 @@
 
 
         <div class="message-container">
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    <strong>Error!</strong> {{ session('error') }}
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <strong>Error!</strong> Please check the following issues:
@@ -122,7 +128,7 @@
                         @foreach ($classes_student as $classes_students)
                             <tr>
                                 <!-- <td>{{ $classes_students->id }}</td> -->
-                                <td>{{ $classes_students->classId }}</td>
+                                <td>{{ $classes_students->classID }}</td>
                                 <td>{{ $classes_students->studentID }}</td>
                                 <td>{{ $classes_students->name }}</td>
                                 <td>{{ $classes_students->email }}</td>
@@ -162,7 +168,7 @@
                                             onclick="closeDeleteClassModal({{ $classes_students->id }})">Cancel</button>
 
                                         <form method="POST"
-                                            action="{{ route('class.removestudent', ['class' => $class->id, 'student' => $classes_students->studentID, 'quizzesscores' => $classes_students->studentID]) }}">
+                                            action="{{ route('class.removestudent', ['class' => $class->id, 'student' => $classes_students->studentID]) }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="delete-btn disabled-btn"
@@ -253,7 +259,7 @@
                                     @endphp
                                     <tr>
                                         <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
-                                        @foreach (['quizzez', 'attendance_behavior', 'assignments_participations_project', 'exam'] as $field)
+                                        @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
                                             <td class="cell-content-container">
                                                 <div class="content-container">
                                                     <div class="cell-content"><input type="number"
