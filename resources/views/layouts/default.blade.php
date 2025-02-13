@@ -57,14 +57,28 @@
                 <div class="nav-links">
                     <label for="">DASHBOARD</label>
                     <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
-                        <i class="fa-solid fa-house"></i><span>Home</span>
-                    </a>
-                    <label for="" style="margin-top:20px;">OPERATION</label>
+                        <i class="fa-solid fa-house"></i><span>Home</span></a>
+                    <a href=""><i class="fa-solid fa-star"></i>
+                        <span>My Grades</span></a>
+                    <a href=""><i class="fa-solid fa-chart-simple"></i>
+                        <span>Reports</span></a>
 
+                    <label for="" style="margin-top:10px;">OPERATION</label>
+                    <a href=""><i class="fa-regular fa-clipboard"></i>
+                        <span>My Class</span></a>
                     <a href="{{ route('registrar_classes') }}"
                         class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
-                        <i class="fa-solid fa-clipboard"></i> <span>Classes</span>
+                        <i class="fa-solid fa-clipboard"></i> <span>All Class</span>
                     </a>
+                    <a href=""><i class="fa-solid fa-users"></i>
+                        <span>Users</span></a>
+
+
+                    <label for="" style="margin-top:10px;">SETTINGS</label>
+                    <a href=""><i class="fa-solid fa-user-tie"></i>
+                        <span>Roles</span></a>
+                    <a href=""><i class="fa-solid fa-key"></i>
+                        <span>Admin</span></a>
                 </div>
             </div>
 
@@ -91,63 +105,6 @@
 
 
 
-    {{-- minimized style --}}
-    <style>
-        .nav-bar {
-
-            transition: width 0.3s ease;
-        }
-
-        .nav-bar.minimized {
-            width: 60px;
-        }
-
-
-        .nav-bar.minimized .nav-links a span,
-        .nav-bar.minimized .nav-header label,
-        .nav-bar.minimized .profile,
-        .nav-bar.minimized .nav-profile i,
-        .nav-bar.minimized .nav-links label,
-        .nav-bar.minimized .main-nav-footer p {
-            display: none;
-        }
-
-
-
-        .nav-bar.minimized .nav-links {
-            gap: 10px;
-        }
-
-        .nav-bar.minimized .nav-links a {
-            text-align: center;
-            padding: 10px;
-        }
-
-        .nav-bar.minimized .nav-header {
-            padding: 20px 10px;
-        }
-
-        .nav-bar.minimized .main-nav-footer h4 {
-            font-size: .8rem;
-        }
-
-        .nav-bar.minimized img {
-            width: 25px;
-        }
-
-        .nav-bar.minimized .logout-btn {
-            font-size: 1rem;
-            margin: 0;
-            padding: 5px;
-        }
-
-
-
-        .nav-bar.minimized .nav-profile {
-            margin: 0;
-            justify-content: center;
-        }
-    </style>
 
 
 
@@ -215,11 +172,208 @@
 
 
 
+
+
+
+
+
+
+
+    <style>
+        .container {
+            width: 100%;
+            height: 100%;
+            background-color: var(--ckcm-color1);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .nav-bar {
+            width: 280px;
+            height: 100%;
+            background-color: var(--ckcm-color2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--color7);
+            overflow-y: auto;
+            /* Enables scrolling when content overflows */
+            overflow-x: hidden;
+            /* Hides horizontal scroll */
+            transition: width 0.3s ease;
+        }
+
+        .main-nav-footer {
+            text-align: left;
+            padding: 10px;
+            color: var(--color1);
+            line-height: 1.2;
+            border-top: var(--color6) 1px solid;
+        }
+
+        .main-nav-footer h4 {
+            margin-bottom: 2px;
+            font-size: 1.1rem;
+            color: var(--color3);
+        }
+
+        .main-nav-footer p {
+            color: var(--color5);
+        }
+
+        .main-nav-contents {
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .nav-header {
+            display: flex;
+            flex-direction: row;
+            padding: 20px;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-header img {
+            width: 30px;
+
+        }
+
+        .nav-profile {
+            cursor: pointer;
+            position: relative;
+            gap: 10px;
+            margin: 0 10px;
+            transition: background 0.3s ease-in-out;
+            display: flex;
+            flex-direction: row;
+            padding: 10px;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--ckcm-color2);
+            border-left: 0;
+            border-right: 0;
+            border-radius: 5px;
+            /* border: 1px solid var(--color6); */
+        }
+
+        .nav-profile:hover {
+            background-color: var(--hover-background-color);
+        }
+
+        .nav-profile img {
+            width: 30px;
+        }
+
+        .nav-profile i {
+            color: var(--color1);
+            font-size: 1.2rem;
+        }
+
+        .profile label {
+            color: var(--color1);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .profile p {
+            color: var(--color6);
+            font-size: 1.2rem;
+
+        }
+
+        .nav-links label {
+            color: var(--color6);
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 10px 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+
+        }
+
+        .nav-links a {
+            font-size: 1.3rem;
+            border-radius: 5px;
+            color: var(--color4);
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--color1);
+            background-color: var(--hover-background-color);
+        }
+
+        .nav-links a.active {
+            color: var(--color1);
+            background-color: var(--ckcm-color1);
+            /* border: 1px solid var(--color6); */
+        }
+
+        .nav-links i {
+            margin-right: 5px;
+
+        }
+
+
+        /* main content */
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-x: auto
+        }
+
+        .content-header {
+            display: flex;
+            padding: 12px;
+            background-color: var(--ckcm-color1);
+            border-bottom: 1px solid var(--color8);
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .content-header i {
+            font-size: 1.5rem;
+            color: var(--color6);
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+
+        }
+
+        .content-header i:hover {
+            color: #3498db;
+            /* Change color on hover */
+        }
+
+
+        /* dynamic content */
+        .content {
+
+            overflow-y: scroll;
+            overflow-x: auto;
+
+        }
+    </style>
+
+
+
+
     <style>
         /* Navigation profile styles */
-
-
-
         /* Logout dropdown */
         .logout-container {
             position: absolute;
@@ -266,211 +420,251 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
+    {{-- minimized style --}}
     <style>
-        .container {
-            width: 100%;
-            height: 100%;
-            background-color: var(--ckcm-color1);
-            display: flex;
-            flex-direction: row;
+        .nav-bar.minimized {
+            width: 60px;
+            transition: ease-in-out 0.3s;
         }
 
-        .nav-bar {
-            width: 280px;
-            height: 100%;
-            background-color: var(--ckcm-color2);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border-right: 1px solid var(--color7);
+
+        .nav-bar.minimized .nav-links a span,
+        .nav-bar.minimized .nav-header label,
+        .nav-bar.minimized .profile,
+        .nav-bar.minimized .nav-profile i,
+        .nav-bar.minimized .nav-links label,
+        .nav-bar.minimized .main-nav-footer p {
+            display: none;
         }
 
-        .main-nav-footer {
-            text-align: left;
-            padding: 10px;
-            color: var(--color1);
-            line-height: 1.2;
-            border-top: var(--color6) 1px solid;
-        }
 
-        .main-nav-footer h4 {
-            margin-bottom: 2px;
-            font-size: 1.1rem;
-        }
 
-        .main-nav-footer p {
-            color: var(--color5);
-        }
-
-        .main-nav-contents {
-            display: flex;
-            flex-direction: column;
-
-        }
-
-        .nav-header {
-            display: flex;
-            flex-direction: row;
-            padding: 20px;
+        .nav-bar.minimized .nav-links {
             gap: 10px;
+        }
+
+        .nav-bar.minimized .nav-links a {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .nav-bar.minimized .nav-header {
+            padding: 20px 10px;
+        }
+
+        .nav-bar.minimized .main-nav-footer h4 {
+            font-size: .8rem;
+        }
+
+        .nav-bar.minimized img {
+            width: 25px;
+        }
+
+        .nav-bar.minimized .logout-btn {
+            font-size: 1rem;
+            margin: 0;
+            padding: 5px;
+        }
+
+
+
+        .nav-bar.minimized .nav-profile {
+            margin: 0;
             justify-content: center;
-            align-items: center;
         }
+    </style>
 
-        .nav-header img {
-            width: 30px;
 
+
+
+
+    {{-- for mobile --}}
+    <style>
+        @media (max-width: 480px) {
+
+
+            .content-header i:nth-child(2) {
+                display: none;
+            }
+
+
+            .nav-bar.minimized {
+                width: 65px;
+                display: flex;
+            }
+
+
+            .nav-bar.minimized .nav-links a span,
+            .nav-bar.minimized .nav-header label,
+            .nav-bar.minimized .profile,
+            .nav-bar.minimized .nav-profile i,
+            .nav-bar.minimized .nav-links label,
+            .nav-bar.minimized .main-nav-footer p {
+                display: none;
+            }
+
+
+
+            .nav-bar.minimized .nav-links {
+                gap: 10px;
+            }
+
+            .nav-bar.minimized .nav-links a {
+                text-align: center;
+                padding: 10px;
+            }
+
+            .nav-bar.minimized .nav-header {
+                padding: 20px 10px;
+            }
+
+            .nav-bar.minimized .main-nav-footer h4 {
+                font-size: .6rem;
+            }
+
+            .nav-bar.minimized img {
+                width: 25px;
+            }
+
+            .nav-bar.minimized .logout-btn {
+                font-size: 1rem;
+                margin: 0;
+                padding: 5px;
+            }
+
+            .nav-bar.minimized .nav-profile {
+                margin: 0;
+                justify-content: center;
+            }
         }
+    </style>
+
+    {{-- tablet --}}
+    <style>
+        @media (max-width: 768px) {
+
+
+            .nav-bar {
+
+                display: none;
+            }
+
+            .content-header i:nth-child(2) {
+                display: none;
+            }
+
+
+            .nav-bar.minimized {
+                width: 65px;
+                display: flex;
+            }
+
+
+            .nav-bar.minimized .nav-links a span,
+            .nav-bar.minimized .nav-header label,
+            .nav-bar.minimized .profile,
+            .nav-bar.minimized .nav-profile i,
+            .nav-bar.minimized .nav-links label,
+            .nav-bar.minimized .main-nav-footer p {
+                display: none;
+            }
 
 
 
+            .nav-bar.minimized .nav-links {
+                gap: 10px;
+            }
 
+            .nav-bar.minimized .nav-links a {
+                text-align: center;
+                padding: 10px;
+            }
 
+            .nav-bar.minimized .nav-header {
+                padding: 20px 10px;
+            }
 
-        .nav-profile {
-            cursor: pointer;
-            position: relative;
-            gap: 10px;
-            margin: 0 10px;
-            transition: background 0.3s ease-in-out;
-            display: flex;
-            flex-direction: row;
-            padding: 10px;
-            gap: 10px;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--ckcm-color2);
-            border-left: 0;
-            border-right: 0;
-            border-radius: 5px;
-            /* border: 1px solid var(--color6); */
+            .nav-bar.minimized .main-nav-footer h4 {
+                font-size: .6rem;
+            }
+
+            .nav-bar.minimized img {
+                width: 25px;
+            }
+
+            .nav-bar.minimized .logout-btn {
+                font-size: 1rem;
+                margin: 0;
+                padding: 5px;
+            }
+
+            .nav-bar.minimized .nav-profile {
+                margin: 0;
+                justify-content: center;
+            }
         }
-
-        .nav-profile:hover {
-            background-color: var(--hover-background-color);
-        }
-
-        .nav-profile img {
-            width: 30px;
-        }
-
-
-
-        .nav-profile i {
-            color: var(--color1);
-            font-size: 1.2rem;
-        }
-
-        .profile label {
-            color: var(--color1);
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-transform: capitalize;
-        }
-
-        .profile p {
-            color: var(--color6);
-            font-size: 1.2rem;
-
-        }
-
-        .nav-links label {
-            color: var(--color6);
-            font-size: 1.1rem;
-            font-weight: bold;
-            padding: 10px;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-
-        }
-
-        .nav-links a {
-            font-size: 1.3rem;
-            border-radius: 5px;
-            color: var(--color4);
-            text-decoration: none;
-            padding: 10px;
-        }
-
-        .nav-links a:hover {
-            color: var(--color1);
-            background-color: var(--hover-background-color);
-        }
-
-        .nav-links a.active {
-            color: var(--color1);
-            background-color: var(--ckcm-color1);
-            /* border: 1px solid var(--color6); */
-        }
-
-        .nav-links i {
-            margin-right: 5px;
-
-        }
+    </style>
 
 
 
 
-        /* main content */
+    {{-- laptop --}}
+    <style>
+        @media (max-width: 1024px) {
+            .nav-bar {
+                display: none;
+            }
 
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
+            .nav-bar.minimized {
+                width: 65px;
+                display: flex;
+            }
 
-        .content-header {
-            display: flex;
-            padding: 12px;
-            background-color: var(--ckcm-color1);
-            border-bottom: 1px solid var(--color8);
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
 
-        .content-header i {
-            font-size: 1.5rem;
-            color: var(--color6);
-            cursor: pointer;
-            transition: transform 0.2s ease, color 0.2s ease;
-
-        }
+            .nav-bar.minimized .nav-links a span,
+            .nav-bar.minimized .nav-header label,
+            .nav-bar.minimized .profile,
+            .nav-bar.minimized .nav-profile i,
+            .nav-bar.minimized .nav-links label,
+            .nav-bar.minimized .main-nav-footer p {
+                display: none;
+            }
 
 
 
-        .content-header i:hover {
-            color: #3498db;
-            /* Change color on hover */
-        }
+            .nav-bar.minimized .nav-links {
+                gap: 10px;
+            }
+
+            .nav-bar.minimized .nav-links a {
+                text-align: center;
+                padding: 10px;
+            }
+
+            .nav-bar.minimized .nav-header {
+                padding: 20px 10px;
+            }
+
+            .nav-bar.minimized .main-nav-footer h4 {
+                font-size: .8rem;
+            }
+
+            .nav-bar.minimized img {
+                width: 25px;
+            }
+
+            .nav-bar.minimized .logout-btn {
+                font-size: 1rem;
+                margin: 0;
+                padding: 5px;
+            }
 
 
 
-
-
-
-
-        /* dynamic content */
-        .content {
-
-            overflow-y: scroll;
-
-
+            .nav-bar.minimized .nav-profile {
+                margin: 0;
+                justify-content: center;
+            }
         }
     </style>
 
