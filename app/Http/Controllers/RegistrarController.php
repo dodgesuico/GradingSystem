@@ -88,12 +88,12 @@ class RegistrarController extends Controller
     public function show(Classes $class)
     {
         // Get all student IDs already in the class
-        $enrolledStudentIds = Classes_Student::where('classId', $class->id)->pluck('studentID')->toArray();
+        $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
 
         // Get students who are not already enrolled in the class
         $students = User::where('role', 'student')->whereNotIn('id', $enrolledStudentIds)->get();
 
-        $classes_student = Classes_Student::where('classId', $class->id)->get();
+        $classes_student = Classes_Student::where('classID', $class->id)->get();
 
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
 
@@ -114,28 +114,37 @@ class RegistrarController extends Controller
 
         // Create a new instance of Classes_Student and assign the values
         $classStudent = new Classes_Student();
-        $classStudent->classId = $class->id;  // Use the existing class ID
+        $classStudent->classID = $class->id;
         $classStudent->studentID = $request->student_id;
         $classStudent->name = $request->name;
         $classStudent->email = $request->email;
         $classStudent->department = $request->department;
 
-        $quizzesandscores = new QuizzesAndScores();
-        $quizzesandscores->classID = $class->id;
-        $quizzesandscores->studentID = $request->student_id;
+        // Array of periodic terms
+        $periodicTerms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
 
         // Save the instance of Classes_Student
-        if ($classStudent->save() && $quizzesandscores->save()) {
+        if ($classStudent->save()) {
+            // Insert a row for each periodic term in quizzes_scores
+            foreach ($periodicTerms as $term) {
+                $quizzesandscores = new QuizzesAndScores();
+                $quizzesandscores->classID = $class->id;
+                $quizzesandscores->studentID = $request->student_id;
+                $quizzesandscores->periodic_term = $term;
+                $quizzesandscores->save();
+            }
+
             return redirect()->route("class.show", $class->id)->with("success", "Student added successfully.");
         }
 
-        return redirect()->route("class.show",$class->id)->with("error", "Failed to add student. Please try again.");
+        return redirect()->route("class.show", $class->id)->with("error", "Failed to add student. Please try again.");
     }
+
 
     public function removestudent($class, $student, $quizzesscores)
     {
         // Find the student in the class
-        $classStudent = Classes_Student::where('classId', $class)
+        $classStudent = Classes_Student::where('classID', $class)
                                     ->where('studentID', $student)
                                     ->first();
 
@@ -203,6 +212,45 @@ class RegistrarController extends Controller
 
 
         return redirect()->route("class.show", $class)->with('success', 'Data saved successfully.');
+    }
+
+    public function addQuizAndScore(Request $request, $class)
+    {
+        $scores = $request->input('scores');
+        $periodicTerm = $request->input('periodic_term');  // 'Prelim', 'Midterm', etc.
+
+        foreach ($scores as $studentId => $fields) {
+            $existingRecord = QuizzesAndScores::where('classID', $class)
+                                            ->where('studentID', $studentId)
+                                            ->where('periodic_term', $periodicTerm)
+                                            ->first();  // Check for existing record with the same periodic term
+
+            if ($existingRecord) {
+                // Update the existing record
+                $existingRecord->update([
+                    'quizzez' => $fields['quizzez'] ?? $existingRecord->quizzez,
+                    'attendance_behavior' => $fields['attendance_behavior'] ?? $existingRecord->attendance_behavior,
+                    'assignments' => $fields['assignments'] ?? $existingRecord->assignments_participations_project,
+                    'exam' => $fields['exam'] ?? $existingRecord->exam,
+                    'updated_at' => now(),
+                ]);
+            } else {
+                // Create a new record for the specific periodic term
+                QuizzesAndScores::create([
+                    'classID' => $class,
+                    'studentID' => $studentId,
+                    'periodic_term' => $periodicTerm,
+                    'quizzez' => $fields['quizzez'] ?? null,
+                    'attendance_behavior' => $fields['attendance_behavior'] ?? null,
+                    'assignments_participations_project' => $fields['assignments_participations_project'] ?? null,
+                    'exam' => $fields['exam'] ?? null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Scores updated successfully.');
     }
 
 

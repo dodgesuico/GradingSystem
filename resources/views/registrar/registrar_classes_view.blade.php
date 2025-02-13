@@ -214,13 +214,13 @@
 
 
 
-
         <div class="grades-container">
-            @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $period)
+            @foreach (['Prelim' => 'Prelim', 'Midterm' => 'Midterm', 'Semi-Finals' => 'Semi-Finals', 'Finals' => 'Finals'] as $period => $term)
                 <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
                     @csrf
                     @method('PUT')
                     <h3 style="margin-top:50px;">{{ $period }} (Raw)</h3>
+                    <input type="hidden" name="periodic_term" value="{{ $term }}">
                     <div class="container">
                         <table class="table">
                             <thead>
@@ -244,19 +244,22 @@
                                         </td>
                                     @endfor
                                 </tr>
-                                @foreach ($quizzesandscores as $quizzesandscore)
+                                @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
                                     @php
-                                        $student = $classes_student->firstWhere(
-                                            'studentID',
-                                            $quizzesandscore->studentID,
-                                        );
+                                        $student = $classes_student->firstWhere('studentID', $quizzesandscore->studentID);
+                                        $score = $quizzesandscores->where('studentID', $student->studentID)
+                                                                    ->where('periodic_term', $term)
+                                                                    ->first();
                                     @endphp
                                     <tr>
                                         <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
-                                        @for ($i = 0; $i < 4; $i++)
+                                        @foreach (['quizzez', 'attendance_behavior', 'assignments_participations_project', 'exam'] as $field)
                                             <td class="cell-content-container">
                                                 <div class="content-container">
-                                                    <div class="cell-content"><input type="number" min="0"></div>
+                                                    <div class="cell-content"><input type="number"
+                                                        name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
+                                                        value="{{ $score ? $score->$field : '' }}"
+                                                        min="0"></div>
                                                     @for ($j = 0; $j < 2; $j++)
                                                         <div class="cell-content">
                                                             <p></p>
@@ -264,7 +267,7 @@
                                                     @endfor
                                                 </div>
                                             </td>
-                                        @endfor
+                                        @endforeach
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -14,7 +14,7 @@ class QuizzesAndScores extends Model
         'periodic_term',
         'quizzez',
         'attendance_behavior',
-        'assignment_participation_project_percentage',
+        'assignments',
         'exam',
 
     ];
