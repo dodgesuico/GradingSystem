@@ -10,6 +10,7 @@ class Percentage extends Model
 
     protected $fillable = [
         'classID',
+        'periodic_term',
         'quiz_percentage',
         'quiz_total_score',
         'attendance_percentage',

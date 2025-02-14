@@ -172,49 +172,38 @@ class RegistrarController extends Controller
 
     public function addPercentageAndScores(Request $request, Classes $class)
     {
-            // Validate the request
-        $request->validate([
-            'quiz_percentage' => 'required|integer|min:0|max:100',
-            'quiz_total_score' => 'nullable|integer|min:0',
-            'attendance_percentage' => 'required|integer|min:0|max:100',
-            'attendance_total_score' => 'nullable|integer|min:0',
-            'assignment_participation_project_percentage' => 'required|integer|min:0|max:100',
-            'assignment_participation_project_total_score' => 'nullable|integer|min:0',
-            'exam_percentage' => 'required|integer|min:0|max:100',
-            'exam_total_score' => 'nullable|integer|min:0',
-        ]);
+        $periodicTerms = $request->input('periodic_terms');
 
-        // Calculate the total percentage
-        $totalPercentage = $request->input('quiz_percentage') +
-                        $request->input('attendance_percentage') +
-                        $request->input('assignment_participation_project_percentage') +
-                        $request->input('exam_percentage');
+        foreach ($periodicTerms as $term) {
+            $totalPercentage = $request->input("quiz_percentage.$term") +
+                            $request->input("attendance_percentage.$term") +
+                            $request->input("assignment_participation_project_percentage.$term") +
+                            $request->input("exam_percentage.$term");
 
-        // Check if total percentage is exactly 100
-        if ($totalPercentage !== 100) {
-            return redirect()->route("class.show", $class)
-                            ->withErrors(['The total percentage must equal 100%.']);
+            if ($totalPercentage !== 100) {
+                return redirect()->route("class.show", $class)
+                    ->withErrors(["The total percentage for $term must equal 100%."]);
+            }
+
+            // Save or update for each term
+            Percentage::updateOrCreate(
+                ['classID' => $class->id, 'periodic_term' => $term],
+                [
+                    'quiz_percentage' => $request->input("quiz_percentage.$term"),
+                    'quiz_total_score' => $request->input("quiz_total_score.$term"),
+                    'attendance_percentage' => $request->input("attendance_percentage.$term"),
+                    'attendance_total_score' => $request->input("attendance_total_score.$term"),
+                    'assignment_participation_project_percentage' => $request->input("assignment_participation_project_percentage.$term"),
+                    'assignment_participation_project_total_score' => $request->input("assignment_participation_project_total_score.$term"),
+                    'exam_percentage' => $request->input("exam_percentage.$term"),
+                    'exam_total_score' => $request->input("exam_total_score.$term"),
+                ]
+            );
         }
-
-        // Save or update the record in your `percentage` table
-        Percentage::updateOrCreate(
-            ['classID' => $class->id], // Condition to check if it already exists for this class
-            [
-                'classID' => $class->id,  // Ensure classID is set in case a new record is created
-                'quiz_percentage' => $request->input('quiz_percentage'),
-                'quiz_total_score' => $request->input('quiz_total_score'),
-                'attendance_percentage' => $request->input('attendance_percentage'),
-                'attendance_total_score' => $request->input('attendance_total_score'),
-                'assignment_participation_project_percentage' => $request->input('assignment_participation_project_percentage'),
-                'assignment_participation_project_total_score' => $request->input('assignment_participation_project_total_score'),
-                'exam_percentage' => $request->input('exam_percentage'),
-                'exam_total_score' => $request->input('exam_total_score'),
-            ]
-        );
-
 
         return redirect()->route("class.show", $class)->with('success', 'Data saved successfully.');
     }
+
 
     public function addQuizAndScore(Request $request, $class)
     {
