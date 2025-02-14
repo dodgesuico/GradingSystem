@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\TransmutedGrade;
 use App\Models\Percentage;
 use App\Models\QuizzesAndScores;
@@ -100,8 +101,25 @@ class RegistrarController extends Controller
 
         $percentage = Percentage::where('classID', $class->id)->first();
 
+        $transmutedGrades = [];
 
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
+        foreach ($quizzesandscores as $score) {
+            $quizScore = (float) $score->quizzez;
+            // Find the corresponding transmuted grade
+            if (!is_numeric($score->quizzez)) {
+                $transmutedGrade = 'N/A';
+            } else {
+                $transmutedGrade = DB::table('transmuted_grade')
+                    ->where('score_bracket', '<=', (float) $score->quizzez)
+                    ->orderBy('score_bracket', 'desc')
+                    ->value('transmuted_grade');
+            }
+
+            // Store the transmuted grade by studentID and periodic term
+            $transmutedGrades[$score->studentID][$score->periodic_term] = $transmutedGrade ?: 'N/A';
+        }
+
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'transmutedGrades'));
     }
 
     public function addstudent(Request $request, Classes $class)

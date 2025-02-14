@@ -200,22 +200,26 @@
                         @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
                             <div class="calculation-container">
                                 @php
-                                    $percentageValue = $percentage && $percentage->where('periodic_term', $term)->first()
-                                                    ? $percentage->where('periodic_term', $term)->first()->{$key . '_percentage'}
-                                                    : '';
+                                    $percentageValue =
+                                        $percentage && $percentage->where('periodic_term', $term)->first()
+                                            ? $percentage->where('periodic_term', $term)->first()
+                                                ->{$key . '_percentage'}
+                                            : '';
                                 @endphp
 
                                 <h4>{{ $category }}</h4>
                                 <div class="calculation-content">
                                     <label>Percentage (%)</label>
-                                    <input type="number" name="{{ $key }}_percentage[{{ $term }}]" value="{{ old($key . '_percentage.' . $term, $percentageValue) }}" min="0" max="100" required>
+                                    <input type="number" name="{{ $key }}_percentage[{{ $term }}]"
+                                        value="{{ old($key . '_percentage.' . $term, $percentageValue) }}" min="0"
+                                        max="100" required>
 
                                 </div>
                                 <div class="calculation-content">
                                     <label>Total Score</label>
                                     <input type="number" name="{{ $key }}_total_score[{{ $term }}]"
-                                                        value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
-                                                        min="0">
+                                        value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
+                                        min="0">
                                 </div>
                             </div>
                         @endforeach
@@ -263,21 +267,37 @@
                                 </tr>
                                 @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
                                     @php
-                                        $student = $classes_student->firstWhere('studentID', $quizzesandscore->studentID);
-                                        $score = $quizzesandscores->where('studentID', $student->studentID)
-                                                                    ->where('periodic_term', $term)
-                                                                    ->first();
+                                        $student = $classes_student->firstWhere(
+                                            'studentID',
+                                            $quizzesandscore->studentID,
+                                        );
+                                        $score = $quizzesandscores
+                                            ->where('studentID', $student->studentID)
+                                            ->where('periodic_term', $term)
+                                            ->first();
                                     @endphp
                                     <tr>
+
                                         <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
                                         @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
                                             <td class="cell-content-container">
                                                 <div class="content-container">
                                                     <div class="cell-content"><input type="number"
-                                                        name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
-                                                        value="{{ $score ? $score->$field : '' }}"
-                                                        min="0"></div>
-                                                    @for ($j = 0; $j < 2; $j++)
+                                                            name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
+                                                            value="{{ $score ? $score->$field : '' }}" min="0">
+                                                    </div>
+                                                    @php
+                                                        $terms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
+                                                    @endphp
+                                                    @foreach ($terms as $term)
+                                                        @if (isset($quizzesandscores->firstWhere('periodic_term', $term)->quizzez))
+                                                            <div class="cell-content">
+                                                                <p>{{ $transmutedGrades[$student->studentID][$term] ?? 'N/A' }}
+                                                                </p>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                    @for ($j = 0; $j < 1; $j++)
                                                         <div class="cell-content">
                                                             <p></p>
                                                         </div>
@@ -392,7 +412,8 @@
                     </div>
                     <div class="info-container">
                         <label for="student">Student</label>
-                        <select id="student" name="name" class="form-control" onchange="fillStudentInfo()" required>
+                        <select id="student" name="name" class="form-control" onchange="fillStudentInfo()"
+                            required>
                             <option value="" disabled selected>Select Student</option>
                             @foreach ($students as $student)
                                 <option value="{{ $student->id }}" data-name="{{ $student->name }}"
