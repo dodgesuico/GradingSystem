@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quizzes_scores', function (Blueprint $table) {
-            $table->id();
-            $table->integer('classID');
-            $table->integer('studentID');
-            $table->string('periodic_term');
-            $table->string('quizzez');
-            $table->string('attendance_behavior');
-            $table->string('assignments');
-            $table->string('exam');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('quizzes_scores')) {
+            Schema::create('quizzes_scores', function (Blueprint $table) {
+                $table->id();
+                $table->integer('classID');
+                $table->integer('studentID');
+                $table->string('periodic_term');
+                $table->string('quizzez');
+                $table->string('attendance_behavior');
+                $table->string('assignments');
+                $table->string('exam');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

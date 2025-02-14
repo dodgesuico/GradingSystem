@@ -12,19 +12,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
-            $table->id();
-            $table->string('department_name');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('departments')) {
+            Schema::create('departments', function (Blueprint $table) {
+                $table->id();
+                $table->string('department_name');
+                $table->timestamps();
+            });
 
-        DB::table('departments')->insert([
-            ['department_name' => 'College of Arts and Social Sciences', 'created_at' => now(), 'updated_at' => now()],
-            ['department_name' => 'College of Business Administration', 'created_at' => now(), 'updated_at' => now()],
-            ['department_name' => 'College of Computer Science', 'created_at' => now(), 'updated_at' => now()],
-            ['department_name' => 'College of Criminology', 'created_at' => now(), 'updated_at' => now()],
-            ['department_name' => 'College of Education', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+            DB::table('departments')->insert([
+                ['department_name' => 'College of Arts and Social Sciences', 'created_at' => now(), 'updated_at' => now()],
+                ['department_name' => 'College of Business Administration', 'created_at' => now(), 'updated_at' => now()],
+                ['department_name' => 'College of Computer Science', 'created_at' => now(), 'updated_at' => now()],
+                ['department_name' => 'College of Criminology', 'created_at' => now(), 'updated_at' => now()],
+                ['department_name' => 'College of Education', 'created_at' => now(), 'updated_at' => now()],
+            ]);
+        }
     }
 
     /**

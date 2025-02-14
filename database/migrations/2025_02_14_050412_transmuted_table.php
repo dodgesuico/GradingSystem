@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('classes')) {
-            Schema::create('classes', function (Blueprint $table) {
+        if (!Schema::hasTable('transmuted_grade')) {
+            Schema::create('transmuted_grade', function (Blueprint $table) {
                 $table->id();
-                $table->string('subject_code');
-                $table->string('descriptive_title');
-                $table->string('instructor');
-                $table->string('academic_period');
-                $table->string('schedule');
-                $table->string('status');
+
+                $table->decimal('score_bracket', 5, 2);
+
+                $table->decimal('score', 5, 2);
+
+                $table->decimal('transmuted_grade', 5, 2);
+
                 $table->timestamps();
             });
         }

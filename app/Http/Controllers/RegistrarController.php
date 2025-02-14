@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TransmutedGrade;
 use App\Models\Percentage;
 use App\Models\QuizzesAndScores;
 use App\Models\Classes_Student;
