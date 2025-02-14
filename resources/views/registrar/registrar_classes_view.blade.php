@@ -186,39 +186,41 @@
         </div>
 
 
-        <h2 style="margin-top:20px;">Calculation</h2>
+        <h2 style="margin:10px 0; padding-top: 25px;">Grading</h2>
 
-        <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="calculation-base-container">
-                @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment_participation_project' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
-                    <div class="calculation-container">
-                        <h4>{{ $category }}</h4>
+        @foreach (['Prelim', 'Midterm', 'Semi-Final', 'Final'] as $term)
+            <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="periodic-term-section">
+                    <h3>{{ $term }}</h3>
+                    <input type="hidden" name="periodic_terms[]" value="{{ $term }}">
 
-                        <!-- Percentage Input -->
-                        <div class="calculation-content">
-                            <label>Percentage (%)</label>
-                            <input type="number" name="{{ $key }}_percentage" min="0" max="100"
-                                value="{{ old($key . '_percentage', $percentage->{$key . '_percentage'} ?? 0) }}" required>
-                        </div>
-
-                        <!-- Total Score Input -->
-                        <div class="calculation-content">
-                            <label>Total Score</label>
-                            <input type="number" name="{{ $key }}_total_score" min="0"
-                                value="{{ old($key . '_total_score', $percentage->{$key . '_total_score'} ?? 0) }}">
-                        </div>
+                    <div class="calculation-base-container">
+                        @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment_participation_project' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
+                            <div class="calculation-container">
+                                <h4>{{ $category }}</h4>
+                                <div class="calculation-content">
+                                    <label>Percentage (%)</label>
+                                    <input type="number" name="{{ $key }}_percentage[{{ $term }}]" min="0" max="100" required>
+                                </div>
+                                <div class="calculation-content">
+                                    <label>Total Score</label>
+                                    <input type="number" name="{{ $key }}_total_score[{{ $term }}]" min="0">
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
+                </div>
 
-            <div style="margin-top: 10px; display: flex; width: 100%; justify-content: right;">
-                <button type="submit">Update</button>
-            </div>
-        </form>
+                <div style="margin-top: 10px; display: flex; width: 100%; justify-content: right;">
+                    <button type="submit">Update</button>
+                </div>
+            </form>
+        @endforeach
 
 
+        <h2 style="">Scores</h2>
 
         <div class="grades-container">
             @foreach (['Prelim' => 'Prelim', 'Midterm' => 'Midterm', 'Semi-Finals' => 'Semi-Finals', 'Finals' => 'Finals'] as $period => $term)
@@ -285,6 +287,7 @@
                 </form>
             @endforeach
         </div>
+
 
 
 
