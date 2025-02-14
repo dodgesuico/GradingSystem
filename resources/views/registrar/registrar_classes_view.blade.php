@@ -289,14 +289,15 @@
                                                     @php
                                                         $terms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
                                                     @endphp
+
                                                     @foreach ($terms as $term)
-                                                        @if (isset($quizzesandscores->firstWhere('periodic_term', $term)->quizzez))
-                                                            <div class="cell-content">
-                                                                <p>{{ $transmutedGrades[$student->studentID][$term] ?? 'N/A' }}
-                                                                </p>
-                                                            </div>
-                                                        @endif
+                                                        <div class="cell-content">
+                                                            <p>
+                                                                {{ $transmutedGrades['quizzes'][$student->id][$term] ?? 'N/A' }}
+                                                            </p>
+                                                        </div>
                                                     @endforeach
+
                                                     @for ($j = 0; $j < 1; $j++)
                                                         <div class="cell-content">
                                                             <p></p>
