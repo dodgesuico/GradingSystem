@@ -202,11 +202,15 @@
                                 <h4>{{ $category }}</h4>
                                 <div class="calculation-content">
                                     <label>Percentage (%)</label>
-                                    <input type="number" name="{{ $key }}_percentage[{{ $term }}]" min="0" max="100" required>
+                                    <input type="number" name="{{ $key }}_percentage[{{ $term }}]"
+                                                        value="{{ old($key . '_percentage.' . $term, $percentage->where('periodic_term', $term)->first()->{$key . '_percentage'} ?? '') }}"
+                                                        min="0" max="100" required>
                                 </div>
                                 <div class="calculation-content">
                                     <label>Total Score</label>
-                                    <input type="number" name="{{ $key }}_total_score[{{ $term }}]" min="0">
+                                    <input type="number" name="{{ $key }}_total_score[{{ $term }}]"
+                                            value="{{ old($key . '_total_score.' . $term, $percentage->where('periodic_term', $term)->first()->{$key . '_total_score'} ?? '') }}"
+                                            min="0">
                                 </div>
                             </div>
                         @endforeach
