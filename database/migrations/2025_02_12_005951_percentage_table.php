@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('percentage', function (Blueprint $table) {
             $table->id();
             $table->integer('classID');
+            $table->integer('periodic_term');
             $table->integer('quiz_percentage');
             $table->integer('quiz_total_score');
             $table->integer('attendance_percentage');

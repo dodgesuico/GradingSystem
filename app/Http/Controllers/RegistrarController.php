@@ -177,7 +177,7 @@ class RegistrarController extends Controller
         foreach ($periodicTerms as $term) {
             $totalPercentage = $request->input("quiz_percentage.$term") +
                             $request->input("attendance_percentage.$term") +
-                            $request->input("assignment_participation_project_percentage.$term") +
+                            $request->input("assignment_percentage.$term") +
                             $request->input("exam_percentage.$term");
 
             if ($totalPercentage !== 100) {
@@ -189,14 +189,14 @@ class RegistrarController extends Controller
             Percentage::updateOrCreate(
                 ['classID' => $class->id, 'periodic_term' => $term],
                 [
-                    'quiz_percentage' => $request->input("quiz_percentage.$term"),
-                    'quiz_total_score' => $request->input("quiz_total_score.$term"),
-                    'attendance_percentage' => $request->input("attendance_percentage.$term"),
-                    'attendance_total_score' => $request->input("attendance_total_score.$term"),
-                    'assignment_participation_project_percentage' => $request->input("assignment_participation_project_percentage.$term"),
-                    'assignment_participation_project_total_score' => $request->input("assignment_participation_project_total_score.$term"),
-                    'exam_percentage' => $request->input("exam_percentage.$term"),
-                    'exam_total_score' => $request->input("exam_total_score.$term"),
+                    'quiz_percentage' => $request->input("quiz_percentage.$term") ?? 0,
+                    'quiz_total_score' => $request->input("quiz_total_score.$term") ?? 0,
+                    'attendance_percentage' => $request->input("attendance_percentage.$term") ?? 0,
+                    'attendance_total_score' => $request->input("attendance_total_score.$term") ?? 0,
+                    'assignment_percentage' => $request->input("assignment_percentage.$term") ?? 0,
+                    'assignment_total_score' => $request->input("assignment_total_score.$term") ?? 0,
+                    'exam_percentage' => $request->input("exam_percentage.$term") ?? 0,
+                    'exam_total_score' => $request->input("exam_total_score.$term") ?? 0,
                 ]
             );
         }
@@ -231,7 +231,7 @@ class RegistrarController extends Controller
             if (($fields['attendance_behavior'] ?? 0) > $percentage->attendance_total_score) {
                 return redirect()->back()->with('error', "Attendance score for {$studentName} exceeds the total score.");
             }
-            if (($fields['assignments'] ?? 0) > $percentage->assignment_participation_project_total_score) {
+            if (($fields['assignments'] ?? 0) > $percentage->assignment_total_score) {
                 return redirect()->back()->with('error', "Assignment score for {$studentName} exceeds the total score.");
             }
             if (($fields['exam'] ?? 0) > $percentage->exam_total_score) {
@@ -248,7 +248,7 @@ class RegistrarController extends Controller
                 $existingRecord->update([
                     'quizzez' => $fields['quizzez'] ?? $existingRecord->quizzez,
                     'attendance_behavior' => $fields['attendance_behavior'] ?? $existingRecord->attendance_behavior,
-                    'assignments_participations_project' => $fields['assignments_participations_project'] ?? $existingRecord->assignments_participations_project,
+                    'assignments' => $fields['assignments'] ?? $existingRecord->assignments,
                     'exam' => $fields['exam'] ?? $existingRecord->exam,
                     'updated_at' => now(),
                 ]);
@@ -259,7 +259,7 @@ class RegistrarController extends Controller
                     'periodic_term' => $periodicTerm,
                     'quizzez' => $fields['quizzez'] ?? null,
                     'attendance_behavior' => $fields['attendance_behavior'] ?? null,
-                    'assignments_participations_project' => $fields['assignments_participations_project'] ?? null,
+                    'assignments' => $fields['assignments'] ?? null,
                     'exam' => $fields['exam'] ?? null,
                     'created_at' => now(),
                     'updated_at' => now(),
