@@ -99,7 +99,7 @@ class RegistrarController extends Controller
 
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
 
-        $percentage = Percentage::where('classID', $class->id)->first();
+        $percentage = Percentage::where('classID', $class->id)->get();
 
         $transmutedGrades = [];
 
