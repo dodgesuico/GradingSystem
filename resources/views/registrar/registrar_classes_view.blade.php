@@ -275,33 +275,42 @@
                                             ->where('studentID', $student->studentID)
                                             ->where('periodic_term', $term)
                                             ->first();
+
                                     @endphp
                                     <tr>
-
                                         <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
                                         @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
+                                            @php
+                                                $fieldScore = $score ? $score->$field : null;
+
+                                                // Check transmuted grade table for matching score_bracket
+                                                $transmutedGrade = null;
+
+                                                if (!empty($fieldScore) && $fieldScore > 0) {
+                                                    $transmutedGradeEntry = DB::table('transmuted_grade')
+                                                        ->where('score_bracket', $fieldScore)
+                                                        ->first();
+
+                                                    $transmutedGrade = $transmutedGradeEntry
+                                                        ? $transmutedGradeEntry->transmuted_grade
+                                                        : null;
+                                                }
+                                            @endphp
                                             <td class="cell-content-container">
                                                 <div class="content-container">
-                                                    <div class="cell-content"><input type="number"
+                                                    <div class="cell-content">
+                                                        <input type="number"
                                                             name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
-                                                            value="{{ $score ? $score->$field : '' }}" min="0">
+                                                            value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
+                                                            min="0" step="0.01">
                                                     </div>
-                                                    @php
-                                                        $terms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
-                                                    @endphp
-                                                    @foreach ($terms as $term)
-                                                        @if (isset($quizzesandscores->firstWhere('periodic_term', $term)->quizzez))
-                                                            <div class="cell-content">
-                                                                <p>{{ $transmutedGrades[$student->studentID][$term] ?? 'N/A' }}
-                                                                </p>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
-                                                    @for ($j = 0; $j < 1; $j++)
-                                                        <div class="cell-content">
-                                                            <p></p>
-                                                        </div>
-                                                    @endfor
+                                                    <div class="cell-content">
+                                                        <p>{{ $transmutedGrade ?? '' }}</p>
+                                                        <!-- Displays Transmuted Grade for Each Field -->
+                                                    </div>
+                                                    <div class="cell-content">
+                                                        <p></p>
+                                                    </div>
                                                 </div>
                                             </td>
                                         @endforeach

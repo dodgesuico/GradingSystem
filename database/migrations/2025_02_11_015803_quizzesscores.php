@@ -17,10 +17,10 @@ return new class extends Migration
                 $table->integer('classID');
                 $table->integer('studentID');
                 $table->string('periodic_term');
-                $table->decimal('quizzez', 5, 2);
-                $table->decimal('attendance_behavior', 5, 2);
-                $table->decimal('assignments', 5, 2);
-                $table->decimal('exam', 5, 2);
+                $table->decimal('quizzez', 5, 2)->nullable();
+                $table->decimal('attendance_behavior', 5, 2)->nullable();
+                $table->decimal('assignments', 5, 2)->nullable();
+                $table->decimal('exam', 5, 2)->nullable();
                 $table->timestamps();
             });
         }
