@@ -89,37 +89,14 @@ class RegistrarController extends Controller
 
     public function show(Classes $class)
     {
-        // Get all student IDs already in the class
         $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
-
-        // Get students who are not already enrolled in the class
-        $students = User::where('role', 'student')->whereNotIn('id', $enrolledStudentIds)->get();
-
+        $students = User::where('role', 'student')->get();
         $classes_student = Classes_Student::where('classID', $class->id)->get();
-
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
+        $percentage = Percentage::where('classID', $class->id)->get();
 
-        $percentage = Percentage::where('classID', $class->id)->first();
 
-        $transmutedGrades = [];
-
-        foreach ($quizzesandscores as $score) {
-            $quizScore = (float) $score->quizzez;
-            // Find the corresponding transmuted grade
-            if (!is_numeric($score->quizzez)) {
-                $transmutedGrade = 'N/A';
-            } else {
-                $transmutedGrade = DB::table('transmuted_grade')
-                    ->where('score_bracket', '<=', (float) $score->quizzez)
-                    ->orderBy('score_bracket', 'desc')
-                    ->value('transmuted_grade');
-            }
-
-            // Store the transmuted grade by studentID and periodic term
-            $transmutedGrades[$score->studentID][$score->periodic_term] = $transmutedGrade ?: 'N/A';
-        }
-
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'transmutedGrades'));
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
     }
 
 
