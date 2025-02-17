@@ -22,16 +22,18 @@ return new class extends Migration
                 $table->string("role");
                 $table->timestamps();
             });
+
+
+            DB::table('users')->insert([
+                ['name' => 'Student1', 'email' => 'student@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Student2', 'email' => 'Student2@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Student3', 'email' => 'Student3@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Instructor1', 'email' => 'Instructor1@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Instructor2', 'email' => 'Instructor2@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Registrar', 'email' => 'Registrar@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
+            ]);
         }
 
-        DB::table('users')->insert([
-            ['name' => 'Student1', 'email' => 'student@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Student2', 'email' => 'Student2@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Student3', 'email' => 'Student3@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Instructor1', 'email' => 'Instructor1@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Instructor2', 'email' => 'Instructor2@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Registrar', 'email' => 'Registrar@gmail.com', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
-        ]);
 
         if (!Schema::hasTable('password_reset_tokens')) {
             Schema::create('password_reset_tokens', function (Blueprint $table) {
