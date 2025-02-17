@@ -122,6 +122,7 @@ class RegistrarController extends Controller
         return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'transmutedGrades'));
     }
 
+
     public function addstudent(Request $request, Classes $class)
     {
         $request->validate([
