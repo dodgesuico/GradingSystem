@@ -87,14 +87,18 @@ class RegistrarController extends Controller
         }
     }
 
-    public function show(Classes $class)
+    public function show(Request $request, Classes $class)
     {
-        $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
-        $students = User::where('role', 'student')->get();
-        $classes_student = Classes_Student::where('classID', $class->id)->get();
-        $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
-        $percentage = Percentage::where('classID', $class->id)->get();
 
+        $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
+
+        $students = User::where('role', 'student')->get();
+
+        $classes_student = Classes_Student::where('classID', $class->id)->get();
+
+        $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
+
+        $percentage = Percentage::where('classID', $class->id)->get();
 
         return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
     }
@@ -142,13 +146,13 @@ class RegistrarController extends Controller
     {
         // Find the student in the class
         $classStudent = Classes_Student::where('classID', $class)
-                                    ->where('studentID', $student)
-                                    ->first();
+            ->where('studentID', $student)
+            ->first();
 
         // Find all related quizzes and scores for this student in the class
         $quizzesScores = QuizzesAndScores::where('classID', $class)
-                                        ->where('studentID', $student)
-                                        ->get();  // Get all records instead of first()
+            ->where('studentID', $student)
+            ->get();  // Get all records instead of first()
 
         if ($classStudent || $quizzesScores->isNotEmpty()) {
             if ($classStudent) {
@@ -173,9 +177,9 @@ class RegistrarController extends Controller
 
         foreach ($periodicTerms as $term) {
             $totalPercentage = $request->input("quiz_percentage.$term") +
-                            $request->input("attendance_percentage.$term") +
-                            $request->input("assignment_percentage.$term") +
-                            $request->input("exam_percentage.$term");
+                $request->input("attendance_percentage.$term") +
+                $request->input("assignment_percentage.$term") +
+                $request->input("exam_percentage.$term");
 
             if ($totalPercentage !== 100) {
                 return redirect()->route("class.show", $class)
@@ -216,10 +220,10 @@ class RegistrarController extends Controller
 
         foreach ($scores as $studentId => $fields) {
             $classStudent = Classes_Student::where('classID', $class)
-                                   ->where('studentID', $studentId)
-                                   ->first();
+                ->where('studentID', $studentId)
+                ->first();
 
-            $studentName = $classStudent->name ?? "Student ID $studentId";// Fetch the student record
+            $studentName = $classStudent->name ?? "Student ID $studentId"; // Fetch the student record
 
             // Validate scores against total scores from percentage table
             if (($fields['quizzez'] ?? 0) > $percentage->quiz_total_score) {
@@ -266,6 +270,4 @@ class RegistrarController extends Controller
 
         return redirect()->back()->with('success', 'Scores updated successfully.');
     }
-
-
 }
