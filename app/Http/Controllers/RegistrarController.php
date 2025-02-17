@@ -90,35 +90,13 @@ class RegistrarController extends Controller
     public function show(Classes $class)
     {
         $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
-        $students = User::where('role', 'student')->whereIn('id', $enrolledStudentIds)->get();
+        $students = User::where('role', 'student')->get();
         $classes_student = Classes_Student::where('classID', $class->id)->get();
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
-        $percentage = Percentage::where('classID', $class->id)->first();
+        $percentage = Percentage::where('classID', $class->id)->get();
 
-        $transmutedGrades = [];
-        $terms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
 
-        // Initialize transmutedGrades for all students and terms
-        foreach ($classes_student as $student) {
-            foreach ($terms as $term) {
-                $transmutedGrades['quizzes'][$student->studentID][$term] = 'N/A';
-            }
-        }
-
-        // Populate transmuted grades for quizzes
-        foreach ($quizzesandscores as $score) {
-            $term = $score->periodic_term;
-            $studentID = $score->studentID;
-
-            if ($score->quizzez !== null) {
-                $transmutedGrades['quizzes'][$studentID][$term] = DB::table('transmuted_grade')
-                    ->where('score_bracket', '<=', (float)$score->quizzez)
-                    ->orderBy('score_bracket', 'desc')
-                    ->value('transmuted_grade') ?: 'N/A';
-            }
-        }
-
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'transmutedGrades'));
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
     }
 
 

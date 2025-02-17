@@ -16,14 +16,14 @@ return new class extends Migration
                 $table->id();
                 $table->integer('classID');
                 $table->integer('periodic_term');
-                $table->integer('quiz_percentage');
-                $table->integer('quiz_total_score');
-                $table->integer('attendance_percentage');
-                $table->integer('attendance_total_score');
-                $table->integer('assignment_participation_project_percentage');
-                $table->integer('assignment_participation_project_total_score');
-                $table->integer('exam_percentage');
-                $table->integer('exam_total_score');
+                $table->decimal('quiz_percentage', 5, 2)->nullable();
+                $table->decimal('quiz_total_score', 5, 2)->nullable();
+                $table->decimal('attendance_percentage', 5, 2)->nullable();
+                $table->decimal('attendance_total_score', 5, 2)->nullable();
+                $table->decimal('assignment_percentage', 5, 2)->nullable();
+                $table->decimal('assignment_total_score', 5, 2)->nullable();
+                $table->decimal('exam_percentage', 5, 2)->nullable();
+                $table->decimal('exam_total_score', 5, 2)->nullable();
                 $table->timestamps();
             });
         }

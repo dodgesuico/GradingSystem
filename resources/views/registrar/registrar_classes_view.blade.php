@@ -286,19 +286,7 @@
                                                             name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
                                                             value="{{ $score ? $score->$field : '' }}" min="0">
                                                     </div>
-                                                    @php
-                                                        $terms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
-                                                    @endphp
-
-                                                    @foreach ($terms as $term)
-                                                        <div class="cell-content">
-                                                            <p>
-                                                                {{ $transmutedGrades['quizzes'][$student->id][$term] ?? 'N/A' }}
-                                                            </p>
-                                                        </div>
-                                                    @endforeach
-
-                                                    @for ($j = 0; $j < 1; $j++)
+                                                    @for ($j = 0; $j < 2; $j++)
                                                         <div class="cell-content">
                                                             <p></p>
                                                         </div>
