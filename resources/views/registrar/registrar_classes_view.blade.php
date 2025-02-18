@@ -190,7 +190,7 @@
 
         <h2 class="grading-title" style="margin: 20px 0">Grading</h2>
 
-        @foreach (['Prelim', 'Midterm', 'Semi-Final', 'Final'] as $term)
+        @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $term)
             <div class="grading-section-unique">
                 <button type="button" class="grading-toggle-unique"
                     onclick="toggleSection('grading-unique-{{ $term }}')">
@@ -344,8 +344,10 @@
 
                                                         $fieldPercentage = match ($field) {
                                                             'quizzez' => $percentageData->quiz_percentage ?? 0,
-                                                            'attendance_behavior' => $percentageData->attendance_percentage ?? 0,
-                                                            'assignments' => $percentageData->assignment_percentage ?? 0,
+                                                            'attendance_behavior'
+                                                                => $percentageData->attendance_percentage ?? 0,
+                                                            'assignments' => $percentageData->assignment_percentage ??
+                                                                0,
                                                             'exam' => $percentageData->exam_percentage ?? 0,
                                                             default => 0,
                                                         };
@@ -362,7 +364,8 @@
 
                                                             // Compute final grade based on percentage
                                                             if (!is_null($transmutedGrade)) {
-                                                                $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
+                                                                $computedGrade =
+                                                                    ($transmutedGrade * $fieldPercentage) / 100;
                                                             }
                                                         }
                                                     @endphp
@@ -378,7 +381,8 @@
                                                                 <p>{{ $transmutedGrade ?? '' }}</p>
                                                             </div>
                                                             <div class="cell-content">
-                                                                <p>{{ $computedGrade !== null ? number_format($computedGrade, 2) : '' }}</p>
+                                                                <p>{{ $computedGrade !== null ? number_format($computedGrade, 2) : '' }}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -406,6 +410,7 @@
                 border-radius: 5px;
                 overflow: hidden;
             }
+
             .score-toggle-unique {
                 width: 100%;
                 text-align: center;
@@ -441,6 +446,69 @@
 
 
         {{-- start of grade-sheet --}}
+        @php
+            // Store total grades per student and per period
+            $studentGrades = [];
+
+            foreach ($classes_student as $student) {
+                $studentID = $student->studentID;
+                $studentGrades[$studentID] = [
+                    'Prelim' => 0,
+                    'Midterm' => 0,
+                    'Semi-Finals' => 0,
+                    'Finals' => 0,
+                    'Cumulative' => 0,
+                ];
+
+                foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $period) {
+                    $totalPeriodGrade = 0;
+
+                    foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field) {
+                        $score = $quizzesandscores
+                            ->where('studentID', $studentID)
+                            ->where('periodic_term', $period)
+                            ->first();
+                        $fieldScore = $score ? $score->$field : null;
+
+                        // Get percentage for this field and period
+                        $percentageData = DB::table('percentage')
+                            ->where('classID', $class->id)
+                            ->where('periodic_term', $period)
+                            ->first();
+
+                        $fieldPercentage = match ($field) {
+                            'quizzez' => $percentageData->quiz_percentage ?? 0,
+                            'attendance_behavior' => $percentageData->attendance_percentage ?? 0,
+                            'assignments' => $percentageData->assignment_percentage ?? 0,
+                            'exam' => $percentageData->exam_percentage ?? 0,
+                            default => 0,
+                        };
+
+                        // Get transmuted grade
+                        if (!empty($fieldScore) && $fieldScore > 0) {
+                            $transmutedGradeEntry = DB::table('transmuted_grade')
+                                ->where('score_bracket', $fieldScore)
+                                ->first();
+
+                            $transmutedGrade = $transmutedGradeEntry ? $transmutedGradeEntry->transmuted_grade : null;
+
+                            // Compute final grade based on percentage
+                            if (!is_null($transmutedGrade)) {
+                                $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
+                                $totalPeriodGrade += $computedGrade;
+                            }
+                        }
+                    }
+
+                    // Store total grade for this period
+                    $studentGrades[$studentID][$period] = $totalPeriodGrade;
+                }
+
+                // Compute Cumulative Grade (average of all periods)
+                $studentGrades[$studentID]['Cumulative'] = array_sum($studentGrades[$studentID]) / 4;
+            }
+        @endphp
+
         <h2 style="margin: 20px 0">Grades</h2>
         <div class="grade-sheet-container">
             <table>
@@ -451,22 +519,24 @@
                         <td>Midterm</td>
                         <td>Semi-Final</td>
                         <td>Final</td>
-                        <td>Comulative Grade</td>
+                        <td>Cumulative Grade</td>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>(student name here)</td>
-                        <td>(Prelim grade here)</td>
-                        <td>(Midterm)</td>
-                        <td>(semi)</td>
-                        <td>(final)</td>
-                        <td>(Comulative Grade)</td>
-                    </tr>
-
+                    @foreach ($classes_student as $student)
+                        <tr>
+                            <td>{{ $student->name }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Cumulative'], 2) }}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
+
 
 
     </div>
