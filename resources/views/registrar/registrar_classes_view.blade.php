@@ -4,7 +4,7 @@
 
 @section('content')
 
-
+    {{-- start of dashboard --}}
     <div class="dashboard">
         <div class="header-container">
 
@@ -186,175 +186,291 @@
         </div>
 
 
-        <h2 style="margin:10px 0; padding-top: 25px;">Grading</h2>
+
+
+        <h2 class="grading-title" style="margin: 20px 0">Grading</h2>
 
         @foreach (['Prelim', 'Midterm', 'Semi-Final', 'Final'] as $term)
-            <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="periodic-term-section">
-                    <h3>{{ $term }}</h3>
-                    <input type="hidden" name="periodic_terms[]" value="{{ $term }}">
+            <div class="grading-section-unique">
+                <button type="button" class="grading-toggle-unique"
+                    onclick="toggleSection('grading-unique-{{ $term }}')">
+                    {{ $term }} <i class="fa-solid fa-arrows-up-down"></i>
+                </button>
+                <div id="grading-unique-{{ $term }}" class="grading-content-unique">
+                    <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="periodic_terms[]" value="{{ $term }}">
 
-                    <div class="calculation-base-container">
-                        @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
-                            <div class="calculation-container">
-                                @php
-                                    $percentageValue =
-                                        $percentage && $percentage->where('periodic_term', $term)->first()
-                                            ? $percentage->where('periodic_term', $term)->first()
-                                                ->{$key . '_percentage'}
-                                            : '';
-                                @endphp
+                        <div class="calculation-base-container">
+                            @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
+                                <div class="calculation-container">
+                                    @php
+                                        $percentageValue =
+                                            $percentage && $percentage->where('periodic_term', $term)->first()
+                                                ? $percentage->where('periodic_term', $term)->first()
+                                                    ->{$key . '_percentage'}
+                                                : '';
+                                    @endphp
 
-                                <h4>{{ $category }}</h4>
-                                <div class="calculation-content">
-                                    <label>Percentage (%)</label>
-                                    <input type="number" name="{{ $key }}_percentage[{{ $term }}]"
-                                        value="{{ old($key . '_percentage.' . $term, $percentageValue) }}" min="0"
-                                        max="100" required>
-
+                                    <h4>{{ $category }}</h4>
+                                    <div class="calculation-content">
+                                        <label>Percentage (%)</label>
+                                        <input type="number" name="{{ $key }}_percentage[{{ $term }}]"
+                                            value="{{ old($key . '_percentage.' . $term, $percentageValue) }}"
+                                            min="0" max="100" required>
+                                    </div>
+                                    <div class="calculation-content">
+                                        <label>Total Score</label>
+                                        <input type="number" name="{{ $key }}_total_score[{{ $term }}]"
+                                            value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
+                                            min="0">
+                                    </div>
                                 </div>
-                                <div class="calculation-content">
-                                    <label>Total Score</label>
-                                    <input type="number" name="{{ $key }}_total_score[{{ $term }}]"
-                                        value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
-                                        min="0">
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                            @endforeach
+                        </div>
 
-                <div style="margin-top: 10px; display: flex; width: 100%; justify-content: right;">
-                    <button type="submit">Update</button>
+                        <div style="margin-top: 10px; display: flex; width: 100%; justify-content: right;">
+                            <button type="submit">Save</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         @endforeach
 
+        <style>
+            .grading-section-unique {
+                margin-bottom: 15px;
+                border-radius: 5px;
+                overflow: hidden;
+                border: 1px solid var(--color6);
+            }
 
-        <h2 style="">Scores</h2>
+            .grading-toggle-unique {
+                width: 100%;
+                text-align: center;
 
+                padding: 10px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            .grading-content-unique {
+                display: none;
+                padding: 15px;
+                transition: all 0.3s ease-in-out;
+            }
+        </style>
+
+        <script>
+            function toggleSection(id) {
+                let section = document.getElementById(id);
+                if (section.style.display === "none" || section.style.display === "") {
+                    section.style.display = "block";
+                } else {
+                    section.style.display = "none";
+                }
+            }
+        </script>
+        {{-- end of grading form --}}
+
+
+
+        <h2 style="margin-bottom:10px">Scores</h2>
+        {{-- grades container --}}
         <div class="grades-container">
             @foreach (['Prelim' => 'Prelim', 'Midterm' => 'Midterm', 'Semi-Finals' => 'Semi-Finals', 'Finals' => 'Finals'] as $period => $term)
-                <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
-                    @csrf
-                    @method('PUT')
-                    <h3 style="margin-top:50px;">{{ $period }} (Raw)</h3>
-                    <input type="hidden" name="periodic_term" value="{{ $term }}">
-                    <div class="container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Student Name</th>
-                                    @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
-                                        <th>{{ $category }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    @for ($i = 0; $i < 4; $i++)
-                                        <td>
-                                            <div class="content-container">
-                                                @foreach (['Accumulated Score', 'Transmuted Grade', 'Grade'] as $label)
-                                                    <div class="cell-content">{{ $label }}</div>
-                                                @endforeach
-                                            </div>
-                                        </td>
-                                    @endfor
-                                </tr>
-                                @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
-                                    @php
-                                        $student = $classes_student->firstWhere(
-                                            'studentID',
-                                            $quizzesandscore->studentID,
-                                        );
-                                        $score = $quizzesandscores
-                                            ->where('studentID', $student->studentID)
-                                            ->where('periodic_term', $term)
-                                            ->first();
-
-                                    @endphp
-                                    <tr>
-                                        <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
-                                        @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
+                <div class="score-section-unique">
+                    <button type="button" class="score-toggle-unique"
+                        onclick="toggleSection('score-unique-{{ $term }}')">
+                        {{ $period }} Scores <i class="fa-solid fa-arrows-up-down"></i>
+                    </button>
+                    <div id="score-unique-{{ $term }}" class="score-content-unique">
+                        <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
+                            @csrf
+                            @method('PUT')
+                            <h3>{{ $period }} (Raw)</h3>
+                            <input type="hidden" name="periodic_term" value="{{ $term }}">
+                            <div class="container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
+                                                <th>{{ $category }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            @for ($i = 0; $i < 4; $i++)
+                                                <td>
+                                                    <div class="content-container">
+                                                        @foreach (['Accumulated Score', 'Transmuted Grade', 'Grade'] as $label)
+                                                            <div class="cell-content">{{ $label }}</div>
+                                                        @endforeach
+                                                    </div>
+                                                </td>
+                                            @endfor
+                                        </tr>
+                                        @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
                                             @php
-                                                $fieldScore = $score ? $score->$field : null;
-                                                $transmutedGrade = null;
-                                                $computedGrade = null;
-
-                                                // Fetch the percentage for this specific field and term
-                                                $percentageData = DB::table('percentage')
-                                                    ->where('classID', $class->id)
-                                                    ->where('periodic_term', $period)
+                                                $student = $classes_student->firstWhere(
+                                                    'studentID',
+                                                    $quizzesandscore->studentID,
+                                                );
+                                                $score = $quizzesandscores
+                                                    ->where('studentID', $student->studentID)
+                                                    ->where('periodic_term', $term)
                                                     ->first();
-
-                                                $fieldPercentage = match ($field) {
-                                                    'quizzez' => $percentageData->quiz_percentage ?? 0,
-                                                    'attendance_behavior' => $percentageData->attendance_percentage ??
-                                                        0,
-                                                    'assignments' => $percentageData->assignment_percentage ?? 0,
-                                                    'exam' => $percentageData->exam_percentage ?? 0,
-                                                    default => 0,
-                                                };
-
-                                                // Get transmuted grade
-                                                if (!empty($fieldScore) && $fieldScore > 0) {
-                                                    $transmutedGradeEntry = DB::table('transmuted_grade')
-                                                        ->where('score_bracket', $fieldScore)
-                                                        ->first();
-
-                                                    $transmutedGrade = $transmutedGradeEntry
-                                                        ? $transmutedGradeEntry->transmuted_grade
-                                                        : null;
-
-                                                    // Compute final grade based on percentage
-                                                    if (!is_null($transmutedGrade)) {
-                                                        $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
-                                                    }
-                                                }
                                             @endphp
-                                            <td class="cell-content-container">
-                                                <div class="content-container">
-                                                    <div class="cell-content">
-                                                        <input type="number"
-                                                            name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
-                                                            value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
-                                                            min="0" step="0.01">
-                                                    </div>
-                                                    <div class="cell-content">
-                                                        <p>{{ $transmutedGrade ?? '' }}</p>
-                                                        <!-- Displays Transmuted Grade for Each Field -->
-                                                    </div>
-                                                    <div class="cell-content">
-                                                        <p>{{ $computedGrade !== null ? number_format($computedGrade, 2) : '' }}</p>
-                                                        <!-- Displays Computed Grade based on Percentage -->
-                                                    </div>
-                                                </div>
-                                            </td>
+                                            <tr>
+                                                <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
+                                                @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
+                                                    @php
+                                                        $fieldScore = $score ? $score->$field : null;
+                                                        $transmutedGrade = null;
+                                                        $computedGrade = null;
+
+                                                        // Fetch the percentage for this specific field and term
+                                                        $percentageData = DB::table('percentage')
+                                                            ->where('classID', $class->id)
+                                                            ->where('periodic_term', $period)
+                                                            ->first();
+
+                                                        $fieldPercentage = match ($field) {
+                                                            'quizzez' => $percentageData->quiz_percentage ?? 0,
+                                                            'attendance_behavior' => $percentageData->attendance_percentage ?? 0,
+                                                            'assignments' => $percentageData->assignment_percentage ?? 0,
+                                                            'exam' => $percentageData->exam_percentage ?? 0,
+                                                            default => 0,
+                                                        };
+
+                                                        // Get transmuted grade
+                                                        if (!empty($fieldScore) && $fieldScore > 0) {
+                                                            $transmutedGradeEntry = DB::table('transmuted_grade')
+                                                                ->where('score_bracket', $fieldScore)
+                                                                ->first();
+
+                                                            $transmutedGrade = $transmutedGradeEntry
+                                                                ? $transmutedGradeEntry->transmuted_grade
+                                                                : null;
+
+                                                            // Compute final grade based on percentage
+                                                            if (!is_null($transmutedGrade)) {
+                                                                $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    <td class="cell-content-container">
+                                                        <div class="content-container">
+                                                            <div class="cell-content">
+                                                                <input type="number"
+                                                                    name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
+                                                                    value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
+                                                                    min="0" step="0.01">
+                                                            </div>
+                                                            <div class="cell-content">
+                                                                <p>{{ $transmutedGrade ?? '' }}</p>
+                                                            </div>
+                                                            <div class="cell-content">
+                                                                <p>{{ $computedGrade !== null ? number_format($computedGrade, 2) : '' }}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                @endforeach
+                                            </tr>
                                         @endforeach
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="margin-top: 10px; display: flex; width: 100%; justify-content: right;">
+                                <button type="submit" style="margin-right: 5px">Save and Lock in</button>
+                                <button type="submit">Update</button>
+                            </div>
+                        </form>
                     </div>
-                    <div style="margin-top: 10px; display:flex; width: 100%; justify-content:right;">
-                        <button type="submit" style="margin-right: 5px">Lock in</button>
-                        <button type="submit">Update</button>
-                    </div>
-                </form>
+                </div>
             @endforeach
+        </div>
+        {{-- end of grades container --}}
+
+        <style>
+            .score-section-unique {
+                border: 1px solid var(--color6);
+                margin-bottom: 15px;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            .score-toggle-unique {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            .score-content-unique {
+                display: none;
+                padding: 15px;
+                transition: all 0.3s ease-in-out;
+            }
+        </style>
+
+        <script>
+            function toggleSection(id) {
+                let section = document.getElementById(id);
+                if (section.style.display === "none" || section.style.display === "") {
+                    section.style.display = "block";
+                } else {
+                    section.style.display = "none";
+                }
+            }
+        </script>
+
+
+        {{-- end of grades container --}}
+
+
+
+        {{-- start of grade-sheet --}}
+        <h2 style="margin: 20px 0">Grades</h2>
+        <div class="grade-sheet-container">
+            <table>
+                <thead>
+                    <tr>
+                        <td>Student</td>
+                        <td>Prelim</td>
+                        <td>Midterm</td>
+                        <td>Semi-Final</td>
+                        <td>Final</td>
+                        <td>Comulative Grade</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>(student name here)</td>
+                        <td>(Prelim grade here)</td>
+                        <td>(Midterm)</td>
+                        <td>(semi)</td>
+                        <td>(final)</td>
+                        <td>(Comulative Grade)</td>
+                    </tr>
+
+                </tbody>
+            </table>
         </div>
 
 
-
-
-
-
-
     </div>
+    {{-- end of dashboard --}}
 
 
 
