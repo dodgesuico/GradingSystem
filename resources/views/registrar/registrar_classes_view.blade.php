@@ -341,6 +341,7 @@
                         </table>
                     </div>
                     <div style="margin-top: 10px; display:flex; width: 100%; justify-content:right;">
+                        <button type="submit" style="margin-right: 5px">Lock in</button>
                         <button type="submit">Update</button>
                     </div>
                 </form>
