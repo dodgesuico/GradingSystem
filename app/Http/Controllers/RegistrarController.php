@@ -212,7 +212,9 @@ class RegistrarController extends Controller
         $periodicTerm = $request->input('periodic_term');
 
         // Retrieve total scores from the percentage table for the specific class
-        $percentage = Percentage::where('classID', $class)->first();
+        $percentage = Percentage::where('classID', $class)
+                        ->where('periodic_term', $periodicTerm)
+                        ->first();
 
         if (!$percentage) {
             return redirect()->back()->with('error', 'Percentage data not found for this class.');
@@ -227,16 +229,16 @@ class RegistrarController extends Controller
 
             // Validate scores against total scores from percentage table
             if (($fields['quizzez'] ?? 0) > $percentage->quiz_total_score) {
-                return redirect()->back()->with('error', "Quiz score for {$studentName} exceeds the total score.");
+                return redirect()->back()->with('error', "Quiz score for {$studentName} in {$periodicTerm} exceeds the total score.");
             }
             if (($fields['attendance_behavior'] ?? 0) > $percentage->attendance_total_score) {
-                return redirect()->back()->with('error', "Attendance score for {$studentName} exceeds the total score.");
+                return redirect()->back()->with('error', "Attendance score for {$studentName} in {$periodicTerm} exceeds the total score.");
             }
             if (($fields['assignments'] ?? 0) > $percentage->assignment_total_score) {
-                return redirect()->back()->with('error', "Assignment score for {$studentName} exceeds the total score.");
+                return redirect()->back()->with('error', "Assignment score for {$studentName} in {$periodicTerm} exceeds the total score.");
             }
             if (($fields['exam'] ?? 0) > $percentage->exam_total_score) {
-                return redirect()->back()->with('error', "Exam score for {$studentName} exceeds the total score.");
+                return redirect()->back()->with('error', "Exam score for {$studentName} in {$periodicTerm} exceeds the total score.");
             }
 
             // Check for existing record
