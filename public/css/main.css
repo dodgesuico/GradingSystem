@@ -364,11 +364,10 @@ tr:nth-child(odd) {
     font-size: 1rem;
 }
 
-.info-container input,
-.info-container select {
+ input,
+ select {
     padding: 5px;
     background-color: var(--ckcm-color2);
-    border-radius: 5px;
     border: 1px solid var(--ckcm-color2);
     color: var(--color1);
 }
