@@ -70,7 +70,7 @@
                         class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
                         <i class="fa-solid fa-clipboard"></i> <span>All Class</span>
                     </a>
-                    <a href=""><i class="fa-solid fa-users"></i>
+                    <a href="{{ route('user.show') }}"><i class="fa-solid fa-users"></i>
                         <span>Users</span></a>
 
 

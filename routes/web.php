@@ -9,6 +9,7 @@ use App\Http\Controllers\DeanController;
 use App\Http\Controllers\RegistrarController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/classes/class={class}', [RegistrarController::class, 'addPercentageAndScores'])->name('class.addPercentageAndScores');
     Route::get('/quizzesadded/class={class}', [RegistrarController::class, 'show'])->name('class.quizzes');
     Route::put('/quizzesadded/class={class}', [RegistrarController::class, 'addQuizAndScore'])->name('class.addquizandscore');
+
+    Route::get('/users', [UserController::class, 'show'])->name('user.show');
 
 
     // Dean
