@@ -15,18 +15,18 @@
     font-style: normal;
     font-size: 2.5rem;
     font-variation-settings:
-      "slnt" 0,
-      "wdth" 100,
-      "GRAD" 0,
-      "XOPQ" 96,
-      "XTRA" 468,
-      "YOPQ" 79,
-      "YTAS" 750,
-      "YTDE" -203,
-      "YTFI" 738,
-      "YTLC" 514,
-      "YTUC" 712;
-  }
+        "slnt" 0,
+        "wdth" 100,
+        "GRAD" 0,
+        "XOPQ" 96,
+        "XTRA" 468,
+        "YOPQ" 79,
+        "YTAS" 750,
+        "YTDE" -203,
+        "YTFI" 738,
+        "YTLC" 514,
+        "YTUC" 712;
+}
 
 :root {
     font-size: 65%;
@@ -49,7 +49,7 @@
     --color7: #343A40;
     --color8: #212529;
     --color9: #121416;
-
+    --color9b:#121416c2;
 
 
     /* ckcm color */
@@ -107,12 +107,10 @@ button i {
 }
 
 
-h1{
-
-}
+h1 {}
 
 table {
-    border: 1px solid var(--color8);
+    border: 1px solid var(--color7);
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
@@ -125,7 +123,7 @@ thead th {
     padding: 10px;
     color: var(--color1);
     font-size: 1.2rem;
-    border-bottom: 2px solid var(--color1);
+    border-bottom: 2px solid var(--color7);
     text-align: center;
 }
 
@@ -193,9 +191,15 @@ tr:nth-child(odd) {
     border: 1px solid #f5c6cb;
 }
 
+.save-btn{
+    color: var(--color-green);
 
 
+}
 
+.save-btn:hover {
+    color: var(--color-green-hover);
+}
 
 
 
@@ -364,8 +368,8 @@ tr:nth-child(odd) {
     font-size: 1rem;
 }
 
- input,
- select {
+input,
+select {
     padding: 5px;
     background-color: var(--ckcm-color2);
     border: 1px solid var(--ckcm-color2);

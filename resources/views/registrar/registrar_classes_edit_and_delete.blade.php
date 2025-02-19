@@ -56,7 +56,7 @@
                     </div>
                     <div class="modal-footer">
 
-                        <button type="submit" class="modal-add-btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+                        <button type="submit" class="save-btn"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
                         <button type="button" class="btn btn-secondary" onclick="closeEditClassModal({{ $class->id }})">Close</button>
 
                     </div>
@@ -124,7 +124,7 @@
                 /* Lower visibility */
             }
         </style>
-        
+
 
         <script>
             // Open the Edit Class modal

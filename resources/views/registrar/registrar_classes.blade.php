@@ -19,7 +19,7 @@
 
     <div class="classes-header">
         <input type="text" id="searchInput" class="search" placeholder="🔎 Quick Search...">
-       
+
 
     </div>
 
@@ -187,7 +187,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-   
+
 
     }
 
