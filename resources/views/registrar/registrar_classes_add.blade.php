@@ -44,7 +44,7 @@
                 <input type="status" id="status" name="status" value="Active" readonly>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="modal-add-btn"><i class="fa-solid fa-file-arrow-up"></i> Add Class</button>
+                <button type="submit" class="save-btn"><i class="fa-solid fa-file-arrow-up"></i> Add Class</button>
                 <button type="button" class="close-btn" id="cancelModal">Cancel</button>
             </div>
         </form>
