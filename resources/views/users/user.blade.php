@@ -159,7 +159,7 @@
                 let userEmail = $(this).closest("tr").find("td:nth-child(3)").text().trim();
                 let userDepartment = $(this).closest("tr").find("td:nth-child(4)").text().trim();
                 let userRoles = $(this).closest("tr").find("td:nth-child(5)").text().trim().split(
-                    /\s*,\s*/);
+                /\s*,\s*/);
 
                 $("#modalUserId").val(userId);
                 $("#editUserName").val(userName);
@@ -176,6 +176,8 @@
                 });
 
                 updateRolesInput(); // 🟢 Ensure hidden input updates
+                updateDropdown(); // 🟢 Update dropdown to hide selected roles
+
                 $("#editUserModal").fadeIn();
             });
 
@@ -202,6 +204,7 @@
                 if (selectedRole && !roleExists(selectedRole)) {
                     $("#roleContainer").append(createRoleBadge(selectedRole));
                     updateRolesInput(); // 🟢 Update hidden input
+                    updateDropdown(); // 🟢 Hide selected role from dropdown
                 }
                 $("#roleDropdown").hide();
             });
@@ -211,6 +214,7 @@
                 event.stopPropagation();
                 $(this).parent().remove();
                 updateRolesInput(); // 🟢 Update hidden input
+                updateDropdown(); // 🟢 Show role back in dropdown
             });
 
             function roleExists(role) {
@@ -225,10 +229,10 @@
 
             function createRoleBadge(role) {
                 return `
-        <span class="role-badge" data-role="${role}">
-            ${role.charAt(0).toUpperCase() + role.slice(1)}
-            <button class="remove-role">X</button>
-        </span>`;
+            <span class="role-badge" data-role="${role}">
+                ${role.charAt(0).toUpperCase() + role.slice(1)}
+                <button class="remove-role">X</button>
+            </span>`;
             }
 
             function updateRolesInput() {
@@ -239,6 +243,22 @@
 
                 // 🟢 Store the roles as a JSON string in the hidden input
                 $("#rolesInput").val(JSON.stringify(selectedRoles));
+            }
+
+            function updateDropdown() {
+                let selectedRoles = [];
+                $("#roleContainer .role-badge").each(function() {
+                    selectedRoles.push($(this).data("role"));
+                });
+
+                $("#roleDropdown .dropdown-item").each(function() {
+                    let role = $(this).data("role");
+                    if (selectedRoles.includes(role)) {
+                        $(this).hide(); // ✅ Hide selected roles
+                    } else {
+                        $(this).show(); // ✅ Show unselected roles
+                    }
+                });
             }
         });
     </script>
