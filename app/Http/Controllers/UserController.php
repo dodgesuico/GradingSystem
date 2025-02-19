@@ -47,29 +47,25 @@ class UserController extends Controller
 
     public function editUser(Request $request)
     {
-        // Validate request data
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $request->user_id,
-            'department' => 'nullable|string',
-            'roles' => 'nullable|array', // Ensure roles are an array
+            'email' => 'required|email|max:255',
+            'department' => 'required|string',
+            'roles' => 'required|string', // ✅ Expect a JSON string // Ensure valid roles
         ]);
 
-        // Find the user
-        $user = User::findOrFail($request->user_id);
+        try {
+            $user = User::findOrFail($request->user_id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->department = $request->department;
+            $user->role = implode(',', json_decode($request->roles, true)); // Store roles as comma-separated
 
-        // Update user information
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->department = $request->department;
+            $user->save();
 
-        // Convert roles array to a comma-separated string before saving
-        $user->role = $request->has('roles') ? implode(',', $request->roles) : null;
-
-        // Save user changes
-        $user->save();
-
-        return response()->json(['message' => 'User updated successfully!']);
+            return redirect(route("user.show"))->with("success", "User Updated Successfully");
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update user. ' . $e->getMessage());
+        }
     }
 }

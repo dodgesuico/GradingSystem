@@ -32,6 +32,33 @@
             <button type="button" id="resetFilters">Reset</button>
         </form>
 
+
+        <div class="message-container">
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    <strong>Error!</strong> {{ session('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <strong>Error!</strong> Please check the following issues:
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    <strong>Success!</strong> {{ session('success') }}
+                </div>
+            @endif
+        </div>
+
+
         <!-- Users Table -->
         <table border="1">
             <thead>
@@ -73,47 +100,52 @@
             <span class="close">&times;</span>
             <h2>Edit User</h2>
 
-            <!-- Hidden User ID -->
-            <input type="hidden" id="modalUserId">
+            <!-- 🟢 Form for submitting user edits -->
+            <form action="{{ route('user.edituser') }}" method="POST">
+                @csrf
+                <input type="hidden" id="modalUserId" name="user_id">
 
-            <!-- Name -->
-            <label for="editUserName">Name:</label>
-            <input type="text" id="editUserName">
+                <!-- Name -->
+                <label for="editUserName">Name:</label>
+                <input type="text" id="editUserName" name="name">
 
-            <!-- Email -->
-            <label for="editUserEmail">Email:</label>
-            <input type="email" id="editUserEmail">
+                <!-- Email -->
+                <label for="editUserEmail">Email:</label>
+                <input type="email" id="editUserEmail" name="email">
 
-            <!-- Department -->
-            <!-- Department Dropdown -->
-            <label for="editUserDepartment">Department:</label>
-            <select id="editUserDepartment" name="department">
-                <option value="">Select Department</option>
-                @foreach ($department as $departments)
-                    <option value="{{ $departments }}">{{ $departments }}</option>
-                @endforeach
-            </select>
+                <!-- Department -->
+                <label for="editUserDepartment">Department:</label>
+                <select id="editUserDepartment" name="department">
+                    <option value="">Select Department</option>
+                    @foreach ($department as $departments)
+                        <option value="{{ $departments }}">{{ $departments }}</option>
+                    @endforeach
+                </select>
 
+                <!-- Roles Section -->
+                <label>Roles:</label>
+                <div id="roleContainer" class="role-container">
+                    <!-- Selected roles will appear here -->
+                </div>
 
-            <!-- Roles -->
-            <label>Roles:</label>
-            <div id="roleContainer" class="role-container">
-                <!-- Selected roles will appear here -->
-            </div>
+                <!-- Role Dropdown -->
+                <div class="dropdown-menu" id="roleDropdown">
+                    <div class="dropdown-item" data-role="student">Student</div>
+                    <div class="dropdown-item" data-role="instructor">Instructor</div>
+                    <div class="dropdown-item" data-role="dean">Dean</div>
+                    <div class="dropdown-item" data-role="registrar">Registrar</div>
+                    <div class="dropdown-item" data-role="admin">Admin</div>
+                </div>
 
-            <!-- Role Dropdown -->
-            <div class="dropdown-menu" id="roleDropdown">
-                <div class="dropdown-item" data-role="student">Student</div>
-                <div class="dropdown-item" data-role="instructor">Instructor</div>
-                <div class="dropdown-item" data-role="dean">Dean</div>
-                <div class="dropdown-item" data-role="registrar">Registrar</div>
-                <div class="dropdown-item" data-role="admin">Admin</div>
-            </div>
+                <!-- Hidden input to store selected roles -->
+                <input type="hidden" id="rolesInput" name="roles">
 
-            <!-- Save Button -->
-            <button id="confirmEditUser">Save Changes</button>
+                <!-- Submit Button -->
+                <button type="submit">Save Changes</button>
+            </form>
         </div>
     </div>
+
 
 
 
@@ -126,7 +158,8 @@
                 let userName = $(this).closest("tr").find("td:nth-child(2)").text().trim();
                 let userEmail = $(this).closest("tr").find("td:nth-child(3)").text().trim();
                 let userDepartment = $(this).closest("tr").find("td:nth-child(4)").text().trim();
-                let userRoles = $(this).closest("tr").find("td:nth-child(5)").text().trim().split(/\s*,\s*/);
+                let userRoles = $(this).closest("tr").find("td:nth-child(5)").text().trim().split(
+                    /\s*,\s*/);
 
                 $("#modalUserId").val(userId);
                 $("#editUserName").val(userName);
@@ -142,6 +175,7 @@
                     }
                 });
 
+                updateRolesInput(); // 🟢 Ensure hidden input updates
                 $("#editUserModal").fadeIn();
             });
 
@@ -167,17 +201,16 @@
                 let selectedRole = $(this).data("role");
                 if (selectedRole && !roleExists(selectedRole)) {
                     $("#roleContainer").append(createRoleBadge(selectedRole));
-                    updateDropdown(); // Remove selected role from dropdown
+                    updateRolesInput(); // 🟢 Update hidden input
                 }
                 $("#roleDropdown").hide();
             });
 
             // Remove role on clicking 'X' and restore in dropdown
             $(document).on("click", ".remove-role", function(event) {
-                event.stopPropagation(); // Prevent opening dropdown
-                let role = $(this).parent().data("role");
+                event.stopPropagation();
                 $(this).parent().remove();
-                updateDropdown(); // Add back the removed role
+                updateRolesInput(); // 🟢 Update hidden input
             });
 
             function roleExists(role) {
@@ -192,26 +225,20 @@
 
             function createRoleBadge(role) {
                 return `
-                <span class="role-badge" data-role="${role}">
-                    ${role.charAt(0).toUpperCase() + role.slice(1)}
-                    <button class="remove-role">X</button>
-                </span>`;
+        <span class="role-badge" data-role="${role}">
+            ${role.charAt(0).toUpperCase() + role.slice(1)}
+            <button class="remove-role">X</button>
+        </span>`;
             }
 
-            function updateDropdown() {
+            function updateRolesInput() {
                 let selectedRoles = [];
                 $("#roleContainer .role-badge").each(function() {
                     selectedRoles.push($(this).data("role"));
                 });
 
-                $("#roleDropdown .dropdown-item").each(function() {
-                    let role = $(this).data("role");
-                    if (selectedRoles.includes(role)) {
-                        $(this).hide();
-                    } else {
-                        $(this).show();
-                    }
-                });
+                // 🟢 Store the roles as a JSON string in the hidden input
+                $("#rolesInput").val(JSON.stringify(selectedRoles));
             }
         });
     </script>
@@ -272,43 +299,6 @@
                 $('#department').val('');
                 $('#role').val('');
                 fetchUsers();
-            });
-        });
-
-
-        // for editing user
-        $(document).ready(function() {
-            $("#confirmEditUser").click(function() {
-                let userId = $("#modalUserId").val();
-                let name = $("#editUserName").val();
-                let email = $("#editUserEmail").val();
-                let department = $("#editUserDepartment").val();
-
-                // Collect selected roles
-                let roles = [];
-                $(".role-badge").each(function() {
-                    roles.push($(this).data("role"));
-                });
-
-                $.ajax({
-                    url: "{{ route('user.edituser') }}", // Adjust route name if necessary
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        user_id: userId,
-                        name: name,
-                        email: email,
-                        department: department,
-                        roles: roles,
-                    },
-                    success: function(response) {
-                        alert(response.message); // Show success message
-                        location.reload(); // Refresh page to update user data
-                    },
-                    error: function(xhr) {
-                        alert("Error updating user: " + xhr.responseJSON.message);
-                    }
-                });
             });
         });
     </script>
