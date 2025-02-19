@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/quizzesadded/class={class}', [RegistrarController::class, 'addQuizAndScore'])->name('class.addquizandscore');
 
     Route::get('/users', [UserController::class, 'show'])->name('user.show');
+    Route::post('/users', [UserController::class, 'editUser'])->name('user.edituser');
 
 
     // Dean
