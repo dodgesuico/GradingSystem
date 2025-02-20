@@ -482,9 +482,12 @@
                 $studentGrades[$studentID] = [
                     'Prelim' => 0,
                     'Midterm' => 0,
+                    'Midterm Raw' => 0,
                     'Semi-Finals' => 0,
+                    'Semi-Finals Raw' => 0,
                     'Finals' => 0,
-                    'Cumulative' => 0,
+                    'Finals Raw' => 0,
+                    'Remarks' => '',
                 ];
 
                 foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $period) {
@@ -549,37 +552,55 @@
                         }
                     }
 
+                    // Store raw grade
+                    if ($period !== 'Prelim') {
+                        $studentGrades[$studentID]["{$period} Raw"] = $totalPeriodGrade;
+                    }
+
                     // Store total grade for this period
                     $studentGrades[$studentID][$period] = $totalPeriodGrade;
                 }
 
                 // Compute final grades per term using weighted formula
-                $studentGrades[$studentID]['Prelim Final'] = max(
-                    0,
-                    0.33 * $studentGrades[$studentID]['Prelim'] + 0.66 * $studentGrades[$studentID]['Midterm'],
-                );
-                $studentGrades[$studentID]['Midterm Final'] = max(
-                    0,
-                    0.33 * $studentGrades[$studentID]['Midterm'] + 0.66 * $studentGrades[$studentID]['Semi-Finals'],
-                );
-                $studentGrades[$studentID]['Semi-Finals Final'] = max(
-                    0,
-                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.66 * $studentGrades[$studentID]['Finals'],
-                );
-                $studentGrades[$studentID]['Finals Final'] = max(
-                    0,
-                    0.33 * $studentGrades[$studentID]['Finals'] + 0.66 * $studentGrades[$studentID]['Finals'],
-                );
+                // Compute final grades per term using weighted formula
+                $studentGrades[$studentID]['Midterm'] =
+                    0.33 * $studentGrades[$studentID]['Prelim'] + 0.67 * $studentGrades[$studentID]['Midterm Raw'];
 
-                // Compute Cumulative Grade (average of all final grades)
-                $studentGrades[$studentID]['Cumulative'] = max(
-                    0,
-                    ($studentGrades[$studentID]['Prelim Final'] +
-                        $studentGrades[$studentID]['Midterm Final'] +
-                        $studentGrades[$studentID]['Semi-Finals Final'] +
-                        $studentGrades[$studentID]['Finals Final']) /
-                        4,
-                );
+                $studentGrades[$studentID]['Semi-Finals'] =
+                    0.33 * $studentGrades[$studentID]['Midterm'] + 0.67 * $studentGrades[$studentID]['Semi-Finals Raw'];
+
+                // Fetch the final transmutation table
+                $transmutations = DB::table('final_transmutation')
+                    ->orderBy('grades', 'asc') // Ensure it's ordered properly
+                    ->get();
+
+                // Function to find the transmutation based on final grade
+                function getTransmutation($finalGrade, $transmutations) {
+                    foreach ($transmutations as $transmutation) {
+                        if ($finalGrade >= $transmutation->grades) {
+                            $matchedTransmutation = $transmutation;
+                        } else {
+                            break;
+                        }
+                    }
+                    return $matchedTransmutation ?? null;
+                }
+
+                // Compute Finals (same as before)
+                $studentGrades[$studentID]['Finals'] =
+                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
+
+                // Get the corresponding transmutation
+                $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
+
+                if ($transmutation) {
+                    // Set transmuted grade and remarks
+                    $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
+                    $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
+                } else {
+                    // Default to FAILED if no match is found
+                    $studentGrades[$studentID]['Remarks'] = 'FAILED';
+                }
             }
         @endphp
 
@@ -589,7 +610,6 @@
                 <thead>
                     <tr>
                         <th>Student</th>
-                        <th>Prelim (Raw)</th>
                         <th>Prelim</th>
                         <th>Midterm (Raw)</th>
                         <th>Midterm</th>
@@ -597,7 +617,7 @@
                         <th>Semi-Finals</th>
                         <th>Final (Raw)</th>
                         <th>Finals</th>
-                        <th>Cumulative Grade</th>
+                        <th>Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -605,25 +625,36 @@
                         <tr>
                             <td>{{ $student->name }}</td>
 
-                            <!-- Raw Grades (No Adjustment) -->
+                            <!-- Prelim -->
                             <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
-                            <td>{{ number_format($studentGrades[$student->studentID]['Prelim Final'], 2) }}</td>
 
+                            <!-- Midterm Raw and Midterm -->
+                            <td>{{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td>
                             <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
-                            <td>{{ number_format($studentGrades[$student->studentID]['Midterm Final'], 2) }}</td>
 
+                            <!-- Semi-Finals Raw and Semi-Finals -->
+                            <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}</td>
                             <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
-                            <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals Final'], 2) }}</td>
 
-                            <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
-                            <td>{{ number_format($studentGrades[$student->studentID]['Finals Final'], 2) }}</td>
+                            <!-- Finals Raw and Finals -->
+                            <td>{{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}</td>
+                            <td>
+                                {{ $studentGrades[$student->studentID]['Finals'] >= 0.99 && $studentGrades[$student->studentID]['Finals'] < 1
+                                    ? 1
+                                    : ($studentGrades[$student->studentID]['Finals'] >= 4.95 && $studentGrades[$student->studentID]['Finals'] < 5
+                                        ? 5
+                                        : number_format($studentGrades[$student->studentID]['Finals'], 2)) }}
+                            </td>
 
-                            <td>{{ number_format($studentGrades[$student->studentID]['Cumulative'], 2) }}</td>
+                            <!-- Remarks -->
+                            <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+
+
 
 
 
