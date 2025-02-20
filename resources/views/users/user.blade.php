@@ -35,13 +35,13 @@
 
         <div class="message-container">
             @if (session('error'))
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" style="margin: 0 0 10px 0;">
                     <strong>Error!</strong> {{ session('error') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" style="margin: 0 0 10px 0;">
                     <strong>Error!</strong> Please check the following issues:
                     <ul>
                         @foreach ($errors->all() as $error)
@@ -52,7 +52,7 @@
             @endif
 
             @if (session('success'))
-                <div class="alert alert-success">
+                <div class="alert alert-success" style="margin: 0 0 10px 0;">
                     <strong>Success!</strong> {{ session('success') }}
                 </div>
             @endif
@@ -60,7 +60,7 @@
 
 
         <!-- Users Table -->
-        <table border="1">
+        <table class="user-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -79,10 +79,19 @@
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->department }}</td>
-                        <td>{{ $user->role }}</td>
-                        <td>{{ $user->created_at->format('Y-m-d') }}</td>
                         <td>
-                            <button class="edit-user-btn" data-user-id="{{ $user->id }}">Edit User</button>
+                            @foreach (explode(',', $user->role) as $index => $role)
+                                <span class="display-role-badge">{{ trim($role) }}</span>
+                                @if (!$loop->last)
+                                    <span class="invisible-comma">,</span>
+                                @endif
+                            @endforeach
+                        </td>
+
+                        <td>{{ $user->created_at->format('Y-m-d') }}</td>
+                        <td style="text-align: center;">
+                            <button class="edit-btn" data-user-id="{{ $user->id }}"><i
+                                    class="fa-solid fa-pen-to-square"></i> Edit User</button>
                         </td>
                     </tr>
                 @empty
@@ -92,7 +101,21 @@
                 @endforelse
             </tbody>
         </table>
+        <script>
+            $(document).ready(function() {
+                $(".display-role-badge").each(function() {
+                    let role = $(this).text().trim().toLowerCase();
+                    if (role === "admin") $(this).css("background-color", "#003049");
+                    else if (role === "student") $(this).css("background-color", "#588157");
+                    else if (role === "dean") $(this).css("background-color", "#d62828");
+                    else if (role === "instructor") $(this).css("background-color", "#f77f00");
+                    else if (role === "registrar") $(this).css("background-color", "#9c27b0");
+                });
+            });
+        </script>
     </div>
+
+
 
     <!-- Edit User Modal -->
     <div id="editUserModal" class="modal">
@@ -141,7 +164,8 @@
                 <input type="hidden" id="rolesInput" name="roles">
 
                 <!-- Submit Button -->
-                <button type="submit">Save Changes</button>
+                <button type="submit" style="margin-top: 10px;"class="save-btn"><i class="fa-solid fa-floppy-disk"></i>
+                    Save Changes</button>
             </form>
         </div>
     </div>
@@ -153,13 +177,13 @@
 
     <script>
         $(document).ready(function() {
-            $(".edit-user-btn").click(function() {
+            $(document).on("click", ".edit-btn", function() {
                 let userId = $(this).data("user-id");
                 let userName = $(this).closest("tr").find("td:nth-child(2)").text().trim();
                 let userEmail = $(this).closest("tr").find("td:nth-child(3)").text().trim();
                 let userDepartment = $(this).closest("tr").find("td:nth-child(4)").text().trim();
                 let userRoles = $(this).closest("tr").find("td:nth-child(5)").text().trim().split(
-                /\s*,\s*/);
+                    /\s*,\s*/);
 
                 $("#modalUserId").val(userId);
                 $("#editUserName").val(userName);
@@ -287,23 +311,57 @@
 
                         if (users.length > 0) {
                             users.forEach(user => {
+                                let roleBadges = user.role.split(',').map(role => `
+                                    <span class="display-role-badge">${role.trim()}</span>
+                                `).join('<span class="invisible-comma">,</span>'); // Preserve hidden commas
+
                                 tableBody += `
-                                <tr>
-                                    <td>${user.id}</td>
-                                    <td>${user.name}</td>
-                                    <td>${user.email}</td>
-                                    <td>${user.department}</td>
-                                    <td>${user.role}</td>
-                                    <td>${new Date(user.created_at).toISOString().split('T')[0]}</td>
-                                    <td><button class="edit-user-btn" data-user-id="{{ $user->id }}">Edit User</button></td>
-                                </tr>
-                            `;
+                                    <tr>
+                                        <td>${user.id}</td>
+                                        <td>${user.name}</td>
+                                        <td>${user.email}</td>
+                                        <td>${user.department}</td>
+                                        <td>${roleBadges}</td>
+                                        <td>${new Date(user.created_at).toISOString().split('T')[0]}</td>
+                                        <td style="text-align: center;">
+                                            <button class="edit-btn" data-user-id="${user.id}">
+                                                <i class="fa-solid fa-pen-to-square"></i> Edit User
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
                             });
                         } else {
-                            tableBody = '<tr><td colspan="6">No users found.</td></tr>';
+                            tableBody = '<tr><td colspan="7">No users found.</td></tr>';
                         }
 
+                        // ✅ Update table content
                         $('#userTableBody').html(tableBody);
+
+                        // ✅ Apply role badge colors in real-time
+                        $(".display-role-badge").each(function() {
+                            let role = $(this).text().trim().toLowerCase();
+                            if (role === "admin") $(this).css({
+                                "background-color": "#003049",
+                                "color": "#fff"
+                            });
+                            else if (role === "student") $(this).css({
+                                "background-color": "#588157",
+                                "color": "#fff"
+                            });
+                            else if (role === "dean") $(this).css({
+                                "background-color": "#d62828",
+                                "color": "#fff"
+                            });
+                            else if (role === "instructor") $(this).css({
+                                "background-color": "#f77f00",
+                                "color": "#fff"
+                            });
+                            else if (role === "registrar") $(this).css({
+                                "background-color": "#9c27b0",
+                                "color": "#fff"
+                            });
+                        });
                     }
                 });
             }
@@ -320,8 +378,12 @@
                 $('#role').val('');
                 fetchUsers();
             });
+
+            // ✅ Initial fetch to display users on page load
+            fetchUsers();
         });
     </script>
+
 @endsection
 
 
@@ -332,6 +394,7 @@
 <style>
     .dashboard {
         padding: 10px;
+        overflow: auto;
     }
 
     .dashboard h1 {
@@ -384,46 +447,63 @@
     }
 
     /* Form Inputs */
-    label {
-        font-size: 14px;
+    .modal-content label {
+        font-size: 1.2rem;
         font-weight: bold;
-        margin-bottom: 5px;
+        margin: 5px 0;
         display: block;
     }
 
-    input {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #2a2a3a;
-        color: white;
+    .modal-content input,
+    .modal-content select {
+        width: 100%
     }
+
+
 
     /* Role Container */
     .role-container {
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
-        padding: 10px;
-        border: 1px solid #ccc;
+        padding: 5px;
+        border: 1px solid var(--color7);
         cursor: pointer;
-        min-height: 40px;
+
         border-radius: 5px;
-        background-color: #2a2a3a;
+        background-color: var(--ckcm-color2);
     }
 
     /* Role Badge */
     .role-badge {
         display: inline-flex;
         align-items: center;
-        background: gray;
+        background: var(--ckcm-color1);
         color: white;
         padding: 5px 10px;
         border-radius: 5px;
         gap: 5px;
     }
+
+    .invisible-comma {
+        visibility: hidden;
+        /* Makes the comma invisible but still keeps the space */
+        /* Ensures a slight spacing effect */
+    }
+
+    .display-role-badge {
+        display: inline-block;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+
+
+
 
     .remove-role {
         background: red;
@@ -438,42 +518,40 @@
     /* Dropdown */
     .dropdown-menu {
         position: absolute;
-        background: white;
+        background: var(--ckcm-color1);
         border: 1px solid #ccc;
-        width: 180px;
+        width: 92%;
         max-height: 150px;
         overflow-y: auto;
         z-index: 100;
         border-radius: 5px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         display: none;
+
+
     }
 
     .dropdown-item {
         padding: 8px;
         cursor: pointer;
         transition: background 0.2s ease-in-out;
-        color: black;
+        color: var(--color1);
     }
 
     .dropdown-item:hover {
-        background-color: #f0f0f0;
+        background: var(--hover-background-color);
     }
 
     /* Button Styling */
-    button {
-        background-color: #007bff;
-        color: white;
-        padding: 8px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background 0.2s ease-in-out;
-        width: 100%;
-        font-size: 16px;
+
+    .user-table {
+        margin-top: 0;
     }
 
-    button:hover {
-        background-color: #0056b3;
+    .user-table,
+    .user-table th,
+    .user-table td {
+        border-left: 0;
+        border-right: 0;
     }
 </style>
