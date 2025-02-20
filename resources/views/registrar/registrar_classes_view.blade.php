@@ -120,6 +120,14 @@
                     <strong>Success!</strong> {{ session('success') }}
                 </div>
             @endif
+
+            @if (session('warnings'))
+            <div class="alert alert-warning">
+                @foreach (session('warnings') as $warning)
+                    <p>{{ $warning }}</p>
+                @endforeach
+            </div>
+        @endif
         </div>
 
 

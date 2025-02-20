@@ -174,8 +174,10 @@ class RegistrarController extends Controller
     public function addPercentageAndScores(Request $request, Classes $class)
     {
         $periodicTerms = $request->input('periodic_terms');
+        $warnings = [];
 
         foreach ($periodicTerms as $term) {
+            // Calculate total percentage
             $totalPercentage = $request->input("quiz_percentage.$term") +
                 $request->input("attendance_percentage.$term") +
                 $request->input("assignment_percentage.$term") +
@@ -184,6 +186,19 @@ class RegistrarController extends Controller
             if ($totalPercentage !== 100) {
                 return redirect()->route("class.show", $class)
                     ->withErrors(["The total percentage for $term must equal 100%."]);
+            }
+
+            foreach (['quiz', 'attendance', 'assignment', 'exam'] as $category) {
+                $totalScore = $request->input("{$category}_total_score.$term");
+
+                // Check if this total score exists in transmuted_grade
+                $scoreExists = DB::table('transmuted_grade')
+                    ->where('score_bracket', $totalScore)
+                    ->exists();
+
+                if (!$scoreExists) {
+                    $warnings[] = "WARNING! The total score of $totalScore for " . ucfirst($category) . " in $term does not exist in transmuted_grade.";
+                }
             }
 
             // Save or update for each term
@@ -202,8 +217,12 @@ class RegistrarController extends Controller
             );
         }
 
-        return redirect()->route("class.show", $class)->with('success', 'Data saved successfully.');
+        // Redirect with warnings if any
+        return redirect()->route("class.show", $class)
+            ->with('success', 'Data saved successfully.')
+            ->with('warnings', $warnings);
     }
+
 
 
     public function addQuizAndScore(Request $request, $class)
@@ -213,8 +232,8 @@ class RegistrarController extends Controller
 
         // Retrieve total scores from the percentage table for the specific class
         $percentage = Percentage::where('classID', $class)
-                        ->where('periodic_term', $periodicTerm)
-                        ->first();
+            ->where('periodic_term', $periodicTerm)
+            ->first();
 
         if (!$percentage) {
             return redirect()->back()->with('error', 'Percentage data not found for this class.');
