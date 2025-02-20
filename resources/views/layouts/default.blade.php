@@ -75,8 +75,7 @@
 
 
                     <label for="" style="margin-top:10px;">SETTINGS</label>
-                    <a href=""><i class="fa-solid fa-user-tie"></i>
-                        <span>Roles</span></a>
+
                     <a href=""><i class="fa-solid fa-key"></i>
                         <span>Admin</span></a>
                 </div>
@@ -201,6 +200,7 @@
             overflow-x: hidden;
             /* Hides horizontal scroll */
             transition: width 0.3s ease;
+
         }
 
         .main-nav-footer {
