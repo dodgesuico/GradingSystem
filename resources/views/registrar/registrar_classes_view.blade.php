@@ -122,12 +122,12 @@
             @endif
 
             @if (session('warnings'))
-            <div class="alert alert-warning">
-                @foreach (session('warnings') as $warning)
-                    <p>{{ $warning }}</p>
-                @endforeach
-            </div>
-        @endif
+                <div class="alert alert-warning">
+                    @foreach (session('warnings') as $warning)
+                        <p>{{ $warning }}</p>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
 
@@ -346,22 +346,31 @@
                                                     };
                                                 }
 
-                                                if (!empty($fieldScore) && $fieldScore > 0 && $totalScoreField) {
-                                                    // Get total possible score for this field
+                                                if (!empty($fieldScore) && $totalScoreField) {
                                                     $totalScore = $percentageData->$totalScoreField ?? 0;
 
-                                                    // Find the correct transmuted grade based on the score within the correct bracket
+                                                    // Try to find an exact match
                                                     $transmutedGradeEntry = DB::table('transmuted_grade')
-                                                        ->where('score_bracket', $totalScore) // 🔹 Match the correct bracket
-                                                        ->where('score', $fieldScore) // 🔹 Find score within that bracket
+                                                        ->where('score_bracket', $totalScore)
+                                                        ->where('score', $fieldScore)
                                                         ->first();
 
-                                                    $transmutedGrade = $transmutedGradeEntry
-                                                        ? $transmutedGradeEntry->transmuted_grade
-                                                        : null;
+                                                    if (!$transmutedGradeEntry) {
+                                                        // If no exact match, get the closest lower score
+                                                        $nearestLower = DB::table('transmuted_grade')
+                                                            ->where('score_bracket', $totalScore)
+                                                            ->where('score', '<=', $fieldScore)
+                                                            ->orderBy('score', 'desc') // Get the highest lower value
+                                                            ->first();
+
+                                                        $transmutedGrade = $nearestLower
+                                                            ? $nearestLower->transmuted_grade
+                                                            : null;
+                                                    } else {
+                                                        $transmutedGrade = $transmutedGradeEntry->transmuted_grade;
+                                                    }
 
                                                     if (!is_null($transmutedGrade)) {
-                                                        // Compute final grade based on field percentage
                                                         $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
                                                     }
                                                 }
@@ -464,7 +473,6 @@
 
 
 
-        {{-- start of grade-sheet --}}
         @php
             // Store total grades per student and per period
             $studentGrades = [];
@@ -495,47 +503,47 @@
                             ->first();
                         $fieldScore = $score ? $score->$field : null;
 
-                        // Define field percentage and total score field
+                        // Ensure $totalScoreField is properly assigned
                         $fieldPercentage = 0;
                         $totalScoreField = null;
 
                         if ($percentageData) {
-                            match ($field) {
-                                'quizzez' => [
-                                    ($fieldPercentage = $percentageData->quiz_percentage ?? 0),
-                                    ($totalScoreField = 'quiz_total_score'),
-                                ],
-                                'attendance_behavior' => [
-                                    ($fieldPercentage = $percentageData->attendance_percentage ?? 0),
-                                    ($totalScoreField = 'attendance_total_score'),
-                                ],
-                                'assignments' => [
-                                    ($fieldPercentage = $percentageData->assignment_percentage ?? 0),
-                                    ($totalScoreField = 'assignment_total_score'),
-                                ],
-                                'exam' => [
-                                    ($fieldPercentage = $percentageData->exam_percentage ?? 0),
-                                    ($totalScoreField = 'exam_total_score'),
-                                ],
-                                default => null,
-                            };
+                            switch ($field) {
+                                case 'quizzez':
+                                    $fieldPercentage = $percentageData->quiz_percentage ?? 0;
+                                    $totalScoreField = 'quiz_total_score';
+                                    break;
+                                case 'attendance_behavior':
+                                    $fieldPercentage = $percentageData->attendance_percentage ?? 0;
+                                    $totalScoreField = 'attendance_total_score';
+                                    break;
+                                case 'assignments':
+                                    $fieldPercentage = $percentageData->assignment_percentage ?? 0;
+                                    $totalScoreField = 'assignment_total_score';
+                                    break;
+                                case 'exam':
+                                    $fieldPercentage = $percentageData->exam_percentage ?? 0;
+                                    $totalScoreField = 'exam_total_score';
+                                    break;
+                            }
                         }
 
-                        if (!empty($fieldScore) && $fieldScore > 0 && $totalScoreField) {
+                        if ($fieldScore !== null && $totalScoreField) {
                             // Get total possible score for this field
                             $totalScore = $percentageData->$totalScoreField ?? 0;
 
-                            // Find the correct transmuted grade based on score + bracket
+                            // Find the correct transmuted grade
                             $transmutedGradeEntry = DB::table('transmuted_grade')
-                                ->where('score_bracket', $totalScore) // Match correct bracket
-                                ->where('score', $fieldScore) // Match exact score
+                                ->where('score_bracket', $totalScore)
+                                ->where('score', '<=', $fieldScore) // Find the closest lower score
+                                ->orderBy('score', 'desc')
                                 ->first();
 
                             $transmutedGrade = $transmutedGradeEntry ? $transmutedGradeEntry->transmuted_grade : null;
 
                             if (!is_null($transmutedGrade)) {
                                 // Compute final grade based on field percentage
-                                $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
+                                $computedGrade = max(0, ($transmutedGrade * $fieldPercentage) / 100);
                                 $totalPeriodGrade += $computedGrade;
                             }
                         }
@@ -546,25 +554,34 @@
                 }
 
                 // Compute final grades per term using weighted formula
-                $studentGrades[$studentID]['Prelim Final'] =
-                    0.33 * $studentGrades[$studentID]['Prelim'] + 0.66 * $studentGrades[$studentID]['Midterm'];
-                $studentGrades[$studentID]['Midterm Final'] =
-                    0.33 * $studentGrades[$studentID]['Midterm'] + 0.66 * $studentGrades[$studentID]['Semi-Finals'];
-                $studentGrades[$studentID]['Semi-Finals Final'] =
-                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.66 * $studentGrades[$studentID]['Finals'];
-                $studentGrades[$studentID]['Finals Final'] =
-                    0.33 * $studentGrades[$studentID]['Finals'] + 0.66 * $studentGrades[$studentID]['Finals'];
+                $studentGrades[$studentID]['Prelim Final'] = max(
+                    0,
+                    0.33 * $studentGrades[$studentID]['Prelim'] + 0.66 * $studentGrades[$studentID]['Midterm'],
+                );
+                $studentGrades[$studentID]['Midterm Final'] = max(
+                    0,
+                    0.33 * $studentGrades[$studentID]['Midterm'] + 0.66 * $studentGrades[$studentID]['Semi-Finals'],
+                );
+                $studentGrades[$studentID]['Semi-Finals Final'] = max(
+                    0,
+                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.66 * $studentGrades[$studentID]['Finals'],
+                );
+                $studentGrades[$studentID]['Finals Final'] = max(
+                    0,
+                    0.33 * $studentGrades[$studentID]['Finals'] + 0.66 * $studentGrades[$studentID]['Finals'],
+                );
 
                 // Compute Cumulative Grade (average of all final grades)
-                $studentGrades[$studentID]['Cumulative'] =
+                $studentGrades[$studentID]['Cumulative'] = max(
+                    0,
                     ($studentGrades[$studentID]['Prelim Final'] +
                         $studentGrades[$studentID]['Midterm Final'] +
                         $studentGrades[$studentID]['Semi-Finals Final'] +
                         $studentGrades[$studentID]['Finals Final']) /
-                    4;
+                        4,
+                );
             }
         @endphp
-
 
         <h2 style="margin: 20px 0">Grades</h2>
         <div class="grade-sheet-container">
@@ -572,14 +589,14 @@
                 <thead>
                     <tr>
                         <th>Student</th>
+                        <th>Prelim (Raw)</th>
                         <th>Prelim</th>
-                        <th>Prelim Final</th>
+                        <th>Midterm (Raw)</th>
                         <th>Midterm</th>
-                        <th>Midterm Final</th>
-                        <th>Semi-Final</th>
-                        <th>Semi-Finals Final</th>
-                        <th>Final</th>
-                        <th>Finals Final</th>
+                        <th>Semi-Final (Raw)</th>
+                        <th>Semi-Finals</th>
+                        <th>Final (Raw)</th>
+                        <th>Finals</th>
                         <th>Cumulative Grade</th>
                     </tr>
                 </thead>
@@ -590,24 +607,24 @@
 
                             <!-- Raw Grades (No Adjustment) -->
                             <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
-                            <td>{{ floor($studentGrades[$student->studentID]['Prelim Final'] * 100 - 1) / 100 }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Prelim Final'], 2) }}</td>
 
                             <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
-                            <td>{{ floor($studentGrades[$student->studentID]['Midterm Final'] * 100 - 1) / 100 }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Midterm Final'], 2) }}</td>
 
                             <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
-                            <td>{{ floor($studentGrades[$student->studentID]['Semi-Finals Final'] * 100 - 1) / 100 }}
-                            </td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals Final'], 2) }}</td>
 
                             <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
-                            <td>{{ floor($studentGrades[$student->studentID]['Finals Final'] * 100 - 1) / 100 }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Finals Final'], 2) }}</td>
 
-                            <td>{{ floor($studentGrades[$student->studentID]['Cumulative'] * 100 - 1) / 100 }}</td>
+                            <td>{{ number_format($studentGrades[$student->studentID]['Cumulative'], 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+
 
 
 
