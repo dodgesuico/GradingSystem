@@ -92,7 +92,9 @@ class RegistrarController extends Controller
 
         $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
 
-        $students = User::where('role', 'student')->get();
+        $students = User::where('role', 'student')
+            ->whereNotIn('id', $enrolledStudentIds)
+            ->get();
 
         $classes_student = Classes_Student::where('classID', $class->id)->get();
 
@@ -301,6 +303,7 @@ class RegistrarController extends Controller
             // Fetch student info correctly
             $studentInfo = Classes_Student::where('studentID', $grade['studentID'])->first();
 
+            // Update or insert the active grade record
             DB::table('final_grade')->updateOrInsert(
                 [
                     'classID' => $grade['classID'],
@@ -324,6 +327,26 @@ class RegistrarController extends Controller
                     'created_at' => now(),
                 ]
             );
+
+            // Insert a new record into grade_logs (for history/backup)
+            DB::table('grade_logs')->insert([
+                'classID' => $grade['classID'],
+                'studentID' => $grade['studentID'],
+                'subject_code' => optional($classInfo)->subject_code,
+                'descriptive_title' => optional($classInfo)->descriptive_title,
+                'instructor' => optional($classInfo)->instructor,
+                'academic_period' => optional($classInfo)->academic_period,
+                'schedule' => optional($classInfo)->schedule,
+                'name' => optional($studentInfo)->name,
+                'email' => optional($studentInfo)->email,
+                'department' => optional($studentInfo)->department,
+                'prelim' => $grade['prelim'],
+                'midterm' => $grade['midterm'],
+                'semi_finals' => $grade['semi_finals'],
+                'final' => $grade['final'],
+                'remarks' => $grade['remarks'],
+                'created_at' => now(), // Store timestamp of when the backup was made
+            ]);
         }
 
         return back()->with('success', 'Final grades have been locked in successfully!');
