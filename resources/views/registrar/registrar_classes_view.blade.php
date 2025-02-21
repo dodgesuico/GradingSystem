@@ -572,35 +572,37 @@
                 // Fetch the final transmutation table
                 $transmutations = DB::table('final_transmutation')
                     ->orderBy('grades', 'asc') // Ensure it's ordered properly
-        ->get();
+                    ->get();
 
-    // Function to find the transmutation based on final grade
-    function getTransmutation($finalGrade, $transmutations)
-    {
-        foreach ($transmutations as $transmutation) {
-            if ($finalGrade >= $transmutation->grades) {
-                $matchedTransmutation = $transmutation;
-            } else {
-                break;
-            }
-        }
-        return $matchedTransmutation ?? null;
-    }
+                // Function to find the transmutation based on final grade
+                if (!function_exists('getTransmutation')) {
+                    function getTransmutation($finalGrade, $transmutations)
+                    {
+                        foreach ($transmutations as $transmutation) {
+                            if ($finalGrade >= $transmutation->grades) {
+                                $matchedTransmutation = $transmutation;
+                            } else {
+                                break;
+                            }
+                        }
+                        return $matchedTransmutation ?? null;
+                    }
+                }
 
-    // Compute Finals (same as before)
-    $studentGrades[$studentID]['Finals'] =
-        0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
+                // Compute Finals (same as before)
+                $studentGrades[$studentID]['Finals'] =
+                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
 
-    // Get the corresponding transmutation
-    $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
+                // Get the corresponding transmutation
+                $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
 
-    if ($transmutation) {
-        // Set transmuted grade and remarks
-        $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
-        $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
-    } else {
-        // Default to FAILED if no match is found
-        $studentGrades[$studentID]['Remarks'] = 'FAILED';
+                if ($transmutation) {
+                    // Set transmuted grade and remarks
+                    $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
+                    $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
+                } else {
+                    // Default to FAILED if no match is found
+                    $studentGrades[$studentID]['Remarks'] = 'FAILED';
                 }
             }
         @endphp
@@ -626,58 +628,53 @@
         </div>
 
         <div class="grade-sheet-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Prelim</th>
-                        <th class="raw-column" style="display: none;">Midterm (Raw)</th>
-                        <th>Midterm</th>
-                        <th class="raw-column" style="display: none;">Semi-Final (Raw)</th>
-                        <th>Semi-Finals</th>
-                        <th class="raw-column" style="display: none;">Final (Raw)</th>
-                        <th>Finals</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($classes_student as $student)
+            <form action="{{ route('finalgrade.save') }}" method="POST">
+                @csrf
+                @method('POST')
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ $student->name }}</td>
-
-                            <!-- Prelim -->
-                            <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
-
-                            <!-- Midterm Raw and Midterm -->
-                            <td class="raw-column" style="display: none;">
-                                {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}
-                            </td>
-                            <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
-
-                            <!-- Semi-Finals Raw and Semi-Finals -->
-                            <td class="raw-column" style="display: none;">
-                                {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}
-                            </td>
-                            <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
-
-                            <!-- Finals Raw and Finals -->
-                            <td class="raw-column" style="display: none;">
-                                {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}
-                            </td>
-                            <td>
-                                {{ $studentGrades[$student->studentID]['Finals'] >= 0.99 && $studentGrades[$student->studentID]['Finals'] < 1
-                                    ? 1
-                                    : ($studentGrades[$student->studentID]['Finals'] >= 4.95 && $studentGrades[$student->studentID]['Finals'] < 5
-                                        ? 5
-                                        : number_format($studentGrades[$student->studentID]['Finals'], 2)) }}
-                            </td>
-
-                            <!-- Remarks -->
-                            <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
+                            <th>Student</th>
+                            <th>Prelim</th>
+                            <th class="raw-column" style="display: none;">Midterm (Raw)</th> <!-- Display only -->
+                            <th>Midterm</th>
+                            <th class="raw-column" style="display: none;">Semi-Finals (Raw)</th> <!-- Display only -->
+                            <th>Semi-Finals</th>
+                            <th class="raw-column" style="display: none;">Finals (Raw)</th> <!-- Display only -->
+                            <th>Final</th>
+                            <th>Remarks</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($classes_student as $student)
+                            <tr>
+                                <td>{{ $student->name }}</td>
+                                <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
+                                <td class="raw-column" style="display: none;">{{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td> <!-- Display only -->
+                                <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
+                                <td class="raw-column" style="display: none;">{{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}</td> <!-- Display only -->
+                                <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
+                                <td class="raw-column" style="display: none;">{{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}</td> <!-- Display only -->
+                                <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
+                                <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
+
+                                <!-- Hidden inputs (ONLY SAVING PRELIM, MIDTERM, SEMI-FINALS, FINAL, and REMARKS) -->
+                                <input type="hidden" name="grades[{{ $student->studentID }}][classID]" value="{{ $student->classID }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][studentID]" value="{{ $student->studentID }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][name]" value="{{ $student->name }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][prelim]" value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][midterm]" value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]" value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][final]" value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][remarks]" value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <!-- Lock In Button -->
+                <button type="submit" class="btn btn-primary">Lock In Grades</button>
+            </form>
         </div>
 
         <style>
@@ -692,10 +689,6 @@
                 border-right: 2px dashed var(--color-red);
                 transition: background-color 0.3s ease-in-out;
             }
-
-
-
-
         </style>
 
         <script>

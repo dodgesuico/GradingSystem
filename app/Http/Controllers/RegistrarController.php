@@ -100,6 +100,7 @@ class RegistrarController extends Controller
 
         $percentage = Percentage::where('classID', $class->id)->get();
 
+
         return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
     }
 
@@ -290,5 +291,41 @@ class RegistrarController extends Controller
         }
 
         return redirect()->back()->with('success', 'Scores updated successfully.');
+    }
+
+    public function lockInGrades(Request $request)
+    {
+        foreach ($request->grades as $grade) {
+            $classInfo = Classes::find($grade['classID']); // Get class info
+
+            // Fetch student info correctly
+            $studentInfo = Classes_Student::where('studentID', $grade['studentID'])->first();
+
+            DB::table('final_grade')->updateOrInsert(
+                [
+                    'classID' => $grade['classID'],
+                    'studentID' => $grade['studentID']
+                ],
+                [
+                    'subject_code' => optional($classInfo)->subject_code,
+                    'descriptive_title' => optional($classInfo)->descriptive_title,
+                    'instructor' => optional($classInfo)->instructor,
+                    'academic_period' => optional($classInfo)->academic_period,
+                    'schedule' => optional($classInfo)->schedule,
+                    'name' => optional($studentInfo)->name,
+                    'email' => optional($studentInfo)->email,
+                    'department' => optional($studentInfo)->department,
+                    'prelim' => $grade['prelim'],
+                    'midterm' => $grade['midterm'],
+                    'semi_finals' => $grade['semi_finals'],
+                    'final' => $grade['final'],
+                    'remarks' => $grade['remarks'],
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
+
+        return back()->with('success', 'Final grades have been locked in successfully!');
     }
 }
