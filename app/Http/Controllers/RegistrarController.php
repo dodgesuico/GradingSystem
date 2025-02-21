@@ -197,7 +197,7 @@ class RegistrarController extends Controller
                     ->exists();
 
                 if (!$scoreExists) {
-                    $warnings[] = "WARNING! The total score of $totalScore for " . ucfirst($category) . " in $term does not exist in transmuted_grade.";
+                    $warnings[] = "⚠️WARNING! The total score of $totalScore for " . ucfirst($category) . " in $term does not exist in the database (the system cannot calculate, please change the total score).";
                 }
             }
 

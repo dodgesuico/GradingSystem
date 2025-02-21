@@ -166,6 +166,7 @@ tr:nth-child(odd) {
     justify-content: left;
     align-items: center;
     width: 100%;
+    gap: 20px;
 }
 
 .message-container .alert {
@@ -182,7 +183,7 @@ tr:nth-child(odd) {
 }
 
 .alert-success {
-    background-color: #d4edda;
+    background-color: #ecfff1;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
@@ -191,6 +192,12 @@ tr:nth-child(odd) {
     background-color: #f8d7da;
     color: #962631;
     border: 1px solid #f5c6cb;
+}
+
+.alert-warning {
+
+    color: #fb8500;
+
 }
 
 .save-btn{

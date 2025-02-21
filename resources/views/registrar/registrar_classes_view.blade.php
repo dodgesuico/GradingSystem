@@ -572,50 +572,70 @@
                 // Fetch the final transmutation table
                 $transmutations = DB::table('final_transmutation')
                     ->orderBy('grades', 'asc') // Ensure it's ordered properly
-                    ->get();
+        ->get();
 
-                // Function to find the transmutation based on final grade
-                function getTransmutation($finalGrade, $transmutations) {
-                    foreach ($transmutations as $transmutation) {
-                        if ($finalGrade >= $transmutation->grades) {
-                            $matchedTransmutation = $transmutation;
-                        } else {
-                            break;
-                        }
-                    }
-                    return $matchedTransmutation ?? null;
-                }
+    // Function to find the transmutation based on final grade
+    function getTransmutation($finalGrade, $transmutations)
+    {
+        foreach ($transmutations as $transmutation) {
+            if ($finalGrade >= $transmutation->grades) {
+                $matchedTransmutation = $transmutation;
+            } else {
+                break;
+            }
+        }
+        return $matchedTransmutation ?? null;
+    }
 
-                // Compute Finals (same as before)
-                $studentGrades[$studentID]['Finals'] =
-                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
+    // Compute Finals (same as before)
+    $studentGrades[$studentID]['Finals'] =
+        0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
 
-                // Get the corresponding transmutation
-                $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
+    // Get the corresponding transmutation
+    $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
 
-                if ($transmutation) {
-                    // Set transmuted grade and remarks
-                    $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
-                    $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
-                } else {
-                    // Default to FAILED if no match is found
-                    $studentGrades[$studentID]['Remarks'] = 'FAILED';
+    if ($transmutation) {
+        // Set transmuted grade and remarks
+        $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
+        $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
+    } else {
+        // Default to FAILED if no match is found
+        $studentGrades[$studentID]['Remarks'] = 'FAILED';
                 }
             }
         @endphp
 
+
+
+
+
+
+
+
+
+
+
+
+
         <h2 style="margin: 20px 0">Grades</h2>
+
+        <div style="margin-bottom: 10px;">
+            <button onclick="toggleRawColumns()" class="toggle-btn">
+                <i class="fa-solid fa-eye"></i> Show Raw Columns
+            </button>
+        </div>
+
         <div class="grade-sheet-container">
             <table>
                 <thead>
                     <tr>
                         <th>Student</th>
                         <th>Prelim</th>
-                        <th>Midterm (Raw)</th>
+                        <th class="raw-column" style="display: none;">Midterm (Raw)</th>
                         <th>Midterm</th>
-                        <th>Semi-Final (Raw)</th>
+                        <th class="raw-column" style="display: none;">Semi-Final (Raw)</th>
                         <th>Semi-Finals</th>
-                        <th>Final (Raw)</th>
+                        <th class="raw-column" style="display: none;">Final (Raw)</th>
                         <th>Finals</th>
                         <th>Remarks</th>
                     </tr>
@@ -629,15 +649,21 @@
                             <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
 
                             <!-- Midterm Raw and Midterm -->
-                            <td>{{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td>
+                            <td class="raw-column" style="display: none;">
+                                {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}
+                            </td>
                             <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
 
                             <!-- Semi-Finals Raw and Semi-Finals -->
-                            <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}</td>
+                            <td class="raw-column" style="display: none;">
+                                {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}
+                            </td>
                             <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
 
                             <!-- Finals Raw and Finals -->
-                            <td>{{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}</td>
+                            <td class="raw-column" style="display: none;">
+                                {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}
+                            </td>
                             <td>
                                 {{ $studentGrades[$student->studentID]['Finals'] >= 0.99 && $studentGrades[$student->studentID]['Finals'] < 1
                                     ? 1
@@ -654,6 +680,40 @@
             </table>
         </div>
 
+        <style>
+            /* Styling scoped to the grade-sheet-container to avoid affecting other elements */
+            .grade-sheet-container .raw-column {
+                background-color: var(--hover-background-color);
+                /* Light red/pink */
+                width: 10%;
+                /* Dark red text */
+                font-weight: bold;
+                border-left: 2px dashed var(--color-red);
+                border-right: 2px dashed var(--color-red);
+                transition: background-color 0.3s ease-in-out;
+            }
+
+
+
+
+        </style>
+
+        <script>
+            function toggleRawColumns() {
+                let columns = document.querySelectorAll('.raw-column');
+                let button = document.querySelector('.toggle-btn');
+                let icon = button.querySelector('i');
+                let isHidden = columns[0].style.display === 'none';
+
+                columns.forEach(col => {
+                    col.style.display = isHidden ? '' : 'none';
+                });
+
+                button.innerHTML = isHidden ?
+                    '<i class="fa-solid fa-eye-slash"></i> Hide Raw Columns' :
+                    '<i class="fa-solid fa-eye"></i> Show Raw Columns';
+            }
+        </script>
 
 
 
