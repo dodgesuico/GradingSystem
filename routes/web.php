@@ -10,6 +10,7 @@ use App\Http\Controllers\RegistrarController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AllGradesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,7 +64,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/quizzesadded/class={class}', [RegistrarController::class, 'addQuizAndScore'])->name('class.addquizandscore');
 
     Route::post('/savefinalgrade', [RegistrarController::class, 'lockInGrades'])->name('finalgrade.save');
+    Route::post('/unlockfinalgrade', [RegistrarController::class, 'UnlockGrades'])->name('finalgrade.unlock');
 
+
+    Route::get('/allgrades', [AllGradesController::class, 'index'])->name('show.grades');
 
     Route::get('/users', [UserController::class, 'show'])->name('user.show');
     Route::post('/users', [UserController::class, 'editUser'])->name('user.edituser');

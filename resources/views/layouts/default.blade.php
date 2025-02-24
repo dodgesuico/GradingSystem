@@ -60,7 +60,7 @@
                         <i class="fa-solid fa-house"></i><span>Home</span></a>
                     <a href=""><i class="fa-solid fa-star"></i>
                         <span>My Grades</span></a>
-                    <a href=""><i class="fa-solid fa-chart-simple"></i>
+                    <a href="{{ route('show.grades') }}"><i class="fa-solid fa-chart-simple"></i>
                         <span>Reports</span></a>
 
                     <label for="" style="margin-top:10px;">OPERATION</label>

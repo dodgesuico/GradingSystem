@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class FinalGrade extends Model
 {
-    protected $fillable = ['final_grade']; // Ensure 'department_name' is fillable
+    protected $table = 'final_grade'; // Ensure 'department_name' is fillable
 }

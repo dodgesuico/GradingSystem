@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
-use App\Models\TransmutedGrade;
+use App\Models\FinalGrade;
 use App\Models\Percentage;
 use App\Models\QuizzesAndScores;
 use App\Models\Classes_Student;
@@ -102,8 +102,11 @@ class RegistrarController extends Controller
 
         $percentage = Percentage::where('classID', $class->id)->get();
 
+        $finalGrades = DB::table('final_grade')
+            ->where('classID', $class->id)
+            ->get();
 
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage'));
+        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'finalGrades'));
     }
 
 
@@ -155,17 +158,29 @@ class RegistrarController extends Controller
         // Find all related quizzes and scores for this student in the class
         $quizzesScores = QuizzesAndScores::where('classID', $class)
             ->where('studentID', $student)
-            ->get();  // Get all records instead of first()
+            ->get();
 
-        if ($classStudent || $quizzesScores->isNotEmpty()) {
+        // Find the student's final grade in the class
+        $finalGrade = FinalGrade::where('classID', $class)
+            ->where('studentID', $student)
+            ->first();
+
+        if ($classStudent || $quizzesScores->isNotEmpty() || $finalGrade) {
+            // Delete student from classes_student
             if ($classStudent) {
                 $classStudent->delete();
             }
 
+            // Delete related quizzes and scores
             if ($quizzesScores->isNotEmpty()) {
                 foreach ($quizzesScores as $score) {
-                    $score->delete();  // Delete each record individually
+                    $score->delete();
                 }
+            }
+
+            // Delete the student's final grade
+            if ($finalGrade) {
+                $finalGrade->delete();
             }
 
             return redirect()->route("class.show", $class)->with("success", "Student removed successfully.");
@@ -173,6 +188,7 @@ class RegistrarController extends Controller
 
         return redirect()->route("class.show", $class)->with("error", "Student not found or already removed.");
     }
+
 
     public function addPercentageAndScores(Request $request, Classes $class)
     {
@@ -323,32 +339,21 @@ class RegistrarController extends Controller
                     'semi_finals' => $grade['semi_finals'],
                     'final' => $grade['final'],
                     'remarks' => $grade['remarks'],
+                    'status' => 'Locked', // Add status field here
                     'updated_at' => now(),
                     'created_at' => now(),
                 ]
             );
-
-            // Insert a new record into grade_logs (for history/backup)
-            DB::table('grade_logs')->insert([
-                'classID' => $grade['classID'],
-                'studentID' => $grade['studentID'],
-                'subject_code' => optional($classInfo)->subject_code,
-                'descriptive_title' => optional($classInfo)->descriptive_title,
-                'instructor' => optional($classInfo)->instructor,
-                'academic_period' => optional($classInfo)->academic_period,
-                'schedule' => optional($classInfo)->schedule,
-                'name' => optional($studentInfo)->name,
-                'email' => optional($studentInfo)->email,
-                'department' => optional($studentInfo)->department,
-                'prelim' => $grade['prelim'],
-                'midterm' => $grade['midterm'],
-                'semi_finals' => $grade['semi_finals'],
-                'final' => $grade['final'],
-                'remarks' => $grade['remarks'],
-                'created_at' => now(), // Store timestamp of when the backup was made
-            ]);
         }
 
         return back()->with('success', 'Final grades have been locked in successfully!');
     }
+
+    public function UnlockGrades()
+    {
+        DB::table('final_grade')->update(['status' => null]);
+
+        return back()->with('success', 'Final grades have been unlocked successfully!');
+    }
+
 }
