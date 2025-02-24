@@ -624,7 +624,7 @@
 
 
 
-        <h2 style="margin: 20px 0">Grades</h2>
+        <h2 style="margin: 10px 0">Grades</h2>
 
         <div style="margin-bottom: 10px;">
             <button onclick="toggleRawColumns()" class="toggle-btn">
@@ -632,11 +632,12 @@
             </button>
         </div>
 
-        <h4>Status:
-            <strong>
+        <h3 style="color: {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
+            Status:
+            <strong >
                 {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'Locked' : 'Not Locked Yet' }}
             </strong>
-        </h4>
+        </h3 >
 
         <div class="grade-sheet-container">
             <form action="{{ route('finalgrade.lock') }}" method="POST">
@@ -685,23 +686,23 @@
 
                 <!-- Lock In Button -->
                 @if ($finalGrades->isEmpty() || !$finalGrades->first()->status)
-                    <button class="btn btn-primary">Lock In Grades</button>
+                    <button class="save-btn" style="margin-top: 10px"><i class="fa-solid fa-unlock"></i> Lock In Grades</button>
                 @endif
             </form>
 
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
                 <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to unlock grades?')">
-                        Unlock Grades
+                    <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0" onclick="return confirm('Are you sure you want to unlock grades?')">
+                        <i class="fa-solid fa-lock"></i>  Unlock Grades
                     </button>
                 </form>
 
                 <form action="{{ route('finalgrade.save') }}" method="POST" style="display:inline;">
                     @csrf
                     @method('POST')
-                    <button type="submit" class="btn btn-danger">
-                        Submit
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-file-export"></i> Submit
                     </button>
                 </form>
             @endif
@@ -1053,4 +1054,6 @@
     h3 {
         color: var(--ckcm-color4)
     }
+
+
 </style>

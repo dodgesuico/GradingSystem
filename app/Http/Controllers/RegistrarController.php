@@ -347,7 +347,7 @@ class RegistrarController extends Controller
             );
         }
 
-        return back()->with('success', 'Final grades have been unlocked successfully!');
+        return back()->with('success', 'Final grades have been locked successfully!');
     }
 
 
