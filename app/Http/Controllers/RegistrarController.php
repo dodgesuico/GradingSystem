@@ -391,6 +391,12 @@ class RegistrarController extends Controller
                     'updated_at' => now(),
                 ]);
 
+                // Delete student's quiz scores
+                DB::table('quizzes_scores')
+                    ->where('classID', $grade->classID)
+                    ->where('studentID', $grade->studentID)
+                    ->delete();
+
                 // Delete student from classes_student
                 DB::table('classes_student')
                     ->where('classID', $grade->classID)
@@ -411,6 +417,7 @@ class RegistrarController extends Controller
             return back()->with('error', 'An error occurred while submitting grades: ' . $e->getMessage());
         }
     }
+
 
 
 
