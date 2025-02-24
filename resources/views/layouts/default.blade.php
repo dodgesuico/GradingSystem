@@ -35,7 +35,7 @@
                 <div class="nav-profile">
 
                     <div style="display: flex; gap:10px;">
-                        <img src="{{ asset('system_images/profile.png') }}" alt="">
+                        <img src="{{ asset('system_images/user.png') }}" alt="">
 
                         <div class="profile">
                             <label for="">{{ Auth::user()->name ?? 'Registrar Name' }}</label>
