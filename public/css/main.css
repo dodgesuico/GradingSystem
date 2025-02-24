@@ -66,6 +66,7 @@
 /* Scrollbar width */
 ::-webkit-scrollbar {
     width: 10px;
+    height: 5px;
 }
 
 /* Scrollbar track (background) */

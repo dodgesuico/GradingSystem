@@ -69,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/allgrades', [AllGradesController::class, 'index'])->name('show.grades');
+    Route::get('/api/grades', [AllGradesController::class, 'getGrades']);
 
     Route::get('/users', [UserController::class, 'show'])->name('user.show');
     Route::post('/users', [UserController::class, 'editUser'])->name('user.edituser');

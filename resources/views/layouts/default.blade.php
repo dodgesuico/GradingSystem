@@ -60,8 +60,7 @@
                         <i class="fa-solid fa-house"></i><span>Home</span></a>
                     <a href=""><i class="fa-solid fa-star"></i>
                         <span>My Grades</span></a>
-                    <a href="{{ route('show.grades') }}"><i class="fa-solid fa-chart-simple"></i>
-                        <span>Reports</span></a>
+
 
                     <label for="" style="margin-top:10px;">OPERATION</label>
                     <a href=""><i class="fa-regular fa-clipboard"></i>
@@ -70,7 +69,13 @@
                         class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
                         <i class="fa-solid fa-clipboard"></i> <span>All Class</span>
                     </a>
-                    <a href="{{ route('user.show') }}" class="{{ Request::is('users') ? 'active' : '' }}"><i class="fa-solid fa-users"></i>
+
+                    <a href="{{ route('show.grades') }}" class="{{ Request::is('allgrades') ? 'active' : '' }}"><i
+                            class="fa-solid fa-box-archive"></i>
+                        <span>All Grades</span></a>
+
+                    <a href="{{ route('user.show') }}" class="{{ Request::is('users') ? 'active' : '' }}"><i
+                            class="fa-solid fa-users"></i>
                         <span>Users</span></a>
 
 
@@ -362,10 +367,8 @@
 
         /* dynamic content */
         .content {
-
             overflow-y: scroll;
             overflow-x: auto;
-
         }
     </style>
 
