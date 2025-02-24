@@ -15,21 +15,21 @@ return new class extends Migration
             Schema::create('grade_logs', function (Blueprint $table) {
                 $table->id();
                 $table->integer('classID');
-                $table->string('subject_code');
-                $table->string('descriptive_title');
-                $table->string('instructor');
-                $table->string('academic_period');
-                $table->string('schedule');
+                $table->string('subject_code')->nullable();
+                $table->string('descriptive_title')->nullable();
+                $table->string('instructor')->nullable();
+                $table->string('academic_period')->nullable();
+                $table->string('schedule')->nullable();
                 $table->integer('studentID');
-                $table->string('name');
-                $table->string('email');
+                $table->string('name')->nullable();
+                $table->string('email')->nullable();
                 $table->string('department');
                 $table->decimal('prelim', 5,2);
                 $table->decimal('midterm', 5,2);
                 $table->decimal('semi_finals', 5,2);
                 $table->decimal('final', 5,2);
-                $table->string('remarks');
-                $table->string('status');
+                $table->string('remarks')->nullable();
+                $table->string('status')->nullable();
                 $table->timestamps();
             });
         }
