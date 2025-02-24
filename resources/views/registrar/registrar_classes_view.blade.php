@@ -130,7 +130,9 @@
             @endif
         </div>
 
-        @if (!($finalGrades->isNotEmpty() && $finalGrades->first()->status))
+        @if (!($finalGrades->where('classID', $class->id)->isNotEmpty() &&
+            $finalGrades->where('classID', $class->id)->first()->status))
+
             <div id="grade-content">
 
 
@@ -292,15 +294,12 @@
                                         </tr>
                                         @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
                                             @php
-                                                $student = $classes_student->firstWhere(
-                                                    'studentID',
-                                                    $quizzesandscore->studentID,
-                                                );
-                                                $score = $quizzesandscores
-                                                    ->where('studentID', $student->studentID)
-                                                    ->where('periodic_term', $term)
-                                                    ->first();
-                                                $computedGrade = null;
+                                                $student = $classes_student->firstWhere('studentID', $quizzesandscore->studentID);
+    $score = $quizzesandscores
+        ->where('studentID', optional($student)->studentID) // Prevent error if $student is null
+        ->where('periodic_term', $term)
+        ->first();
+    $computedGrade = null;
                                             @endphp
                                             <tr>
                                                 <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
@@ -640,7 +639,7 @@
         </h4>
 
         <div class="grade-sheet-container">
-            <form action="{{ route('finalgrade.save') }}" method="POST">
+            <form action="{{ route('finalgrade.lock') }}" method="POST">
                 @csrf
                 @method('POST')
                 <table>
@@ -686,15 +685,23 @@
 
                 <!-- Lock In Button -->
                 @if ($finalGrades->isEmpty() || !$finalGrades->first()->status)
-                    <button type="submit" class="btn btn-primary">Lock In Grades</button>
+                    <button class="btn btn-primary">Lock In Grades</button>
                 @endif
             </form>
+
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
                 <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
                     @csrf
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to unlock grades?')">
+                        Unlock Grades
+                    </button>
+                </form>
+
+                <form action="{{ route('finalgrade.save') }}" method="POST" style="display:inline;">
+                    @csrf
                     @method('POST')
                     <button type="submit" class="btn btn-danger">
-                        Unlock Grades
+                        Submit
                     </button>
                 </form>
             @endif

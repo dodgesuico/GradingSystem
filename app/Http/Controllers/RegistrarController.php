@@ -311,6 +311,7 @@ class RegistrarController extends Controller
         return redirect()->back()->with('success', 'Scores updated successfully.');
     }
 
+
     public function lockInGrades(Request $request)
     {
         foreach ($request->grades as $grade) {
@@ -346,8 +347,72 @@ class RegistrarController extends Controller
             );
         }
 
-        return back()->with('success', 'Final grades have been locked in successfully!');
+        return back()->with('success', 'Final grades have been unlocked successfully!');
     }
+
+
+    public function SubmitGrades()
+    {
+        // Get all locked grades from final_grade table
+        $finalGrades = DB::table('final_grade')->where('status', 'Locked')->get();
+
+        // Check if there are any locked grades
+        if ($finalGrades->isEmpty()) {
+            return back()->with('error', 'No locked grades found to submit.');
+        }
+
+        // Start a transaction to ensure atomicity
+        DB::beginTransaction();
+
+        try {
+            foreach ($finalGrades as $grade) {
+                $classInfo = Classes::find($grade->classID);
+                $studentInfo = Classes_Student::where('studentID', $grade->studentID)->first();
+
+                // Insert into grade_logs
+                DB::table('grade_logs')->insert([
+                    'classID' => $grade->classID,
+                    'studentID' => $grade->studentID,
+                    'subject_code' => optional($classInfo)->subject_code,
+                    'descriptive_title' => optional($classInfo)->descriptive_title,
+                    'instructor' => optional($classInfo)->instructor,
+                    'academic_period' => optional($classInfo)->academic_period,
+                    'schedule' => optional($classInfo)->schedule,
+                    'name' => optional($studentInfo)->name,
+                    'email' => optional($studentInfo)->email,
+                    'department' => optional($studentInfo)->department,
+                    'prelim' => $grade->prelim,
+                    'midterm' => $grade->midterm,
+                    'semi_finals' => $grade->semi_finals,
+                    'final' => $grade->final,
+                    'remarks' => $grade->remarks,
+                    'status' => 'Submitted', // Change status to indicate submission
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Delete student from classes_student
+                DB::table('classes_student')
+                    ->where('classID', $grade->classID)
+                    ->where('studentID', $grade->studentID)
+                    ->delete();
+            }
+
+            // Delete all submitted grades from final_grade
+            DB::table('final_grade')->where('status', 'Locked')->delete();
+
+            // Commit transaction if everything is successful
+            DB::commit();
+
+            return back()->with('success', 'Final grades have been submitted, and students have been removed from the class.');
+        } catch (\Exception $e) {
+            // Rollback transaction on failure
+            DB::rollBack();
+            return back()->with('error', 'An error occurred while submitting grades: ' . $e->getMessage());
+        }
+    }
+
+
 
     public function UnlockGrades()
     {
@@ -355,5 +420,4 @@ class RegistrarController extends Controller
 
         return back()->with('success', 'Final grades have been unlocked successfully!');
     }
-
 }

@@ -63,7 +63,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quizzesadded/class={class}', [RegistrarController::class, 'show'])->name('class.quizzes');
     Route::put('/quizzesadded/class={class}', [RegistrarController::class, 'addQuizAndScore'])->name('class.addquizandscore');
 
-    Route::post('/savefinalgrade', [RegistrarController::class, 'lockInGrades'])->name('finalgrade.save');
+    Route::post('/lockedfinalgrade', [RegistrarController::class, 'LockInGrades'])->name('finalgrade.lock');
+    Route::post('/savefinalgrade', [RegistrarController::class, 'SubmitGrades'])->name('finalgrade.save');
     Route::post('/unlockfinalgrade', [RegistrarController::class, 'UnlockGrades'])->name('finalgrade.unlock');
 
 
