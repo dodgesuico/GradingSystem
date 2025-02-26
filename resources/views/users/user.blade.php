@@ -93,7 +93,7 @@
                                     class="fa-solid fa-pen-to-square"></i> Edit User
                             </button>
                             <button class="view-btn" data-user-id="{{ $user->id }}">
-                                <i class="fa-solid fa-eye"></i> View Details
+                                <i class="fa-solid fa-clipboard-user"></i> View Details
                             </button>
                             @if ($user->role === 'student')
                                 <span class="user-grades" data-grades="{{ json_encode($user->grades) }}"
@@ -181,31 +181,31 @@
     <!-- User Details Modal -->
     <div id="userDetailsModal" class="modal">
         <div class="modal-content">
-            <span class="close-user-details">&times;</span>
+
             <h2>User Details</h2>
 
             <!-- Name -->
             <label>Name:</label>
-            <p id="userDetailsName" class="user-info"></p>
+            <p id="userDetailsName"></p>
 
             <!-- Email -->
             <label>Email:</label>
-            <p id="userDetailsEmail" class="user-info"></p>
+            <p id="userDetailsEmail"></p>
 
             <!-- Department -->
             <label>Department:</label>
-            <p id="userDetailsDepartment" class="user-info"></p>
+            <p id="userDetailsDepartment"></p>
 
             <!-- Roles Section -->
             <label>Roles:</label>
-            <div id="userDetailsRoles" class="role-container">
+            <p id="userDetailsRoles">
                 <!-- Roles will be inserted here -->
-            </div>
+            </p>
 
             <!-- 🟢 Grades Section (only for students) -->
             <div id="userGradesSection" style="display: none;">
                 <h2>Grades</h2>
-                <table border="1">
+                <table>
                     <thead>
                         <tr>
                             <th>Subject Code</th>
@@ -224,6 +224,10 @@
             </div>
         </div>
     </div>
+
+
+
+
 
     <script>
         $(document).ready(function() {
@@ -587,5 +591,40 @@
     .user-table td {
         border-left: 0;
         border-right: 0;
+    }
+
+
+    .view-btn {
+        border: 0;
+        font-size: 1rem;
+    }
+</style>
+
+
+
+
+{{-- view details  --}}
+<style>
+    #userDetailsModal .modal-content {
+        width: 50%;
+        margin: 5% auto;
+        gap: 10px;
+
+    }
+
+    #userDetailsModal .modal-content h2 {
+        margin: 10px 0;
+    }
+
+    #userDetailsModal .modal-content label {
+        color: var(--ckcm-color4);
+    }
+
+    #userDetailsModal .modal-content p,
+    #userDetailsModal .modal-content span {
+        color: var(--color1);
+        font-size: 1.2rem;
+        margin: 0;
+        padding: 0;
     }
 </style>
