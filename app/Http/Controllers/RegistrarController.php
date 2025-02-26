@@ -314,6 +314,11 @@ class RegistrarController extends Controller
 
     public function lockInGrades(Request $request)
     {
+        // Check if the grades are empty or null
+        if (empty($request->grades)) {
+            return back()->with('error', 'No students yet, you can\'t lock.');
+        }
+
         foreach ($request->grades as $grade) {
             $classInfo = Classes::find($grade['classID']); // Get class info
 
@@ -349,6 +354,7 @@ class RegistrarController extends Controller
 
         return back()->with('success', 'Final grades have been locked successfully!');
     }
+
 
 
     public function SubmitGrades()
