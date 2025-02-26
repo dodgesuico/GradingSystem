@@ -28,6 +28,7 @@
                     </option>
                 @endforeach
             </select>
+
         </form>
 
 
@@ -201,7 +202,6 @@
                 <!-- Roles will be inserted here -->
             </div>
 
-
             <!-- 🟢 Grades Section (only for students) -->
             <div id="userGradesSection" style="display: none;">
                 <h2>Grades</h2>
@@ -214,6 +214,7 @@
                             <th>Midterm</th>
                             <th>Semi-Final</th>
                             <th>Final</th>
+                            <th>Remarks</th> <!-- ✅ Added Remarks Column -->
                         </tr>
                     </thead>
                     <tbody id="userGradesTable">
@@ -222,8 +223,6 @@
                 </table>
             </div>
         </div>
-
-
     </div>
 
     <script>
@@ -264,16 +263,17 @@
                     if (userGrades.length > 0) {
                         userGrades.forEach(grade => {
                             gradesHtml += `<tr>
-                                <td>${grade.subject_code}</td>
-                                <td>${grade.descriptive_title}</td>
-                                <td>${grade.prelim}</td>
-                                <td>${grade.midterm}</td>
-                                <td>${grade.semi_finals}</td>
-                                <td>${grade.final}</td>
-                            </tr>`;
+                            <td>${grade.subject_code}</td>
+                            <td>${grade.descriptive_title}</td>
+                            <td>${grade.prelim}</td>
+                            <td>${grade.midterm}</td>
+                            <td>${grade.semi_finals}</td>
+                            <td>${grade.final}</td>
+                            <td>${grade.remarks ? grade.remarks : 'N/A'}</td> <!-- ✅ Included Remarks -->
+                        </tr>`;
                         });
                     } else {
-                        gradesHtml = "<tr><td colspan='6'>No grades available</td></tr>";
+                        gradesHtml = "<tr><td colspan='7'>No grades available</td></tr>";
                     }
                     $("#userGradesTable").html(gradesHtml);
                 } else {
@@ -297,6 +297,7 @@
             });
         });
     </script>
+
 
 
     <script>

@@ -45,7 +45,7 @@ class UserController extends Controller
         foreach ($users as $user) {
             if ($user->role === 'student') {
                 $user->grades = DB::table('grade_logs')
-                    ->select('subject_code', 'descriptive_title', 'prelim', 'midterm', 'semi_finals', 'final')
+                    ->select('subject_code', 'descriptive_title', 'prelim', 'midterm', 'semi_finals', 'final', 'remarks')
                     ->where('studentID', $user->id)
                     ->get();
             }
