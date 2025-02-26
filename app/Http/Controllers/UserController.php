@@ -42,6 +42,16 @@ class UserController extends Controller
         $department = DB::table('departments')->pluck('department_name'); // Assuming your department table has a 'name' column
         $roles = User::select('role')->distinct()->pluck('role');
 
+        foreach ($users as $user) {
+            if ($user->role === 'student') {
+                $user->grades = DB::table('grade_logs')
+                    ->select('subject_code', 'descriptive_title', 'prelim', 'midterm', 'semi_finals', 'final')
+                    ->where('studentID', $user->id)
+                    ->get();
+            }
+        }
+
+
         return view('users.user', compact('users', 'departments', 'roles', 'department'));
     }
 

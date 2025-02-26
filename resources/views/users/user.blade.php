@@ -91,12 +91,16 @@
                         <td>{{ $user->created_at->format('Y-m-d') }}</td>
                         <td style="text-align: center;">
                             <button class="edit-btn" data-user-id="{{ $user->id }}"><i
-                                    class="fa-solid fa-pen-to-square"></i> Edit User</button>
-                            <button class="view-btn"><i
-                                class="fa-solid fa-pen-to-square"></i> View User</button>
+                                    class="fa-solid fa-pen-to-square"></i> Edit User
+                            </button>
+                            <button class="view-btn" data-user-id="{{ $user->id }}">
+                                <i class="fa-solid fa-eye"></i> View Details
+                            </button>
+                            @if ($user->role === 'student')
+                                <span class="user-grades" data-grades="{{ json_encode($user->grades) }}"
+                                    style="display: none;"></span>
+                            @endif
                         </td>
-
-
                     </tr>
                 @empty
                     <tr>
@@ -119,7 +123,6 @@
             });
         </script>
     </div>
-
 
 
     <!-- Edit User Modal -->
@@ -176,9 +179,119 @@
     </div>
 
 
+    <!-- User Details Modal -->
+    <div id="userDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="clos">&times;</span>
+            <h2>User Details</h2>
+
+            <!-- Name -->
+            <label>Name:</label>
+            <p id="userDetailsName" class="user-info"></p>
+
+            <!-- Email -->
+            <label>Email:</label>
+            <p id="userDetailsEmail" class="user-info"></p>
+
+            <!-- Department -->
+            <label>Department:</label>
+            <p id="userDetailsDepartment" class="user-info"></p>
+
+            <!-- Roles Section -->
+            <label>Roles:</label>
+            <div id="userDetailsRoles" class="role-container">
+                <!-- Roles will be inserted here -->
+            </div>
 
 
+            <!-- 🟢 Grades Section (only for students) -->
+            <div id="userGradesSection" style="display: none;">
+                <h2>Grades</h2>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Descriptive Title</th>
+                            <th>Prelim</th>
+                            <th>Midterm</th>
+                            <th>Semi-Final</th>
+                            <th>Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userGradesTable">
+                        <!-- Grades will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
 
+        </div>
+
+
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on("click", ".view-btn", function() {
+                let userId = $(this).data("user-id");
+                let userName = $(this).closest("tr").find("td:nth-child(2)").text().trim();
+                let userEmail = $(this).closest("tr").find("td:nth-child(3)").text().trim();
+                let userDepartment = $(this).closest("tr").find("td:nth-child(4)").text().trim();
+                let userRoles = $(this).closest("tr").find("td:nth-child(5)").text().trim();
+
+                // Assign user details to modal
+                $("#userDetailsName").text(userName);
+                $("#userDetailsEmail").text(userEmail);
+                $("#userDetailsDepartment").text(userDepartment);
+
+                // Display roles properly
+                let rolesHtml = userRoles.split(',').map(role =>
+                    `<span class="display-role-badge">${role.trim()}</span>`
+                ).join('');
+                $("#userDetailsRoles").html(rolesHtml);
+
+                // Check if the user has grades data
+                let userGrades = $(this).closest("tr").find(".user-grades").data("grades");
+
+                if (userRoles.includes("student") && userGrades) {
+                    $("#userGradesSection").show(); // Show grades section
+
+                    let gradesHtml = "";
+                    if (userGrades.length > 0) {
+                        userGrades.forEach(grade => {
+                            gradesHtml += `<tr>
+                        <td>${grade.subject_code}</td>
+                        <td>${grade.descriptive_title}</td>
+                        <td>${grade.prelim}</td>
+                        <td>${grade.midterm}</td>
+                        <td>${grade.semi_finals}</td>
+                        <td>${grade.final}</td>
+                    </tr>`;
+                        });
+                    } else {
+                        gradesHtml = "<tr><td colspan='6'>No grades available</td></tr>";
+                    }
+                    $("#userGradesTable").html(gradesHtml);
+                } else {
+                    $("#userGradesSection").hide(); // Hide grades if not a student
+                }
+
+                // Open the modal
+                $("#userDetailsModal").fadeIn();
+            });
+
+            // Close modal when clicking close button
+            $(".close-user-details").click(function() {
+                $("#userDetailsModal").fadeOut();
+            });
+
+            // Close modal when clicking outside of modal content
+            $(window).click(function(event) {
+                if ($(event.target).is("#userDetailsModal")) {
+                    $("#userDetailsModal").fadeOut();
+                }
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function() {
@@ -318,7 +431,7 @@
                             users.forEach(user => {
                                 let roleBadges = user.role.split(',').map(role => `
                                     <span class="display-role-badge">${role.trim()}</span>
-                                `).join('<span class="invisible-comma">,</span>'); // Preserve hidden commas
+                                `).join('<span class="invisible-comma">,</span>');
 
                                 tableBody += `
                                     <tr>
@@ -332,8 +445,9 @@
                                             <button class="edit-btn" data-user-id="${user.id}">
                                                 <i class="fa-solid fa-pen-to-square"></i> Edit User
                                             </button>
-                                            <button class="edit-btn"><i
-                                                    class="fa-solid fa-pen-to-square"></i> View User</button>
+                                            <button class="view-btn" data-user-id="${user.id}">
+                                                <i class="fa-solid fa-eye"></i> View Details
+                                            </button>
                                         </td>
                                     </tr>
                                 `;
@@ -345,40 +459,55 @@
                         // ✅ Update table content
                         $('#userTableBody').html(tableBody);
 
-                        // ✅ Apply role badge colors in real-time
-                        $(".display-role-badge").each(function() {
-                            let role = $(this).text().trim().toLowerCase();
-                            if (role === "admin") $(this).css({
-                                "background-color": "#003049",
-                                "color": "#fff"
-                            });
-                            else if (role === "student") $(this).css({
-                                "background-color": "#588157",
-                                "color": "#fff"
-                            });
-                            else if (role === "dean") $(this).css({
-                                "background-color": "#d62828",
-                                "color": "#fff"
-                            });
-                            else if (role === "instructor") $(this).css({
-                                "background-color": "#f77f00",
-                                "color": "#fff"
-                            });
-                            else if (role === "registrar") $(this).css({
-                                "background-color": "#9c27b0",
-                                "color": "#fff"
-                            });
+                        // ✅ Rebind event listeners for buttons
+                        bindActionButtons();
+
+                        // ✅ Apply role badge colors
+                        applyRoleBadgeColors();
+                    }
+                });
+            }
+
+            // ✅ Apply role badge colors dynamically
+            function applyRoleBadgeColors() {
+                $(".display-role-badge").each(function() {
+                    let role = $(this).text().trim().toLowerCase();
+                    let colorMap = {
+                        "admin": "#003049",
+                        "student": "#588157",
+                        "dean": "#d62828",
+                        "instructor": "#f77f00",
+                        "registrar": "#9c27b0"
+                    };
+
+                    if (colorMap[role]) {
+                        $(this).css({
+                            "background-color": colorMap[role],
+                            "color": "#fff"
                         });
                     }
                 });
             }
 
-            // Trigger search and filtering in real time
+            // ✅ Bind event listeners for edit and view buttons
+            function bindActionButtons() {
+                $('.edit-btn').off('click').on('click', function() {
+                    let userId = $(this).data('user-id');
+                    editUser(userId);
+                });
+
+                $('.view-btn').off('click').on('click', function() {
+                    let userId = $(this).data('user-id');
+                    fetchUserDetails(userId);
+                });
+            }
+
+            // ✅ Handle search and filtering in real-time
             $('#search, #department, #role').on('input change', function() {
                 fetchUsers();
             });
 
-            // Reset filters
+            // ✅ Reset filters
             $('#resetFilters').on('click', function() {
                 $('#search').val('');
                 $('#department').val('');
@@ -390,6 +519,7 @@
             fetchUsers();
         });
     </script>
+
 
 @endsection
 
