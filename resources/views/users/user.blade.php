@@ -92,7 +92,11 @@
                         <td style="text-align: center;">
                             <button class="edit-btn" data-user-id="{{ $user->id }}"><i
                                     class="fa-solid fa-pen-to-square"></i> Edit User</button>
+                            <button class="view-btn"><i
+                                class="fa-solid fa-pen-to-square"></i> View User</button>
                         </td>
+
+
                     </tr>
                 @empty
                     <tr>
@@ -101,6 +105,7 @@
                 @endforelse
             </tbody>
         </table>
+
         <script>
             $(document).ready(function() {
                 $(".display-role-badge").each(function() {
@@ -327,6 +332,8 @@
                                             <button class="edit-btn" data-user-id="${user.id}">
                                                 <i class="fa-solid fa-pen-to-square"></i> Edit User
                                             </button>
+                                            <button class="edit-btn"><i
+                                                    class="fa-solid fa-pen-to-square"></i> View User</button>
                                         </td>
                                     </tr>
                                 `;
