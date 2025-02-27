@@ -210,11 +210,13 @@
                         <tr>
                             <th>Subject Code</th>
                             <th>Descriptive Title</th>
+                            <th>Academic Period</th>
                             <th>Prelim</th>
                             <th>Midterm</th>
                             <th>Semi-Final</th>
                             <th>Final</th>
                             <th>Remarks</th> <!-- ✅ Added Remarks Column -->
+                            <th>Year</th>
                         </tr>
                     </thead>
                     <tbody id="userGradesTable">
@@ -269,11 +271,13 @@
                             gradesHtml += `<tr>
                             <td>${grade.subject_code}</td>
                             <td>${grade.descriptive_title}</td>
+                            <td>${grade.academic_period}</td>
                             <td>${grade.prelim}</td>
                             <td>${grade.midterm}</td>
                             <td>${grade.semi_finals}</td>
                             <td>${grade.final}</td>
-                            <td>${grade.remarks ? grade.remarks : 'N/A'}</td> <!-- ✅ Included Remarks -->
+                            <td>${grade.remarks}</td> <!-- ✅ Included Remarks -->
+                            <td>${grade.created_at}</td>
                         </tr>`;
                         });
                     } else {
