@@ -268,16 +268,16 @@
                     let gradesHtml = "";
                     if (userGrades.length > 0) {
                         userGrades.forEach(grade => {
-                            gradesHtml += `<tr>
-                            <td>${grade.subject_code}</td>
-                            <td>${grade.descriptive_title}</td>
-                            <td>${grade.academic_period}</td>
-                            <td>${grade.prelim}</td>
-                            <td>${grade.midterm}</td>
-                            <td>${grade.semi_finals}</td>
-                            <td>${grade.final}</td>
-                            <td>${grade.remarks}</td> <!-- ✅ Included Remarks -->
-                            <td>${grade.created_at}</td>
+                            gradesHtml += `<tr >
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.prelim}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.midterm}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.semi_finals}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.final}</td>
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.remarks}</td> <!-- ✅ Included Remarks -->
+                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.created_at}</td>
                         </tr>`;
                         });
                     } else {
@@ -610,8 +610,8 @@
 {{-- view details  --}}
 <style>
     #userDetailsModal .modal-content {
-        width: 50%;
-        margin: 5% auto;
+        width: 90%;
+        margin: 2% auto;
         gap: 10px;
 
     }
