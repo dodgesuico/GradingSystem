@@ -85,16 +85,16 @@
         </thead>
         @foreach ($classes as $class)
         <tr>
-            <td>{{ $class->id }}</td>
-            <td>{{ $class->subject_code}}</td>
-            <td>{{ $class->descriptive_title}}</td>
-            <td>{{ $class->instructor }}</td>
-            <td>{{ $class->academic_period }}</td>
-            <td>{{ $class->schedule }}</td>
+            <td >{{ $class->id }}</td>
+            <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->subject_code}}</td>
+            <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->descriptive_title}}</td>
+            <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->instructor }}</td>
+            <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->academic_period }}</td>
+            <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->schedule }}</td>
 
-            <td class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
+            <td style="border: 0; border-bottom: 1px solid var(--color7);" class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
 
-            <td style="text-align:center">
+            <td  style="text-align:center; background-color: var(--color9b);">
                 <!-- Edit Button -->
                 <a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a> |
                 <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |

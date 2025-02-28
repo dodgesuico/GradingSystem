@@ -130,15 +130,19 @@
             @endif
         </div>
 
-        @if (!($finalGrades->where('classID', $class->id)->isNotEmpty() &&
-            $finalGrades->where('classID', $class->id)->first()->status))
+        @if (
+            !(
+                $finalGrades->where('classID', $class->id)->isNotEmpty() &&
+                $finalGrades->where('classID', $class->id)->first()->status
+            ))
 
             <div id="grade-content">
 
 
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
                     <h2 style="margin:10px 0;">Class Students List</h2>
-                    <button class="add-btn" onclick="openAddStudentModal()"><i class="fa-solid fa-plus"></i> Add Student</button>
+                    <button class="add-btn" onclick="openAddStudentModal()"><i class="fa-solid fa-plus"></i> Add
+                        Student</button>
                 </div>
 
                 <div class="container">
@@ -178,7 +182,8 @@
                                     <!-- Delete Modal for each student -->
                                     <div id="deleteClassModal{{ $classes_students->id }}" class="modal">
                                         <div class="modal-content">
-                                            <h2 style="color:var(--color1); text-align:center;margin-bottom:1.5rem;">Remove Student
+                                            <h2 style="color:var(--color1); text-align:center;margin-bottom:1.5rem;">Remove
+                                                Student
                                             </h2>
                                             <p style="color:var(--color-red);font-size:1.5rem; text-align:center;">
                                                 Are you sure you want to remove this student?
@@ -193,7 +198,8 @@
                                                 <input type="checkbox" id="confirmDelete{{ $classes_students->id }}"
                                                     onchange="toggleDeleteButton({{ $classes_students->id }})">
                                                 <label style="color:var(--color6);"
-                                                    for="confirmDelete{{ $classes_students->id }}">I am sure to delete this</label>
+                                                    for="confirmDelete{{ $classes_students->id }}">I am sure to delete
+                                                    this</label>
                                             </div>
 
                                             <div class="modal-footer">
@@ -231,7 +237,8 @@
                         </button>
                         <div id="grading-score-{{ $term }}" class="grading-score-content">
                             <h3>Grading</h3>
-                            <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
+                            <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}"
+                                method="POST">
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="periodic_terms[]" value="{{ $term }}">
@@ -248,21 +255,24 @@
                                             <h4>{{ $category }}</h4>
                                             <div class="calculation-content">
                                                 <label>Percentage (%)</label>
-                                                <input type="number" name="{{ $key }}_percentage[{{ $term }}]"
+                                                <input type="number"
+                                                    name="{{ $key }}_percentage[{{ $term }}]"
                                                     value="{{ old($key . '_percentage.' . $term, $percentageValue) }}"
                                                     min="0" max="100" required>
                                             </div>
                                             <div class="calculation-content">
                                                 <label>Total Score</label>
-                                                <input type="number" name="{{ $key }}_total_score[{{ $term }}]"
+                                                <input type="number"
+                                                    name="{{ $key }}_total_score[{{ $term }}]"
                                                     value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
                                                     min="0">
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
-                                <button type="submit" class="save-btn" style="margin: 5px 0 10px 0"><i
+                                <button type="submit" class="save-btn" style="margin: 5px 0 0 0"><i
                                         class="fa-solid fa-floppy-disk"></i> Save Grading and Total Score</button>
+                                        <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first before entering the student scores.</em>
                             </form>
                             <h3 style="margin:5px 0 10px 0">{{ $term }} Scores (Raw)</h3>
                             <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
@@ -294,12 +304,15 @@
                                         </tr>
                                         @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
                                             @php
-                                                $student = $classes_student->firstWhere('studentID', $quizzesandscore->studentID);
-    $score = $quizzesandscores
-        ->where('studentID', optional($student)->studentID) // Prevent error if $student is null
-        ->where('periodic_term', $term)
-        ->first();
-    $computedGrade = null;
+                                                $student = $classes_student->firstWhere(
+                                                    'studentID',
+                                                    $quizzesandscore->studentID,
+                                                );
+                                                $score = $quizzesandscores
+                                                    ->where('studentID', optional($student)->studentID) // Prevent error if $student is null
+                                                    ->where('periodic_term', $term)
+                                                    ->first();
+                                                $computedGrade = null;
                                             @endphp
                                             <tr>
                                                 <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
@@ -321,7 +334,8 @@
                                                         if ($percentageData) {
                                                             match ($field) {
                                                                 'quizzez' => [
-                                                                    ($fieldPercentage = $percentageData->quiz_percentage ?? 0),
+                                                                    ($fieldPercentage =
+                                                                        $percentageData->quiz_percentage ?? 0),
                                                                     ($totalScoreField = 'quiz_total_score'),
                                                                 ],
                                                                 'attendance_behavior' => [
@@ -335,7 +349,8 @@
                                                                     ($totalScoreField = 'assignment_total_score'),
                                                                 ],
                                                                 'exam' => [
-                                                                    ($fieldPercentage = $percentageData->exam_percentage ?? 0),
+                                                                    ($fieldPercentage =
+                                                                        $percentageData->exam_percentage ?? 0),
                                                                     ($totalScoreField = 'exam_total_score'),
                                                                 ],
                                                                 default => null,
@@ -363,11 +378,13 @@
                                                                     ? $nearestLower->transmuted_grade
                                                                     : null;
                                                             } else {
-                                                                $transmutedGrade = $transmutedGradeEntry->transmuted_grade;
+                                                                $transmutedGrade =
+                                                                    $transmutedGradeEntry->transmuted_grade;
                                                             }
 
                                                             if (!is_null($transmutedGrade)) {
-                                                                $computedGrade = ($transmutedGrade * $fieldPercentage) / 100;
+                                                                $computedGrade =
+                                                                    ($transmutedGrade * $fieldPercentage) / 100;
                                                             }
                                                         }
                                                     @endphp
@@ -398,6 +415,7 @@
 
                                 <button type="submit" class="save-btn" style="margin: 10px 0"><i
                                         class="fa-solid fa-arrows-rotate"></i> Calculate and Update</button>
+                                        <em style="color: var(--color5); margin-left: 10px;">Note: Do not exceed with the total score.</em>
                             </form>
                         </div>
                     </div>
@@ -407,7 +425,7 @@
         @endif
 
         <script>
-            document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function() {
                 let isLocked = @json($finalGrades->isNotEmpty() && $finalGrades->first()->status);
                 if (isLocked) {
                     document.getElementById("grade-content").style.display = "none";
@@ -577,37 +595,37 @@
                 // Fetch the final transmutation table
                 $transmutations = DB::table('final_transmutation')
                     ->orderBy('grades', 'asc') // Ensure it's ordered properly
-                    ->get();
+        ->get();
 
-                // Function to find the transmutation based on final grade
-                if (!function_exists('getTransmutation')) {
-                    function getTransmutation($finalGrade, $transmutations)
-                    {
-                        foreach ($transmutations as $transmutation) {
-                            if ($finalGrade >= $transmutation->grades) {
-                                $matchedTransmutation = $transmutation;
-                            } else {
-                                break;
-                            }
-                        }
-                        return $matchedTransmutation ?? null;
-                    }
-                }
-
-                // Compute Finals (same as before)
-                $studentGrades[$studentID]['Finals'] =
-                    0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
-
-                // Get the corresponding transmutation
-                $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
-
-                if ($transmutation) {
-                    // Set transmuted grade and remarks
-                    $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
-                    $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
+    // Function to find the transmutation based on final grade
+    if (!function_exists('getTransmutation')) {
+        function getTransmutation($finalGrade, $transmutations)
+        {
+            foreach ($transmutations as $transmutation) {
+                if ($finalGrade >= $transmutation->grades) {
+                    $matchedTransmutation = $transmutation;
                 } else {
-                    // Default to FAILED if no match is found
-                    $studentGrades[$studentID]['Remarks'] = 'FAILED';
+                    break;
+                }
+            }
+            return $matchedTransmutation ?? null;
+        }
+    }
+
+    // Compute Finals (same as before)
+    $studentGrades[$studentID]['Finals'] =
+        0.33 * $studentGrades[$studentID]['Semi-Finals'] + 0.67 * $studentGrades[$studentID]['Finals Raw'];
+
+    // Get the corresponding transmutation
+    $transmutation = getTransmutation($studentGrades[$studentID]['Finals'], $transmutations);
+
+    if ($transmutation) {
+        // Set transmuted grade and remarks
+        $studentGrades[$studentID]['Finals'] = $transmutation->transmutation;
+        $studentGrades[$studentID]['Remarks'] = $transmutation->remarks;
+    } else {
+        // Default to FAILED if no match is found
+        $studentGrades[$studentID]['Remarks'] = 'FAILED';
                 }
             }
         @endphp
@@ -632,12 +650,13 @@
             </button>
         </div>
 
-        <h3 style="color: {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
+        <h3
+            style="color: {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
             Status:
-            <strong >
+            <strong>
                 {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'Locked' : 'Not Locked Yet' }}
             </strong>
-        </h3 >
+        </h3>
 
         <div class="grade-sheet-container">
             <form action="{{ route('finalgrade.lock') }}" method="POST">
@@ -662,23 +681,37 @@
                             <tr>
                                 <td>{{ $student->name }}</td>
                                 <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
-                                <td class="raw-column" style="display: none;">{{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td> <!-- Display only -->
+                                <td class="raw-column" style="display: none;">
+                                    {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td>
+                                <!-- Display only -->
                                 <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
-                                <td class="raw-column" style="display: none;">{{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}</td> <!-- Display only -->
+                                <td class="raw-column" style="display: none;">
+                                    {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}</td>
+                                <!-- Display only -->
                                 <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
-                                <td class="raw-column" style="display: none;">{{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}</td> <!-- Display only -->
+                                <td class="raw-column" style="display: none;">
+                                    {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}</td>
+                                <!-- Display only -->
                                 <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
                                 <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
 
                                 <!-- Hidden inputs (ONLY SAVING PRELIM, MIDTERM, SEMI-FINALS, FINAL, and REMARKS) -->
-                                <input type="hidden" name="grades[{{ $student->studentID }}][classID]" value="{{ $student->classID }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][studentID]" value="{{ $student->studentID }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][name]" value="{{ $student->name }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][prelim]" value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][midterm]" value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]" value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][final]" value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][remarks]" value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                                    value="{{ $student->classID }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                                    value="{{ $student->studentID }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                                    value="{{ $student->name }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                                    value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                                    value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                                    value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                                    value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                                    value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
                             </tr>
                         @endforeach
                     </tbody>
@@ -686,15 +719,17 @@
 
                 <!-- Lock In Button -->
                 @if ($finalGrades->isEmpty() || !$finalGrades->first()->status)
-                    <button class="save-btn" style="margin-top: 10px"><i class="fa-solid fa-unlock"></i> Lock In Grades</button>
+                    <button class="save-btn" style="margin-top: 10px"><i class="fa-solid fa-unlock"></i> Lock In
+                        Grades</button>
                 @endif
             </form>
 
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
                 <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0" onclick="return confirm('Are you sure you want to unlock grades?')">
-                        <i class="fa-solid fa-lock"></i>  Unlock Grades
+                    <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0"
+                        onclick="return confirm('Are you sure you want to unlock grades?')">
+                        <i class="fa-solid fa-lock"></i> Unlock Grades
                     </button>
                 </form>
 
@@ -1054,6 +1089,4 @@
     h3 {
         color: var(--ckcm-color4)
     }
-
-
 </style>

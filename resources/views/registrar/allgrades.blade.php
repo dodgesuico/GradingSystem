@@ -67,22 +67,22 @@
                         data.forEach(grade => {
                             gradesTable.innerHTML += `
                             <tr>
-                                <td>${grade.id}</td>
-                                  <td>${grade.name}</td>
-                                   <td>${grade.email}</td>
-                                <td>${grade.department}</td>
-                                <td>${grade.classID}</td>
-                                <td>${grade.subject_code}</td>
-                                <td>${grade.descriptive_title}</td>
-                                <td>${grade.instructor}</td>
-                                <td>${grade.academic_period}</td>
-                                <td>${grade.schedule}</td>
-                                <td>${grade.studentID}</td>
-                                <td>${grade.prelim ?? 'N/A'}</td>
-                                <td>${grade.midterm ?? 'N/A'}</td>
-                                <td>${grade.semi_finals ?? 'N/A'}</td>
-                                <td>${grade.final ?? 'N/A'}</td>
-                                <td>${grade.remarks ?? 'N/A'}</td>
+                                <td >${grade.id}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.name}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.email}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.department}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.classID}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.instructor}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.schedule}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.studentID}</td>
+                                <td  style="background:var(--color9b)">${grade.prelim ?? 'N/A'}</td>
+                                <td  style="background:var(--color9b)">${grade.midterm ?? 'N/A'}</td>
+                                <td  style="background:var(--color9b)">${grade.semi_finals ?? 'N/A'}</td>
+                                <td  style="background:var(--color9b)">${grade.final ?? 'N/A'}</td>
+                                <td  style="background:var(--color9b)">${grade.remarks ?? 'N/A'}</td>
 
 
                             </tr>
@@ -111,4 +111,5 @@
         color: var(--ckcm-color4);
 
     }
+
 </style>
