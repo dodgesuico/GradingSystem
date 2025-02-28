@@ -841,6 +841,7 @@
                         <input type="text" id="studentSearch" class="form-control"
                             placeholder="Search for a student..." oninput="filterStudents()">
                         <div id="studentDropdown" class="dropdown-menu"></div>
+
                     </div>
                     <div class="info-container">
                         <label for="student_id">Student ID</label>
@@ -1037,8 +1038,24 @@
 </style>
 
 
+{{-- style for dropdow in searching student --}}
+<style>
+    .dropdown-menu {
+        padding: 5px;
+        gap: 5px;
+        font-size: 1.1rem;
+        text-align: center;
 
-
+    }
+    .dropdown-menu div{
+        border-radius: 10px;
+        padding: 5px;
+        background: var(--color-blue);
+        color: var(--color2);
+        cursor: pointer;
+        margin-bottom: 5px;
+    }
+</style>
 
 
 

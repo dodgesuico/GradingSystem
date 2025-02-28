@@ -20,7 +20,7 @@
                 <label for="instructorSearch">Instructor</label>
                 <input type="text" id="instructorSearch" name="instructor" class="form-control"
                     placeholder="Search for an instructor..." oninput="filterInstructors()">
-                <div id="instructorDropdown" class="dropdown-menu"></div>
+                <div id="instructorDropdown" class="dropdown-menu" ></div>
             </div>
 
             <div class="info-container">
@@ -114,3 +114,23 @@
         }
     });
 </script>
+
+
+{{-- style for dropdow in searching student --}}
+<style>
+    .dropdown-menu {
+        padding: 5px;
+        gap: 5px;
+        font-size: 1.1rem;
+        text-align: center;
+
+    }
+    .dropdown-menu div{
+        border-radius: 10px;
+        padding: 5px;
+        background: var(--color-blue);
+        color: var(--color2);
+        cursor: pointer;
+        margin-bottom: 5px;
+    }
+</style>
