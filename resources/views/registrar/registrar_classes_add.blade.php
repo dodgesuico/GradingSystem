@@ -17,14 +17,12 @@
                 <input type="text" id="descriptive_title" name="descriptive_title" required>
             </div>
             <div class="info-container">
-                <label for="instructor">Instructor</label>
-                <select id="instructor" name="instructor">
-                    <option value="" disabled selected>Select a Instructor</option>
-                    @foreach ($instructors as $instructor)
-                    <option value="{{ $instructor->name }}">{{ $instructor->name }}</option>
-                    @endforeach
-                </select>
+                <label for="instructorSearch">Instructor</label>
+                <input type="text" id="instructorSearch" name="instructor" class="form-control"
+                    placeholder="Search for an instructor..." oninput="filterInstructors()">
+                <div id="instructorDropdown" class="dropdown-menu"></div>
             </div>
+
             <div class="info-container">
                 <label for="academic_period">Academic Period</label>
                 <select id="academic_period" name="academic_period">
@@ -54,7 +52,41 @@
     </div>
 </div>
 
+<script>
+    function filterInstructors() {
+        let input = document.getElementById("instructorSearch").value.toLowerCase();
+        let dropdown = document.getElementById("instructorDropdown");
+        dropdown.innerHTML = ""; // Clear previous results
 
+        if (input.trim() === "") {
+            dropdown.style.display = "none";
+            return;
+        }
+
+        let instructors = {!! json_encode($instructors) !!}; // Use Blade variable
+        let filtered = instructors.filter(instructor =>
+            instructor.name.toLowerCase().includes(input)
+        );
+
+        if (filtered.length === 0) {
+            dropdown.style.display = "none";
+            return;
+        }
+
+        filtered.forEach(instructor => {
+            let option = document.createElement("div");
+            option.classList.add("dropdown-item");
+            option.textContent = instructor.name;
+            option.onclick = function() {
+                document.getElementById("instructorSearch").value = instructor.name;
+                dropdown.style.display = "none";
+            };
+            dropdown.appendChild(option);
+        });
+
+        dropdown.style.display = "block";
+    }
+</script>
 
 <!-- scripts -->
 <!-- script for modal -->
@@ -82,4 +114,3 @@
         }
     });
 </script>
-

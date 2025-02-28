@@ -67,35 +67,6 @@
         </div> --}}
 
 
-        <script>
-            function openAddStudentModal() {
-                document.getElementById('addStudentModal').style.display = 'block';
-            }
-
-            function closeAddStudentModal() {
-                document.getElementById('addStudentModal').style.display = 'none';
-            }
-
-            function fillStudentInfo() {
-                const selectedOption = document.getElementById('student').selectedOptions[0];
-
-                if (selectedOption) {
-                    document.getElementById('student_id').value = selectedOption.getAttribute('data-id');
-                    document.getElementById('name').value = selectedOption.getAttribute('data-name');
-                    document.getElementById('email').value = selectedOption.getAttribute('data-email');
-                    document.getElementById('department').value = selectedOption.getAttribute('data-department');
-                }
-            }
-
-            // Close the modal if the user clicks outside of it
-            window.onclick = function(event) {
-                const modal = document.getElementById('addStudentModal');
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            }
-        </script>
-
 
         <div class="message-container">
             @if (session('error'))
@@ -272,7 +243,8 @@
                                 </div>
                                 <button type="submit" class="save-btn" style="margin: 5px 0 0 0"><i
                                         class="fa-solid fa-floppy-disk"></i> Save Grading and Total Score</button>
-                                        <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first before entering the student scores.</em>
+                                <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first
+                                    before entering the student scores.</em>
                             </form>
                             <h3 style="margin:5px 0 10px 0">{{ $term }} Scores (Raw)</h3>
                             <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
@@ -415,7 +387,8 @@
 
                                 <button type="submit" class="save-btn" style="margin: 10px 0"><i
                                         class="fa-solid fa-arrows-rotate"></i> Calculate and Update</button>
-                                        <em style="color: var(--color5); margin-left: 10px;">Note: Do not exceed with the total score.</em>
+                                <em style="color: var(--color5); margin-left: 10px;">Note: Do not exceed with the total
+                                    score.</em>
                             </form>
                         </div>
                     </div>
@@ -901,23 +874,16 @@
                 @csrf
                 <div class="modal-body">
                     <div class="info-container">
+                        <label for="studentSearch">Student</label>
+                        <input type="text" id="studentSearch" class="form-control"
+                            placeholder="Search for a student..." oninput="filterStudents()">
+                        <div id="studentDropdown" class="dropdown-menu"></div>
+                    </div>
+                    <div class="info-container">
                         <label for="student_id">Student ID</label>
                         <input type="text" id="student_id" name="student_id" class="form-control" required readonly>
                     </div>
-                    <div class="info-container">
-                        <label for="student">Student</label>
-                        <select id="student" name="name" class="form-control" onchange="fillStudentInfo()"
-                            required>
-                            <option value="" disabled selected>Select Student</option>
-                            @foreach ($students as $student)
-                                <option value="{{ $student->id }}" data-name="{{ $student->name }}"
-                                    data-email="{{ $student->email }}" data-department="{{ $student->department }}"
-                                    data-id="{{ $student->id }}">
-                                    {{ $student->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+
                     <div class="info-container">
                         <label for="name">Name</label>
                         <input type="text" id="name" name="name" class="form-control" required readonly>
@@ -944,7 +910,78 @@
 
 
 
+    <script>
+        function openAddStudentModal() {
+            document.getElementById('addStudentModal').style.display = 'block';
+        }
 
+        function closeAddStudentModal() {
+            document.getElementById('addStudentModal').style.display = 'none';
+        }
+
+        function fillStudentInfo() {
+            const selectedOption = document.getElementById('student').selectedOptions[0];
+
+            if (selectedOption) {
+                document.getElementById('student_id').value = selectedOption.getAttribute('data-id');
+                document.getElementById('name').value = selectedOption.getAttribute('data-name');
+                document.getElementById('email').value = selectedOption.getAttribute('data-email');
+                document.getElementById('department').value = selectedOption.getAttribute('data-department');
+            }
+        }
+
+        // Close the modal if the user clicks outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('addStudentModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function filterStudents() {
+            let input = document.getElementById("studentSearch").value.toLowerCase();
+            let dropdown = document.getElementById("studentDropdown");
+            dropdown.innerHTML = ""; // Clear previous results
+
+            if (input.trim() === "") {
+                dropdown.style.display = "none";
+                return;
+            }
+
+            let students = {!! json_encode($students) !!}; // Use existing Blade variable
+            let filtered = students.filter(student =>
+                student.name.toLowerCase().includes(input) ||
+                student.email.toLowerCase().includes(input)
+            );
+
+            if (filtered.length === 0) {
+                dropdown.style.display = "none";
+                return;
+            }
+
+            filtered.forEach(student => {
+                let option = document.createElement("div");
+                option.classList.add("dropdown-item");
+                option.textContent = student.name;
+                option.onclick = function() {
+                    document.getElementById("studentSearch").value = student.name;
+                    document.getElementById("student_id").value = student.id;
+                    document.getElementById("name").value = student.name;
+                    document.getElementById("email").value = student.email;
+                    document.getElementById("department").value = student.department;
+                    dropdown.style.display = "none";
+                };
+                dropdown.appendChild(option);
+            });
+
+            dropdown.style.display = "block";
+        }
+    </script>
+
+
+    <style>
+
+    </style>
 
 
 
