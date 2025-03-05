@@ -112,8 +112,13 @@
 
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
                     <h2 style="margin:10px 0;">Class Students List</h2>
-                    <button class="add-btn" onclick="openAddStudentModal()"><i class="fa-solid fa-plus"></i> Add
-                        Student</button>
+
+                    @if (Auth::user() && str_contains(Auth::user()->role, 'dean'))
+                        <button class="add-btn" onclick="openAddStudentModal()">
+                            <i class="fa-solid fa-plus"></i> Add Student
+                        </button>
+                    @endif
+
                 </div>
 
                 <div class="container">
@@ -129,7 +134,10 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Department</th>
+
+                                    @if (Auth::user() && str_contains(Auth::user()->role, 'dean'))
                                     <th>Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,12 +149,15 @@
                                         <td>{{ $classes_students->name }}</td>
                                         <td>{{ $classes_students->email }}</td>
                                         <td>{{ $classes_students->department }}</td>
-                                        <td style="text-align:center;">
 
-                                            <button class="delete-btn"
-                                                onclick="openDeleteClassModal({{ $classes_students->id }})"><i
-                                                    class="fa-solid fa-trash"></i>Remove</button>
-                                        </td>
+                                        @if (Auth::user() && str_contains(Auth::user()->role, 'dean'))
+                                            <td style="text-align:center;">
+
+                                                <button class="delete-btn"
+                                                    onclick="openDeleteClassModal({{ $classes_students->id }})"><i
+                                                        class="fa-solid fa-trash"></i>Remove</button>
+                                            </td>
+                                        @endif
                                     </tr>
 
 
@@ -177,15 +188,20 @@
                                                 <button class="btn-cancel"
                                                     onclick="closeDeleteClassModal({{ $classes_students->id }})">Cancel</button>
 
+
                                                 <form method="POST"
                                                     action="{{ route('class.removestudent', ['class' => $class->id, 'student' => $classes_students->studentID]) }}">
                                                     @csrf
                                                     @method('DELETE')
+
                                                     <button type="submit" class="delete-btn disabled-btn"
                                                         id="deleteBtn{{ $classes_students->id }}" disabled>
                                                         <i class="fa-solid fa-trash"></i> Remove
                                                     </button>
+
                                                 </form>
+
+
                                             </div>
                                         </div>
                                     </div>
@@ -1047,7 +1063,8 @@
         text-align: center;
 
     }
-    .dropdown-menu div{
+
+    .dropdown-menu div {
         border-radius: 10px;
         padding: 5px;
         background: var(--color-blue);

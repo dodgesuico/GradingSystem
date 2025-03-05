@@ -217,11 +217,11 @@
 {{-- former code for td --}}
 
 {{-- <td  style="text-align:center; background-color: var(--color9b);">
-                <!-- Edit Button -->
-                <a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a> |
-                <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
-                <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
-            </td> --}}
+<!-- Edit Button -->
+<a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a> |
+<button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
+<button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
+</td> --}}
 
 
 
