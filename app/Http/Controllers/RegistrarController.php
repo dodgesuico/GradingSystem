@@ -435,4 +435,17 @@ class RegistrarController extends Controller
 
         return back()->with('success', 'Final grades have been unlocked successfully!');
     }
+
+    public function verifyPassword(Request $request)
+    {
+        $class = Classes::find($request->id);
+
+        if (!$class || $class->password !== $request->password) {
+            return response()->json(['success' => false, 'message' => 'Incorrect password']);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+
 }
