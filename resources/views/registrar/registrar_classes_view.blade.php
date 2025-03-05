@@ -929,7 +929,7 @@
                 option.textContent = student.name;
                 option.onclick = function() {
                     document.getElementById("studentSearch").value = student.name;
-                    document.getElementById("student_id").value = student.id;
+                    document.getElementById("student_id").value = student.studentID;
                     document.getElementById("name").value = student.name;
                     document.getElementById("email").value = student.email;
                     document.getElementById("department").value = student.department;
