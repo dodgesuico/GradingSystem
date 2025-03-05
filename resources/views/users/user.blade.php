@@ -74,7 +74,7 @@
             <tbody id="userTableBody">
                 @forelse($users as $user)
                     <tr>
-                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->studentID }}</td>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->department }}</td>
@@ -89,10 +89,10 @@
 
                         <td>{{ $user->created_at->format('Y-m-d') }}</td>
                         <td style="text-align: center;">
-                            <button class="edit-btn" data-user-id="{{ $user->id }}"><i
+                            <button class="edit-btn" data-user-id="{{ $user->studentID }}"><i
                                     class="fa-solid fa-pen-to-square"></i> Edit User
                             </button>
-                            <button class="view-btn" data-user-id="{{ $user->id }}">
+                            <button class="view-btn" data-user-id="{{ $user->studentID }}">
                                 <i class="fa-solid fa-clipboard-user"></i> View Details
                             </button>
                             @if ($user->role === 'student')
