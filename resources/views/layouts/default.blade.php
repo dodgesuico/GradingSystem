@@ -63,8 +63,9 @@
 
 
                     <label for="" style="margin-top:10px;">OPERATION</label>
-                    <a href=""><i class="fa-regular fa-clipboard"></i>
+                    <a  href="{{ route('instructor.my_class') }}" class="{{ Request::is('my_class') ? 'active' : '' }}"><i class="fa-regular fa-clipboard"></i>
                         <span>My Class</span></a>
+
                     <a href="{{ route('registrar_classes') }}"
                         class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
                         <i class="fa-solid fa-clipboard"></i> <span>All Class</span>

@@ -21,6 +21,7 @@ use App\Http\Controllers\AllGradesController;
 | they will be redirected to their dashboard instead.
 |
 */
+
 Route::middleware(['guest'])->group(function () {
     Route::get("/login", [AuthController::class, "login"])->name('login');
     Route::get("/register", [AuthController::class, 'register'])->name('register');
@@ -69,6 +70,10 @@ Route::middleware(['auth'])->group(function () {
 
     // for action access
     Route::post('/class/verify-password', [RegistrarController::class, 'verifyPassword'])->name('class.verifyPassword');
+
+
+    // for instructor
+    Route::get("/my_class", [InstructorController::class, "index"])->name('instructor.my_class');
 
 
     Route::get('/allgrades', [AllGradesController::class, 'index'])->name('show.grades');
