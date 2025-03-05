@@ -265,20 +265,27 @@
                 if (userRoles.includes("student") && userGrades) {
                     $("#userGradesSection").show(); // Show grades section
 
+                    // Get the latest grades by selecting the highest ID for each subject_code
+                    let latestGrades = Object.values(userGrades.reduce((acc, grade) => {
+                        let key = `${grade.subject_code}_${grade.descriptive_title}`; // Combine subject code and title as key
+                        acc[key] = acc[key] && acc[key].id > grade.id ? acc[key] : grade;
+                        return acc;
+                    }, {}));
+
                     let gradesHtml = "";
-                    if (userGrades.length > 0) {
-                        userGrades.forEach(grade => {
-                            gradesHtml += `<tr >
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.prelim}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.midterm}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.semi_finals}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.final}</td>
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.remarks}</td> <!-- ✅ Included Remarks -->
-                            <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.created_at}</td>
-                        </tr>`;
+                    if (latestGrades.length > 0) {
+                        latestGrades.forEach(grade => {
+                            gradesHtml += `<tr>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.prelim}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.midterm}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.semi_finals}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.final}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.remarks}</td> <!-- ✅ Included Remarks -->
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.created_at}</td>
+                            </tr>`;
                         });
                     } else {
                         gradesHtml = "<tr><td colspan='7'>No grades available</td></tr>";
