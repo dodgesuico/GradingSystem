@@ -100,69 +100,6 @@
                         </button>
                     </td>
 
-                    <!-- Password Modal -->
-                    <div id="passwordModal" class="modal">
-                        <div class="modal-content" style="display: flex; flex-direction: column; gap: 10px;">
-                            <h3 style="color: var(--color1)">Enter Class Password</h3>
-                            <input type="password" id="classPassword" placeholder="Enter Password">
-                            <button id="confirmPasswordBtn" class="save-btn">Submit</button>
-                            <p id="passwordError" style="color:var(--color-red); display: none; text-align: center;">Incorrect password. Try again.</p>
-                        </div>
-                    </div>
-
-                    <script>
-                        let selectedClassId = null;
-
-                        function openPasswordModal(classId) {
-                            selectedClassId = classId;
-                            document.getElementById("passwordModal").style.display = "block";
-                        }
-
-                        document.getElementById("confirmPasswordBtn").addEventListener("click", function() {
-                            let password = document.getElementById("classPassword").value;
-
-                            fetch("{{ route('class.verifyPassword') }}", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify({
-                                    id: selectedClassId,
-                                    password: password
-                                })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    document.getElementById(`actions-${selectedClassId}`).innerHTML = `
-                                        <a href="{{ route('class.show', '') }}/${selectedClassId}" class="view-btn">
-                                            <i class="fa-solid fa-up-right-from-square"></i> View Class
-                                        </a> |
-                                        <button class="edit-btn" onclick="openEditClassModal(${selectedClassId})">
-                                            <i class="fa-solid fa-pen-to-square"></i> Edit
-                                        </button> |
-                                        <button class="delete-btn" onclick="openDeleteClassModal(${selectedClassId})">
-                                            <i class="fa-solid fa-trash"></i> Delete
-                                        </button>
-                                    `;
-                                    closePasswordModal();
-                                } else {
-                                    document.getElementById("passwordError").style.display = "block";
-                                }
-                            })
-                            .catch(error => console.error("Error:", error));
-                        });
-
-                        function closePasswordModal() {
-                            document.getElementById("passwordModal").style.display = "none";
-                            document.getElementById("classPassword").value = "";
-                            document.getElementById("passwordError").style.display = "none";
-                        }
-
-                        document.querySelector(".close").addEventListener("click", closePasswordModal);
-                    </script>
-
 
 
 
@@ -187,6 +124,71 @@
 
 
 
+
+
+{{-- script for unlock actions --}}
+  <!-- Password Modal -->
+  <div id="passwordModal" class="modal">
+    <div class="modal-content" style="display: flex; flex-direction: column; gap: 10px;">
+        <h3 style="color: var(--color1)">Enter Class Password</h3>
+        <input type="password" id="classPassword" placeholder="Enter Password">
+        <button id="confirmPasswordBtn" class="save-btn">Submit</button>
+        <p id="passwordError" style="color:var(--color-red); display: none; text-align: center;">Incorrect password. Try again.</p>
+    </div>
+</div>
+<script>
+    let selectedClassId = null;
+
+    function openPasswordModal(classId) {
+        selectedClassId = classId;
+        document.getElementById("passwordModal").style.display = "block";
+    }
+
+    document.getElementById("confirmPasswordBtn").addEventListener("click", function() {
+        let password = document.getElementById("classPassword").value;
+
+        fetch("{{ route('class.verifyPassword') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                id: selectedClassId,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`actions-${selectedClassId}`).innerHTML = `
+                    <a href="{{ route('class.show', '') }}/${selectedClassId}" class="view-btn">
+                        <i class="fa-solid fa-up-right-from-square"></i> View Class
+                    </a> |
+                    <button class="edit-btn" onclick="openEditClassModal(${selectedClassId})">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button> |
+                    <button class="delete-btn" onclick="openDeleteClassModal(${selectedClassId})">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                `;
+                closePasswordModal();
+            } else {
+                document.getElementById("passwordError").style.display = "block";
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    function closePasswordModal() {
+        document.getElementById("passwordModal").style.display = "none";
+        document.getElementById("classPassword").value = "";
+        document.getElementById("passwordError").style.display = "none";
+    }
+
+    document.querySelector(".close").addEventListener("click", closePasswordModal);
+</script>
+{{-- end for action script --}}
 
 
 
