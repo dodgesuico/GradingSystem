@@ -93,7 +93,7 @@ class RegistrarController extends Controller
         $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
 
         $students = User::where('role', 'student')
-            ->whereNotIn('id', $enrolledStudentIds)
+            ->whereNotIn('studentID', $enrolledStudentIds)
             ->get();
 
         $classes_student = Classes_Student::where('classID', $class->id)->get();

@@ -837,7 +837,7 @@
                 @csrf
                 <div class="modal-body">
                     <div class="info-container">
-                        <label for="studentSearch">Student</label>
+                        <label for="studentSearch">Find Student</label>
                         <input type="text" id="studentSearch" class="form-control"
                             placeholder="Search for a student..." oninput="filterStudents()">
                         <div id="studentDropdown" class="dropdown-menu"></div>
