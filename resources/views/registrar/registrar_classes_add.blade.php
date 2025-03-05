@@ -41,6 +41,22 @@
                 <label for="status">Status: <em>*automatically active upon adding*</em></label>
                 <input type="status" id="status" name="status" value="Active" readonly>
             </div>
+            <div class="info-container">
+                <label for="status">Password: <em>*for security purposes*</em></label>
+                <input  id="password" name="password" ><button type="button" id="generate-password" onclick="generateRandomPassword()"> Generate Password</button>
+            </div>
+
+            <script>
+                function generateRandomPassword(){
+                    const characters = 'ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+                    let password ='';
+                    for (let i = 0; i < 10; i++){
+                        password += characters.charAt(Math.floor(Math.random() * characters.length));
+                    }
+                    document.getElementById('password').value = password;
+                }
+            </script>
+
             <div class="modal-footer">
                 <button type="submit" class="save-btn"><i class="fa-solid fa-file-arrow-up"></i> Add Class</button>
                 <button type="button" class="close-btn" id="cancelModal">Cancel</button>

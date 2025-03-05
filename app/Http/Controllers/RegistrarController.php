@@ -35,6 +35,7 @@ class RegistrarController extends Controller
             "academic_period" => "required",
             "schedule" => "required",
             "status" => "required",
+            "password" => "required"
         ]);
 
         $class = new Classes();
@@ -44,6 +45,7 @@ class RegistrarController extends Controller
         $class->academic_period = $request->academic_period;
         $class->schedule = $request->schedule;
         $class->status = $request->status;
+        $class->password = $request->password;
 
         if ($class->save()) {
             return redirect(route("registrar_classes"))->with("success", "Class Created Successfully");
