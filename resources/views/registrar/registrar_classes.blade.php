@@ -162,7 +162,7 @@
         .then(data => {
             if (data.success) {
                 document.getElementById(`actions-${selectedClassId}`).innerHTML = `
-                    <a href="{{ route('class.show', '') }}/${selectedClassId}" class="view-btn">
+                    <a href="{{ route('class.show', '') }}${selectedClassId}" class="view-btn">
                         <i class="fa-solid fa-up-right-from-square"></i> View Class
                     </a> |
                     <button class="edit-btn" onclick="openEditClassModal(${selectedClassId})">
