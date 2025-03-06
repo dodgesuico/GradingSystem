@@ -89,9 +89,11 @@
 
                         <td>{{ $user->created_at->format('Y-m-d') }}</td>
                         <td style="text-align: center;">
+                            @if (Auth::check() && str_contains(Auth::user()->role, 'admin'))
                             <button class="edit-btn" data-user-id="{{ $user->studentID }}"><i
                                     class="fa-solid fa-pen-to-square"></i> Edit User
                             </button>
+                            @endif
                             <button class="view-btn" data-user-id="{{ $user->studentID }}">
                                 <i class="fa-solid fa-clipboard-user"></i> View Details
                             </button>

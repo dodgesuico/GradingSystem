@@ -24,9 +24,17 @@
 
 
     <div class="container">
+
+
+
+
+        {{-- nav bar for all the pages --}}
         <div class="nav-bar" id="navBar">
+
+
             <div class="main-nav-contents">
 
+                {{-- for header --}}
                 <div class="nav-header">
                     <img src="{{ asset('system_images/icon.png') }}" alt="">
                     <label class="gradient-text">CKCM Grading <em>v.1</em></label>
@@ -40,7 +48,7 @@
 
                         <div class="profile">
                             <label for="">{{ Auth::user()->name ?? 'Registrar Name' }}</label>
-                            <p>ID#: {{ Auth::user()->id ?? '0000' }}</p>
+                            <p>ID#: {{ Auth::user()->studentID ?? '000000' }}</p>
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-down"></i>
@@ -55,38 +63,77 @@
                     </div>
                 </div>
 
+                {{-- for navigation --}}
                 <div class="nav-links">
                     <label for="">DASHBOARD</label>
                     <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
-                        <i class="fa-solid fa-house"></i><span>Home</span></a>
-                    <a  href="{{ route('my_grades') }}" class="{{ Request::is('my_grades') ? 'active' : '' }}"><i class="fa-solid fa-star"></i>
-                        <span>My Grades</span></a>
-
-                    <label for="" style="margin-top:10px;">OPERATION</label>
-                    <a  href="{{ route('instructor.my_class') }}" class="{{ Request::is('my_class') ? 'active' : '' }}"><i class="fa-regular fa-clipboard"></i>
-                        <span>My Class</span></a>
-
-                    <a href="{{ route('registrar_classes') }}"
-                        class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
-                        <i class="fa-solid fa-clipboard"></i> <span>All Class</span>
+                        <i class="fa-solid fa-house"></i><span>Home</span>
                     </a>
+                    {{-- If the role is "student" --}}
+                    @if (Auth::check() && str_contains(Auth::user()->role, 'student'))
+                        <a href="{{ route('my_grades') }}" class="{{ Request::is('my_grades') ? 'active' : '' }}">
+                            <i class="fa-solid fa-star"></i>
+                            <span>My Grades</span>
+                        </a>
+                    @endif
+                    {{-- End student --}}
 
-                    <a href="{{ route('show.grades') }}" class="{{ Request::is('allgrades') ? 'active' : '' }}"><i
-                            class="fa-solid fa-box-archive"></i>
-                        <span>All Grades</span></a>
 
-                    <a href="{{ route('user.show') }}" class="{{ Request::is('users') ? 'active' : '' }}"><i
-                            class="fa-solid fa-users"></i>
-                        <span>Users</span></a>
+                    {{-- If the role is "instructor" --}}
+                    @if (Auth::check() && str_contains(Auth::user()->role, 'instructor'))
+                        <label for="" style="margin-top:10px;">OPERATION</label>
+                        <a href="{{ route('instructor.my_class') }}"
+                            class="{{ Request::is('my_class') ? 'active' : '' }}">
+                            <i class="fa-regular fa-clipboard"></i>
+                            <span>My Class</span>
+                        </a>
+                    @endif
+                    {{-- End instructor --}}
 
+                    {{-- If the role is "dean" --}}
+                    @if (Auth::check() && str_contains(Auth::user()->role, 'dean'))
+                        <a href="{{ route('registrar_classes') }}"
+                            class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
+                            <i class="fa-solid fa-clipboard"></i> <span>All Class</span>
+                        </a>
+                    @endif
+                    {{-- End dean --}}
 
-                    <label for="" style="margin-top:10px;">SETTINGS</label>
+                    {{-- If the role is "registrar" OR "dean" --}}
+                    @if (Auth::check() && (str_contains(Auth::user()->role, 'registrar') || str_contains(Auth::user()->role, 'dean')))
+                        <a href="{{ route('show.grades') }}" class="{{ Request::is('allgrades') ? 'active' : '' }}">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>All Grades</span>
+                        </a>
 
-                    <a href=""><i class="fa-solid fa-key"></i>
-                        <span>Admin</span></a>
+                        <a href="{{ route('user.show') }}" class="{{ Request::is('users') ? 'active' : '' }}">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Users</span>
+                        </a>
+                    @endif
+                    {{-- End registrar or dean --}}
+
+                    {{-- If the role is "admin" --}}
+                    @if (Auth::check() && str_contains(Auth::user()->role, 'admin'))
+                        <label for="" style="margin-top:10px;">SETTINGS</label>
+                        <a href="">
+                            <i class="fa-solid fa-key"></i>
+                            <span>Admin</span>
+                        </a>
+                    @endif
+                    {{-- End admin --}}
+
                 </div>
+                {{-- End of navigation --}}
+
+
+
+
             </div>
 
+
+
+            {{-- footer --}}
             <div class="main-nav-footer">
                 <h4 class="footer-title">POWERED BY CKCM TECH</h4>
                 <p>&copy; {{ date('Y') }} CKCM Technologies, LLC</p>
@@ -94,16 +141,66 @@
             </div>
         </div>
 
+
+
+
+        {{-- the main content --}}
         <div class="main-content">
+
+            {{-- for fullscreen and toggle navbar --}}
             <div class="content-header">
                 <i class="fa-solid fa-bars" id="menuToggle"></i>
                 <i id="fullscreen-icon" class="fa-solid fa-expand" title="Expand"></i>
             </div>
+            <script>
+                $(document).ready(function() {
+                    // Handle navbar state from localStorage
+                    if (localStorage.getItem('navMinimized') === 'true') {
+                        $('#navBar').addClass('minimized');
+                    }
 
+                    $('#menuToggle').click(function() {
+                        $('#navBar').toggleClass('minimized');
+                        localStorage.setItem('navMinimized', $('#navBar').hasClass('minimized'));
+                    });
+
+                    // Handle fullscreen mode with localStorage
+                    const icon = document.getElementById("fullscreen-icon");
+
+                    if (localStorage.getItem('fullscreen') === 'true') {
+                        document.documentElement.requestFullscreen();
+                        icon.classList.replace("fa-expand", "fa-compress");
+                        icon.setAttribute("title", "Compress");
+                    }
+
+                    icon.addEventListener("click", () => {
+                        if (!document.fullscreenElement) {
+                            document.documentElement.requestFullscreen();
+                            icon.classList.replace("fa-expand", "fa-compress");
+                            icon.setAttribute("title", "Compress");
+                            localStorage.setItem('fullscreen', 'true');
+                        } else {
+                            document.exitFullscreen();
+                            icon.classList.replace("fa-compress", "fa-expand");
+                            icon.setAttribute("title", "Expand");
+                            localStorage.setItem('fullscreen', 'false');
+                        }
+                    });
+                });
+            </script>
+
+
+            {{-- for dynamic contect base on the page, must not edit or touch --}}
             <div class="content">
                 @yield('content')
             </div>
         </div>
+
+
+
+
+
+
     </div>
 
 
@@ -115,42 +212,7 @@
 
 
 
-    <script>
-        $(document).ready(function() {
-            // Handle navbar state from localStorage
-            if (localStorage.getItem('navMinimized') === 'true') {
-                $('#navBar').addClass('minimized');
-            }
 
-            $('#menuToggle').click(function() {
-                $('#navBar').toggleClass('minimized');
-                localStorage.setItem('navMinimized', $('#navBar').hasClass('minimized'));
-            });
-
-            // Handle fullscreen mode with localStorage
-            const icon = document.getElementById("fullscreen-icon");
-
-            if (localStorage.getItem('fullscreen') === 'true') {
-                document.documentElement.requestFullscreen();
-                icon.classList.replace("fa-expand", "fa-compress");
-                icon.setAttribute("title", "Compress");
-            }
-
-            icon.addEventListener("click", () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                    icon.classList.replace("fa-expand", "fa-compress");
-                    icon.setAttribute("title", "Compress");
-                    localStorage.setItem('fullscreen', 'true');
-                } else {
-                    document.exitFullscreen();
-                    icon.classList.replace("fa-compress", "fa-expand");
-                    icon.setAttribute("title", "Expand");
-                    localStorage.setItem('fullscreen', 'false');
-                }
-            });
-        });
-    </script>
 
 
 

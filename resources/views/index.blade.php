@@ -4,7 +4,9 @@
         @if (Auth::check())
             <h1>Welcome, {{ Auth::user()->name }}!</h1>
             <h2>Your Role is, {{ Auth::user()->role }}!</h2>
+            @if (Auth::check() && str_contains(Auth::user()->role, 'student'))
             <a href="{{ route('my_grades') }}" ><i class="fa-solid fa-arrow-up-right-from-square"></i> Go to My Grades</a>
+            @endif
         @endif
     </div>
 @endsection
@@ -22,8 +24,11 @@
 
     a{
         font-size: 1.2rem;
-        color: var(--color-green);
+        color: var(--color1);
         text-decoration: none;
+    }
+    a:hover{
+        color: var(--ckcm-color3);
     }
 
     .dashboard h1 {

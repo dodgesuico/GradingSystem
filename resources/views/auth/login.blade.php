@@ -117,7 +117,7 @@
         </div>
 
         <div class="trademark-container">
-            <p style="margin-top:20px; color:var(--color6)"><strong class="gradient-text" style="font-size:1rem;">CKCM Grading System</strong> is a Trademark of Khemark Ocariza and Dodge Nicholson Suico.
+            <p style="margin-top:20px; color:var(--color6)"><strong class="gradient-text" style="font-size:1rem;">CKCM Grading System</strong> is a Trademark of <a href="https://khemarkocariza.ct.ws/" target="_blank">Khemark Ocariza</a> and Dodge Nicholson Suico.
                 Copyright © 2025-<?php echo date("Y"); ?> CKCM Technologies, LLC.</p>
 
         </div>
@@ -136,7 +136,7 @@
 <style>
     .alert{
         width: 100%;
-      
+
     }
 </style>
 
