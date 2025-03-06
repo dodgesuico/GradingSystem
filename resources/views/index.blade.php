@@ -1,19 +1,17 @@
-@extends("layouts.default")
-@section("content")
-
-<div class="dashboard">
-    @if (Auth::check())
-    <h1>Welcome, {{ Auth::user()->name }}!</h1>
-    <h2>Your Role is, {{ Auth::user()->role }}!</h2>
-    @endif
-</div>
-
-
+@extends('layouts.default')
+@section('content')
+    <div class="dashboard">
+        @if (Auth::check())
+            <h1>Welcome, {{ Auth::user()->name }}!</h1>
+            <h2>Your Role is, {{ Auth::user()->role }}!</h2>
+            <a href="{{ route('my_grades') }}" ><i class="fa-solid fa-arrow-up-right-from-square"></i> Go to My Grades</a>
+        @endif
+    </div>
 @endsection
 
 
 <style>
-    .dashboard{
+    .dashboard {
         margin-top: 300px;
         display: flex;
         justify-content: center;
@@ -22,10 +20,43 @@
         gap: 10px;
     }
 
-    .dashboard h1{
+    a{
+        font-size: 1.2rem;
+        color: var(--color-green);
+        text-decoration: none;
+    }
+
+    .dashboard h1 {
         color: var(--ckcm-color4)
     }
-    .dashboard h2{
+
+    .dashboard h2 {
         color: var(--color6);
+    }
+
+    @media (max-width: 480px) {
+        .dashboard h1 {
+            color: var(--ckcm-color4)
+        }
+
+        .dashboard h2 {
+            color: var(--color6);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard {
+            margin-top: 200px;
+        }
+        .dashboard h1 {
+            color: var(--ckcm-color4);
+            font-size: 1.5rem;
+        }
+
+        .dashboard h2 {
+            color: var(--color6);
+            font-size: 1.2rem;
+        }
+
     }
 </style>

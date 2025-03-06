@@ -5,7 +5,7 @@
         <div class="header-container">
             <h1>My Grades</h1>
             <button id="toggleViewBtn"><i class="fa-solid fa-chart-bar"></i> View Grades in Graph</button>
-            <canvas id="gradesChart" style="max-width: 600px; display: none;"></canvas>
+            <canvas id="gradesChart" style="max-width: 600px; display: none; overflow: auto;"></canvas>
             <style>
                 .header-container {
                     display: flex;
@@ -13,6 +13,7 @@
                     width: 100%;
                     margin-bottom: 10px;
                 }
+
 
                 #toggleViewBtn {
                     padding: 5px;
@@ -45,7 +46,7 @@
                         @foreach ($grades as $grade)
                             <tr>
                                 <td>{{ $grade->subject_code }}</td>
-                                <td>{{ $grade->descriptive_title }}</td>
+                                <td style="max-width:50px; overflow: auto;">{{ $grade->descriptive_title }}</td>
                                 <td>{{ $grade->instructor }}</td>
                                 <td
                                     style="color: {{ $grade->prelim <= 3.0 ? 'green' : 'red' }}; background-color:var(--color9b);">
@@ -99,7 +100,7 @@
 
                 if (!chartInstance) {
                     const ctx = chartCanvas.getContext('2d');
-                    const subjects = @json($grades->pluck('descriptive_title'));
+                    const subjects = @json($grades->pluck('subject_code'));
                     const prelimGrades = @json($grades->pluck('prelim'));
                     const midtermGrades = @json($grades->pluck('midterm'));
                     const semiFinalGrades = @json($grades->pluck('semi_finals'));
@@ -138,8 +139,10 @@
                                     min: 0, // Ensures bars grow from bottom
                                     max: 4, // Max height (since 5-1 = 4)
                                     ticks: {
+                                        stepSize: 0.25,
                                         callback: function(value) {
                                             return 5 - value; // Displays grades correctly
+
                                         }
                                     }
                                 }
@@ -174,6 +177,12 @@
 
 
     @media (max-width: 480px){
+
+        .header-container h1{
+            font-size: 1.6rem;
+        }
+        table th:nth-child(2),
+        table td:nth-child(2),
         table th:nth-child(3),
         table td:nth-child(3){
             display: none;
@@ -190,7 +199,7 @@
 
         .grades-container table td,
         .grades-container table th {
-            font-size: 1rem;
+
             padding: 5px;
         }
     }
