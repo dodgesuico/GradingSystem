@@ -26,6 +26,7 @@
     <div class="container">
         <div class="nav-bar" id="navBar">
             <div class="main-nav-contents">
+
                 <div class="nav-header">
                     <img src="{{ asset('system_images/icon.png') }}" alt="">
                     <label class="gradient-text">CKCM Grading <em>v.1</em></label>
@@ -58,9 +59,8 @@
                     <label for="">DASHBOARD</label>
                     <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
                         <i class="fa-solid fa-house"></i><span>Home</span></a>
-                    <a href=""><i class="fa-solid fa-star"></i>
+                    <a  href="{{ route('my_grades') }}" class="{{ Request::is('my_grades') ? 'active' : '' }}"><i class="fa-solid fa-star"></i>
                         <span>My Grades</span></a>
-
 
                     <label for="" style="margin-top:10px;">OPERATION</label>
                     <a  href="{{ route('instructor.my_class') }}" class="{{ Request::is('my_class') ? 'active' : '' }}"><i class="fa-regular fa-clipboard"></i>
@@ -272,6 +272,7 @@
 
         .nav-profile img {
             width: 30px;
+            max-height: 30px;
         }
 
         .nav-profile i {
