@@ -43,13 +43,14 @@ class UserController extends Controller
         $roles = User::select('role')->distinct()->pluck('role');
 
         foreach ($users as $user) {
-            if ($user->role === 'student') {
+            if (str_contains($user->role, 'student')) { // ✅ Check if 'student' exists in the role string
                 $user->grades = DB::table('grade_logs')
                     ->select('subject_code', 'descriptive_title', 'academic_period', 'prelim', 'midterm', 'semi_finals', 'final', 'remarks', 'created_at')
                     ->where('studentID', $user->studentID)
                     ->get();
             }
         }
+
 
 
         return view('users.user', compact('users', 'departments', 'roles', 'department'));

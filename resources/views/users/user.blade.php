@@ -95,7 +95,7 @@
                             <button class="view-btn" data-user-id="{{ $user->studentID }}">
                                 <i class="fa-solid fa-clipboard-user"></i> View Details
                             </button>
-                            @if ($user->role === 'student')
+                            @if (str_contains($user->role, 'student'))
                                 <span class="user-grades" data-grades="{{ json_encode($user->grades) }}"
                                     style="display: none;"></span>
                             @endif
@@ -132,7 +132,6 @@
 
             <!-- 🟢 Form for submitting user edits -->
             <form action="{{ route('user.edituser') }}" method="POST">
-                @method("POST")
                 @csrf
                 <input type="hidden" id="modalUserId" name="user_id">
 
@@ -244,6 +243,9 @@
                 let userEmail = $row.find("td:nth-child(3)").text().trim();
                 let userDepartment = $row.find("td:nth-child(4)").text().trim();
                 let userRoles = $row.find("td:nth-child(5)").text().trim();
+
+                console.log("User ID:", userId); // Debugging log
+                console.log("User Roles:", userRoles); // Debugging log
 
                 // Assign user details to modal
                 $("#userDetailsName").text(userName);
