@@ -65,7 +65,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $user = User::findOrFail($request->user_id);
+            $user = User::where('studentID', $request->user_id)->firstOrFail();
             $user->name = $request->name;
             $user->email = $request->email;
             $user->department = $request->department;

@@ -132,6 +132,7 @@
 
             <!-- 🟢 Form for submitting user edits -->
             <form action="{{ route('user.edituser') }}" method="POST">
+                @method("POST")
                 @csrf
                 <input type="hidden" id="modalUserId" name="user_id">
 
@@ -243,9 +244,6 @@
                 let userEmail = $row.find("td:nth-child(3)").text().trim();
                 let userDepartment = $row.find("td:nth-child(4)").text().trim();
                 let userRoles = $row.find("td:nth-child(5)").text().trim();
-
-                console.log("User ID:", userId); // Debugging log
-                console.log("User Roles:", userRoles); // Debugging log
 
                 // Assign user details to modal
                 $("#userDetailsName").text(userName);
