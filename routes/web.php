@@ -11,6 +11,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AllGradesController;
+use App\Http\Controllers\MygradesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,10 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get("/", [IndexController::class, "index"])->name("index");
+
+    // for mygrades
+    Route::get('/my_grades', [MyGradesController::class, 'showGrades'])->name('my_grades');
+
 
     // Admin
     Route::get("/index", [AdminController::class, "index"])->name('admin');
