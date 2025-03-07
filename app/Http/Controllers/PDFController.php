@@ -28,7 +28,7 @@ class PDFController extends Controller
         }
 
         // Create PDF instance
-        $pdf = new CustomPDF(); // Use the custom class instead of TCPDF
+        $pdf = new CustomPDF('P', 'mm', array(215.9, 330.2), true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor('CKCM Grading System');
         $pdf->SetTitle('Student Grades');
@@ -65,38 +65,70 @@ class PDFController extends Controller
 
         // Student Info
         $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->Cell(100, 5, "NAME: " . strtoupper($user->name), 0, 0, 'L');
+        $pdf->Cell(120, 5, "NAME: " . strtoupper($user->name), 0, 0, 'L');
         $pdf->SetFont('helvetica', '', 8);
         $pdf->Cell(50, 5, "Sex: TBD", 0, 0, 'L');  // Adjust gender if available
         $pdf->Cell(50, 5, "ID No: " . $user->studentID, 0, 1, 'L');
         $pdf->Cell(100, 5, "Course: Bachelor of Science in Computer Science", 0, 1, 'L'); // Adjust course dynamically if needed
-        $pdf->Ln(2);
+        $pdf->Ln(0);
 
-        // Table Header
-        $pdf->SetFillColor(200, 200, 200);
-        $pdf->Cell(30, 7, "Subjects & Numbers", 1, 0, 'C', true);
-        $pdf->Cell(70, 7, "Descriptive Titles", 1, 0, 'C', true);
-        $pdf->Cell(15, 7, "Final", 1, 0, 'C', true);
-        $pdf->Cell(15, 7, "Credit", 1, 1, 'C', true);
+        // Group grades by academic year and period
+        $groupedGrades = $user->grades->groupBy(['academic_year', 'academic_period']);
 
-        // Table Body
-        foreach ($user->grades as $grade) {
-            $pdf->Cell(30, 7, $grade->subject_code, 1);
-            $pdf->Cell(70, 7, $grade->descriptive_title, 1);
+        // Iterate through grouped grades
+        foreach ($groupedGrades as $academicYear => $periods) {
+            foreach ($periods as $academicPeriod => $grades) {
+                // Display Academic Year and Period as Section Headers
+                $pdf->SetFont('helvetica', 'B', 9);
+                $pdf->Cell(0, 6, "Academic Year: $academicYear - $academicPeriod", 0, 1, 'L');
 
-            $pdf->Cell(15, 7, $grade->final, 1, 0, 'C');
+                // Set thinner border
+                $pdf->SetLineWidth(0.2); // Reduce from default (0.5) to 0.2 for thinner borders
 
-            $pdf->Cell(15, 7, $grade->units, 1, 1, 'C'); // Assuming Credit is the same as Units
+
+                // Table Header
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetFillColor(200, 200, 200);
+                $pdf->Cell(40, 7, "Subject Code", 1, 0, 'C', true); // Changed from "No." to "Subject Code"
+                $pdf->Cell(94, 7, "Descriptive Titles", 1, 0, 'C', true);
+                $pdf->Cell(20, 7, "Final Grade", 1, 0, 'C', true);
+                $pdf->Cell(20, 7, "Re-Exam", 1, 0, 'C', true);
+                $pdf->Cell(20, 7, "Credit", 1, 1, 'C', true);
+
+                // Table Body
+                $pdf->SetFont('helvetica', '', 8);
+                foreach ($grades as $grade) {
+                    $pdf->Cell(40, 7, $grade->subject_code, 1); // Use subject code instead of number
+                    $pdf->Cell(94, 7, $grade->descriptive_title, 1);
+                    $pdf->Cell(20, 7, number_format($grade->final, 2), 1, 0, 'C');
+                    $pdf->Cell(20, 7, "", 1, 0, 'C'); // Re-exam column (empty)
+                    $pdf->Cell(20, 7, $grade->units, 1, 1, 'C');
+                }
+
+                $pdf->Ln(2);
+            }
         }
 
         $pdf->Ln(5);
 
         // Footer
-        $pdf->Cell(0, 5, "NOT VALID WITHOUT THE COLLEGE SEAL", 0, 1, 'C');
-        $pdf->Ln(10);
-        $pdf->Cell(0, 5, "__________________________", 0, 1, 'R');
-        $pdf->Cell(0, 5, "ELVIN P. SALMERON, MM-EM", 0, 1, 'R');
-        $pdf->Cell(0, 5, "Registrar", 0, 1, 'R');
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->Cell(120, 5, "NOT VALID WITHOUT THE COLLEGE SEAL", 0, 0, 'L'); // Left align
+
+        // Right-aligned Name
+        $pdf->Cell(70, 5, "ELVIN P. SALMERON, MM-EM", 0, 1, 'R'); // Name
+
+        // Move cursor slightly up to bring the underline closer
+        $pdf->Ln(-3.5); // Adjust the negative value to move the underline closer
+        // Underline (Placed below the name)
+        $pdf->Cell(120, 5, "", 0, 0); // Empty space to align underline
+        $pdf->Cell(70, 2, "__________________________", 0, 1, 'R'); // Right align underline
+
+        // Right-aligned Title
+        $pdf->Cell(120, 5, "", 0, 0); // Empty space to align title
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->Cell(70, 5, "Registrar", 0, 1, 'R'); // Title
+
 
         // Output PDF
         $pdf->Output('grades.pdf', 'I');
