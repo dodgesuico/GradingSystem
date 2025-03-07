@@ -45,7 +45,7 @@ class UserController extends Controller
         foreach ($users as $user) {
             if (str_contains($user->role, 'student')) { // ✅ Check if 'student' exists in the role string
                 $user->grades = DB::table('grade_logs')
-                    ->select('subject_code', 'descriptive_title', 'academic_period', 'prelim', 'midterm', 'semi_finals', 'final', 'remarks', 'created_at')
+                    ->select('subject_code', 'descriptive_title', 'units', 'academic_period', 'academic_year', 'prelim', 'midterm', 'semi_finals', 'final', 'remarks', 'created_at')
                     ->where('studentID', $user->studentID)
                     ->get();
             }
