@@ -28,8 +28,10 @@
                         <th>Class ID</th>
                         <th>Subject Code</th>
                         <th>Descriptive Title</th>
+                        <th>Units</th>
                         <th>Instructor</th>
                         <th>Academic Period</th>
+                        <th>Academic Year</th>
                         <th>Schedule</th>
                         <th>Student ID</th>
                         <th>Prelim</th>
@@ -74,8 +76,10 @@
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.classID}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.units}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.instructor}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_year}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.schedule}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.studentID}</td>
                                 <td  style="background:var(--color9b)">${grade.prelim ?? 'N/A'}</td>

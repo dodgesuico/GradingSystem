@@ -74,8 +74,10 @@
                     <th>ID</th>
                     <th>Subject Code</th>
                     <th>Descriptive Title</th>
+                    <th>Units</th>
                     <th>Instructor</th>
-                    <th>Academic Peroiod</th>
+                    <th>Academic Peroid</th>
+                    <th>Academic Year</th>
                     <th>Schedule</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -87,8 +89,10 @@
                     <td>{{ $class->id }}</td>
                     <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->subject_code }}</td>
                     <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->descriptive_title }}</td>
+                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->units }}</td>
                     <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->instructor }}</td>
                     <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->academic_period }}</td>
+                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->academic_year }}</td>
                     <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->schedule }}</td>
 
                     <td style="border: 0; border-bottom: 1px solid var(--color7);"

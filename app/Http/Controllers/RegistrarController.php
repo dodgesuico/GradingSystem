@@ -31,8 +31,10 @@ class RegistrarController extends Controller
         $request->validate([
             "subject_code" => "required",
             "descriptive_title" => "required",
+            "units" => "required",
             "instructor" => "required",
             "academic_period" => "required",
+            "academic_year" => "required",
             "schedule" => "required",
             "status" => "required",
             "password" => "required"
@@ -41,8 +43,10 @@ class RegistrarController extends Controller
         $class = new Classes();
         $class->subject_code = $request->subject_code;
         $class->descriptive_title = $request->descriptive_title;
+        $class->units = $request->units;
         $class->instructor = $request->instructor;
         $class->academic_period = $request->academic_period;
+        $class->academic_year = $request->academic_year;
         $class->schedule = $request->schedule;
         $class->status = $request->status;
         $class->password = $request->password;
@@ -383,8 +387,10 @@ class RegistrarController extends Controller
                     'studentID' => $grade->studentID,
                     'subject_code' => optional($classInfo)->subject_code,
                     'descriptive_title' => optional($classInfo)->descriptive_title,
+                    'units' => optional($classInfo)->units,
                     'instructor' => optional($classInfo)->instructor,
                     'academic_period' => optional($classInfo)->academic_period,
+                    'academic_year' => optional($classInfo)->academic_year,
                     'schedule' => optional($classInfo)->schedule,
                     'name' => optional($studentInfo)->name,
                     'email' => optional($studentInfo)->email,

@@ -17,12 +17,29 @@
                 <input type="text" id="descriptive_title" name="descriptive_title" required>
             </div>
             <div class="info-container">
+                <label for="units">Units</label>
+                <select id="units" name="units">
+                    <option value="" disabled selected>Select Units</option>
+                    @for ($i = 1; $i <= 6; $i++)
+                        <option value="{{ $i }}">{{ $i }} </option>
+                    @endfor
+                </select>
+            </div>
+            <div class="info-container">
                 <label for="instructorSearch">Instructor</label>
                 <input type="text" id="instructorSearch" name="instructor" class="form-control"
                     placeholder="Search for an instructor..." oninput="filterInstructors()">
                 <div id="instructorDropdown" class="dropdown-menu" ></div>
             </div>
-
+            <div class="info-container">
+                <label for="academic_year">Academic Year</label>
+                <select id="academic_year" name="academic_year">
+                    <option value="" disabled selected>Select Academic Year</option>
+                    @for ($year = date('Y'); $year <= date('Y') + 5; $year++)
+                        <option value="{{ $year }}-{{ $year + 1 }}">{{ $year }}-{{ $year + 1 }}</option>
+                    @endfor
+                </select>
+            </div>
             <div class="info-container">
                 <label for="academic_period">Academic Period</label>
                 <select id="academic_period" name="academic_period">

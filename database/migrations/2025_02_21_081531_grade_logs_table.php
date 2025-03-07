@@ -17,8 +17,10 @@ return new class extends Migration
                 $table->integer('classID');
                 $table->string('subject_code')->nullable();
                 $table->string('descriptive_title')->nullable();
+                $table->integer('units')->nullable();
                 $table->string('instructor')->nullable();
                 $table->string('academic_period')->nullable();
+                $table->string('academic_year')->nullable();
                 $table->string('schedule')->nullable();
                 $table->integer('studentID');
                 $table->string('name')->nullable();

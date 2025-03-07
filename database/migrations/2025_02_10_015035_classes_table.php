@@ -16,8 +16,10 @@ return new class extends Migration
                 $table->id();
                 $table->string('subject_code');
                 $table->string('descriptive_title');
+                $table->integer('units');
                 $table->string('instructor');
                 $table->string('academic_period');
+                $table->string('academic_year');
                 $table->string('schedule');
                 $table->string('status');
                 $table->string('password');
