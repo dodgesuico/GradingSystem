@@ -21,6 +21,16 @@
                                 value="{{ $class->descriptive_title }}" required>
                         </div>
                         <div class="info-container">
+                            <label for="units">Units</label>
+                            <select id="units" name="units" class="form-control" required>
+                                <option value="" disabled>Select Units</option>
+                                @for ($i = 1; $i <= 6; $i++)
+                                    <option value="{{ $i }}" {{ isset($class) && $class->units == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <div class="info-container">
                             <label for="instructorSearch{{ $class->id }}">Instructor</label>
                             <input type="text" id="instructorSearch{{ $class->id }}" class="form-control"
                                 placeholder="Search for an instructor..."
@@ -48,6 +58,19 @@
                                 <option value="Summer"
                                     {{ isset($class) && $class->academic_period == 'Summer' ? 'selected' : '' }}>
                                     Summer</option>
+                            </select>
+                        </div>
+
+                        <div class="info-container">
+                            <label for="academic_year">Academic Year</label>
+                            <select id="academic_year" name="academic_year">
+                                <option value="" disabled>Select Academic Year</option>
+                                @for ($year = date('Y'); $year <= date('Y') + 5; $year++)
+                                    <option value="{{ $year . '-' . ($year + 1) }}"
+                                        {{ isset($class) && $class->academic_year == ($year . '-' . ($year + 1)) ? 'selected' : '' }}>
+                                        {{ $year }}-{{ $year + 1 }}
+                                    </option>
+                                @endfor
                             </select>
                         </div>
 

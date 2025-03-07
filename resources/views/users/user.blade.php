@@ -129,16 +129,6 @@
     </div>
 
 
-
-
-
-
-
-
-
-
-
-
     <!-- Edit User Modal -->
     <div id="editUserModal" class="modal">
         <div class="modal-content">

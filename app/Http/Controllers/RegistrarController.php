@@ -63,16 +63,20 @@ class RegistrarController extends Controller
         $request->validate([
             "subject_code" => "required",
             "descriptive_title" => "required",
+            "units" => "required",
             "instructor" => "required",
             "academic_period" => "required",
+            "academic_year" => "required",
             "schedule" => "required",
             "status" => "required",
         ]);
 
         $class->subject_code = $request->subject_code;
         $class->descriptive_title = $request->descriptive_title;
+        $class->units = $request->units;
         $class->instructor = $request->instructor;
         $class->academic_period = $request->academic_period;
+        $class->academic_year = $request->academic_year;
         $class->schedule = $request->schedule;
         $class->status = $request->status;
 
