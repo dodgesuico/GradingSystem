@@ -21,7 +21,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        {{-- <th>ID</th> --}}
+                        <th>Student ID</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Department</th>
@@ -33,7 +34,7 @@
                         <th>Academic Period</th>
                         <th>Academic Year</th>
                         <th>Schedule</th>
-                        <th>Student ID</th>
+
                         <th>Prelim</th>
                         <th>Midterm</th>
                         <th>Semi Finals</th>
@@ -69,7 +70,8 @@
                         data.forEach(grade => {
                             gradesTable.innerHTML += `
                             <tr>
-                                <td >${grade.id}</td>
+
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.studentID}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.name}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.email}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.department}</td>
@@ -81,7 +83,6 @@
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_year}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.schedule}</td>
-                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.studentID}</td>
                                 <td  style="background:var(--color9b)">${grade.prelim ?? 'N/A'}</td>
                                 <td  style="background:var(--color9b)">${grade.midterm ?? 'N/A'}</td>
                                 <td  style="background:var(--color9b)">${grade.semi_finals ?? 'N/A'}</td>
@@ -115,5 +116,4 @@
         color: var(--ckcm-color4);
 
     }
-
 </style>

@@ -12,7 +12,7 @@
                 value="{{ request('search') }}">
 
             <select name="department" id="department">
-                <option value="">Filter by Department</option>
+                <option value="" {{ request('department') ? '' : 'selected' }}>Filter by Department</option>
                 @foreach ($departments as $dept)
                     <option value="{{ $dept }}" {{ request('department') == $dept ? 'selected' : '' }}>
                         {{ $dept }}
@@ -21,7 +21,7 @@
             </select>
 
             <select name="role" id="role">
-                <option value="">Filter by Role</option>
+                <option value="" {{ request('role') ? '' : 'selected' }}>Filter by Role</option>
                 @foreach ($roles as $role)
                     <option value="{{ $role }}" {{ request('role') == $role ? 'selected' : '' }}>
                         {{ $role }}
@@ -58,6 +58,9 @@
         </div>
 
 
+
+
+
         <!-- Users Table -->
         <table class="user-table">
             <thead>
@@ -90,9 +93,9 @@
                         <td>{{ $user->created_at->format('Y-m-d') }}</td>
                         <td style="text-align: center;">
                             @if (Auth::check() && str_contains(Auth::user()->role, 'admin'))
-                            <button class="edit-btn" data-user-id="{{ $user->studentID }}"><i
-                                    class="fa-solid fa-pen-to-square"></i> Edit User
-                            </button>
+                                <button class="edit-btn" data-user-id="{{ $user->studentID }}"><i
+                                        class="fa-solid fa-pen-to-square"></i> Edit User
+                                </button>
                             @endif
                             <button class="view-btn" data-user-id="{{ $user->studentID }}">
                                 <i class="fa-solid fa-clipboard-user"></i> View Details
@@ -124,6 +127,16 @@
             });
         </script>
     </div>
+
+
+
+
+
+
+
+
+
+
 
 
     <!-- Edit User Modal -->
@@ -186,6 +199,11 @@
 
             <h2>User Details</h2>
 
+
+            <!-- Student ID -->
+            <label>Student ID:</label>
+            <p id="userDetailsStudentID"></p>
+
             <!-- Name -->
             <label>Name:</label>
             <p id="userDetailsName"></p>
@@ -226,14 +244,40 @@
                         <!-- Grades will be inserted here -->
                     </tbody>
                 </table>
+
+
+                <!-- 🟢 View PDF Button -->
+                <button id="viewPdfBtn" class="view-pdf-btn" style="margin-top: 15px;">
+                    <i class="fa-solid fa-file-pdf"></i> View PDF
+                </button>
+
+                <script>
+                    $(document).ready(function() {
+                        $(document).on("click", "#viewPdfBtn", function() {
+                            let studentID = $("#userDetailsStudentID").text().trim(); // ✅ Get Student ID
+
+                            console.log("View PDF Button Clicked - Student ID:", studentID); // ✅ Debugging
+
+                            if (studentID) {
+                                let pdfUrl = `/generate-pdf?studentID=${encodeURIComponent(studentID)}`;
+                                window.open(pdfUrl, '_blank'); // ✅ Open in new tab
+                            } else {
+                                alert("Student ID not found!");
+                            }
+                        });
+                    });
+                </script>
+
+
             </div>
         </div>
     </div>
+    {{-- end of modal for view user --}}
 
 
 
 
-
+    {{-- script for viewing details --}}
     <script>
         $(document).ready(function() {
             // ✅ Attach event listener to dynamically generated buttons
@@ -242,15 +286,18 @@
                 let userId = $button.data("user-id"); // Get user ID from button
                 let $row = $button.closest("tr"); // Get the parent row
 
+                let studentID = $row.find("td:nth-child(1)").text().trim(); // ✅ Extract Student ID
                 let userName = $row.find("td:nth-child(2)").text().trim();
                 let userEmail = $row.find("td:nth-child(3)").text().trim();
                 let userDepartment = $row.find("td:nth-child(4)").text().trim();
                 let userRoles = $row.find("td:nth-child(5)").text().trim();
 
+                console.log("Student ID:", studentID); // ✅ Debugging log
                 console.log("User ID:", userId); // Debugging log
                 console.log("User Roles:", userRoles); // Debugging log
 
                 // Assign user details to modal
+                $("#userDetailsStudentID").text(studentID); // ✅ Set Student ID
                 $("#userDetailsName").text(userName);
                 $("#userDetailsEmail").text(userEmail);
                 $("#userDetailsDepartment").text(userDepartment);
@@ -270,7 +317,8 @@
 
                     // Get the latest grades by selecting the highest ID for each subject_code
                     let latestGrades = Object.values(userGrades.reduce((acc, grade) => {
-                        let key = `${grade.subject_code}_${grade.descriptive_title}`; // Combine subject code and title as key
+                        let key =
+                            `${grade.subject_code}_${grade.descriptive_title}`; // Combine subject code and title as key
                         acc[key] = acc[key] && acc[key].id > grade.id ? acc[key] : grade;
                         return acc;
                     }, {}));
@@ -316,9 +364,22 @@
             });
         });
     </script>
+    {{-- end script for viewing details --}}
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    {{-- script for editing the user --}}
     <script>
         $(document).ready(function() {
             $(document).on("click", ".edit-btn", function() {
@@ -430,12 +491,10 @@
             }
         });
     </script>
-
+    {{-- end of script for editing the user --}}
 
     <!-- jQuery for AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
 
 @endsection
 
@@ -614,6 +673,14 @@
         font-size: 1rem;
     }
 </style>
+
+
+
+
+
+
+
+
 
 
 

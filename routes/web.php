@@ -12,7 +12,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AllGradesController;
 use App\Http\Controllers\MygradesController;
-
+use App\Http\Controllers\PDFController;
 /*
 |--------------------------------------------------------------------------
 | Guest Routes (For Users Not Logged In)
@@ -94,6 +94,10 @@ Route::middleware(['auth'])->group(function () {
     // Instructor
     Route::get("/instructor_dashboard", [InstructorController::class, "index"])->name('instructor');
     Route::get("/instructor_classes", [InstructorController::class, "classes"])->name('classes');
+
+    // for pdf
+    Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);
+
 
     // Logout Route
     Route::post('/logout', function () {
