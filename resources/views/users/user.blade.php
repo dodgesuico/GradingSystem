@@ -212,13 +212,14 @@
                         <tr>
                             <th>Subject Code</th>
                             <th>Descriptive Title</th>
+                            <th>Units</th>
                             <th>Academic Period</th>
+                            <th>Academic Year</th>
                             <th>Prelim</th>
                             <th>Midterm</th>
                             <th>Semi-Final</th>
                             <th>Final</th>
                             <th>Remarks</th> <!-- ✅ Added Remarks Column -->
-                            <th>Year</th>
                         </tr>
                     </thead>
                     <tbody id="userGradesTable">
@@ -280,17 +281,18 @@
                             gradesHtml += `<tr>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.units}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
+                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.academic_year}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.prelim}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.midterm}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.semi_finals}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.final}</td>
                                 <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.remarks}</td> <!-- ✅ Included Remarks -->
-                                <td style="border:0; border-bottom: 1px solid var(--color7);">${grade.created_at}</td>
                             </tr>`;
                         });
                     } else {
-                        gradesHtml = "<tr><td colspan='7'>No grades available</td></tr>";
+                        gradesHtml = "<tr><td colspan='10'>No grades available</td></tr>";
                     }
                     $("#userGradesTable").html(gradesHtml);
                 } else {

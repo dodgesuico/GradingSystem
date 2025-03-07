@@ -31,7 +31,7 @@ return new class extends Migration
                 ['studentID' => '256672', 'name' => 'Khemark Ocariza', 'email' => 'khemark@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
                 ['studentID' => '222222', 'name' => 'Neil Vincent Canama', 'email' => 'Vincent@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
                 ['studentID' => '242424', 'name' => 'Marjon D. Ligan', 'email' => 'Ligan@ckcm.edu.ph', 'department' => 'College of Business Administration', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '265624', 'name' => 'Marjun Senarlo', 'email' => 'Senarlo@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'dean', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '265624', 'name' => 'Marjun Senarlo', 'email' => 'Senarlo@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'dean,instructor,admin', 'created_at' => now(), 'updated_at' => now()],
                 ['studentID' => '256456', 'name' => 'Bevelyn Ganuhay', 'email' => 'Ganuhay@ckcm.edu.ph', 'department' => '', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
 
             ]);
