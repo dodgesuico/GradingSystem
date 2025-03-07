@@ -90,9 +90,9 @@
                         <td>{{ $user->created_at->format('Y-m-d') }}</td>
                         <td style="text-align: center;">
                             @if (Auth::check() && str_contains(Auth::user()->role, 'admin'))
-                            <button class="edit-btn" data-user-id="{{ $user->studentID }}"><i
-                                    class="fa-solid fa-pen-to-square"></i> Edit User
-                            </button>
+                                <button class="edit-btn" data-user-id="{{ $user->studentID }}"><i
+                                        class="fa-solid fa-pen-to-square"></i> Edit User
+                                </button>
                             @endif
                             <button class="view-btn" data-user-id="{{ $user->studentID }}">
                                 <i class="fa-solid fa-clipboard-user"></i> View Details
@@ -124,6 +124,16 @@
             });
         </script>
     </div>
+
+
+
+
+
+
+
+
+
+
 
 
     <!-- Edit User Modal -->
@@ -228,11 +238,12 @@
             </div>
         </div>
     </div>
+    {{-- end of modal for view user --}}
 
 
 
 
-
+    {{-- script for viewing details --}}
     <script>
         $(document).ready(function() {
             // ✅ Attach event listener to dynamically generated buttons
@@ -269,7 +280,8 @@
 
                     // Get the latest grades by selecting the highest ID for each subject_code
                     let latestGrades = Object.values(userGrades.reduce((acc, grade) => {
-                        let key = `${grade.subject_code}_${grade.descriptive_title}`; // Combine subject code and title as key
+                        let key =
+                            `${grade.subject_code}_${grade.descriptive_title}`; // Combine subject code and title as key
                         acc[key] = acc[key] && acc[key].id > grade.id ? acc[key] : grade;
                         return acc;
                     }, {}));
@@ -314,9 +326,22 @@
             });
         });
     </script>
+    {{-- end script for viewing details --}}
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    {{-- script for editing the user --}}
     <script>
         $(document).ready(function() {
             $(document).on("click", ".edit-btn", function() {
@@ -428,12 +453,10 @@
             }
         });
     </script>
-
+    {{-- end of script for editing the user --}}
 
     <!-- jQuery for AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
 
 @endsection
 
@@ -612,6 +635,14 @@
         font-size: 1rem;
     }
 </style>
+
+
+
+
+
+
+
+
 
 
 
