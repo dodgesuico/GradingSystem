@@ -39,17 +39,17 @@ class PDFController extends Controller
         // Set font
         $pdf->SetFont('helvetica', '', 10);
         // Header (School Information)
-        $pdf->Image(public_path('system_images/logo.jpg'), 30, 12, 25); // Adjust logo placement
-        $pdf->SetFont('helvetica', 'B', 11); // 'B' makes it bold
+        $pdf->Image(public_path('system_images/logo.jpg'), 35, 11, 25); // Adjust logo placement
+        $pdf->SetFont('times', 'B', 11); // 'B' makes it bold
         $pdf->Cell(0, 5, "CHRIST THE KING COLLEGE DE MARANDING, INC.", 0, 1, 'C');
         $pdf->SetFont('helvetica', 'B', 9); // Reset back to normal weight after bold text
         $pdf->Cell(0, 5, "Maranding, Lala, Lanao del Norte", 0, 1, 'C');
         $pdf->SetFont('helvetica', '', 9);
         $pdf->Cell(0, 3, "Contact#: Administrator's Office (063)388-7039, Finance Office", 0, 1, 'C');
         $pdf->Cell(0, 3, "(063)388-7282, Registrar Tel. Fax #:(063)388-7373", 0, 1, 'C');
-        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetFont('helvetica', 'I', 8);
         $pdf->Cell(0, 3, "9211 PHILIPPINES", 0, 1, 'C');
-        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetFont('times', 'BI', 10.2);
         $pdf->Cell(0, 10, "OFFICE OF THE COLLEGE REGISTRAR", 0, 1, 'C');
 
         $pdf->Ln(-2); // Moves the cursor UP by 3 units, reducing space
@@ -58,10 +58,10 @@ class PDFController extends Controller
         $pdf->Line(30, $pdf->GetY(), 180, $pdf->GetY()); // Draw line closer to the text
 
         $pdf->Ln(2);
-        $pdf->SetFont('helvetica', '', 10);
+        $pdf->SetFont('times', 'B', 10);
         $pdf->Cell(0, 5, "EVALUATION COPY", 0, 1, 'C');
         $pdf->SetFont('helvetica', '', 8);
-        $pdf->Ln(3);
+        $pdf->Ln(0);
 
         // Student Info
         $pdf->SetFont('helvetica', 'B', 8);
@@ -69,8 +69,15 @@ class PDFController extends Controller
         $pdf->SetFont('helvetica', '', 8);
         $pdf->Cell(50, 5, "Sex: TBD", 0, 0, 'L');  // Adjust gender if available
         $pdf->Cell(50, 5, "ID No: " . $user->studentID, 0, 1, 'L');
-        $pdf->Cell(100, 5, "Course: Bachelor of Science in Computer Science", 0, 1, 'L'); // Adjust course dynamically if needed
+        $pdf->SetFont('helvetica', 'B', 8);
+        $pdf->Cell(100, 1, "Course: Bachelor of Science in Computer Science", 0, 1, 'L'); // Adjust course dynamically if needed
         $pdf->Ln(0);
+
+        $pdf->Ln(-1);
+        $pdf->SetFont('helvetica', 'B',9);
+        $pdf->Cell(0, 5, "COLLEGAITE RECORD", 0, 1, 'C');
+        $pdf->SetFont('helvetica', '', 8);
+        $pdf->Ln(-1);
 
         // Group grades by academic year and period
         $groupedGrades = $user->grades->groupBy(['academic_year', 'academic_period']);
@@ -112,7 +119,7 @@ class PDFController extends Controller
         $pdf->Ln(5);
 
         // Footer
-        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFont('helvetica', 'B', 8);
         $pdf->Cell(120, 5, "NOT VALID WITHOUT THE COLLEGE SEAL", 0, 0, 'L'); // Left align
 
         // Right-aligned Name
