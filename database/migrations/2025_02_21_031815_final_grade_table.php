@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->string('schedule')->nullable();
                 $table->integer('studentID');
                 $table->string('name')->nullable();
+                $table->string('gender')->nullable();
                 $table->string('email')->nullable();
                 $table->string('department')->nullable();
                 $table->decimal('prelim', 5,2);

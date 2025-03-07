@@ -132,6 +132,7 @@
                                     <th>Class ID</th>
                                     <th>Student ID</th>
                                     <th>Name</th>
+                                    <th>Gender</th>
                                     <th>Email</th>
                                     <th>Department</th>
 
@@ -147,6 +148,7 @@
                                         <td>{{ $classes_students->classID }}</td>
                                         <td>{{ $classes_students->studentID }}</td>
                                         <td>{{ $classes_students->name }}</td>
+                                        <td>{{ $classes_students->gender }}</td>
                                         <td>{{ $classes_students->email }}</td>
                                         <td>{{ $classes_students->department }}</td>
 
@@ -474,13 +476,6 @@
         </script>
 
         {{-- end of grading and score --}}
-
-
-
-
-
-
-
 
 
 
@@ -869,6 +864,10 @@
                         <input type="text" id="name" name="name" class="form-control" required readonly>
                     </div>
                     <div class="info-container">
+                        <label for="gender">Gender</label>
+                        <input type="text" id="gender" name="gender" class="form-control" required readonly>
+                    </div>
+                    <div class="info-container">
                         <label for="email">Email</label>
                         <input type="text" id="email" name="email" class="form-control" required readonly>
                     </div>
@@ -905,6 +904,7 @@
             if (selectedOption) {
                 document.getElementById('student_id').value = selectedOption.getAttribute('data-id');
                 document.getElementById('name').value = selectedOption.getAttribute('data-name');
+                document.getElementById('gender').value = selectedOption.getAttribute('data-gender');
                 document.getElementById('email').value = selectedOption.getAttribute('data-email');
                 document.getElementById('department').value = selectedOption.getAttribute('data-department');
             }
@@ -947,6 +947,7 @@
                     document.getElementById("studentSearch").value = student.name;
                     document.getElementById("student_id").value = student.studentID;
                     document.getElementById("name").value = student.name;
+                    document.getElementById("gender").value = student.gender;
                     document.getElementById("email").value = student.email;
                     document.getElementById("department").value = student.department;
                     dropdown.style.display = "none";
@@ -959,17 +960,7 @@
     </script>
 
 
-    <style>
-
-    </style>
-
-
-
-
 @endsection
-
-
-
 
 
 

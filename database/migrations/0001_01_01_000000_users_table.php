@@ -17,6 +17,7 @@ return new class extends Migration
                 $table->id();
                 $table->integer("studentID")->unique();
                 $table->string('name');
+                $table->string('gender');
                 $table->string('email')->unique();
                 $table->string('department')->nullable();
                 $table->string('password');
@@ -26,13 +27,13 @@ return new class extends Migration
 
 
             DB::table('users')->insert([
-                ['studentID' => '219286', 'name' => 'Dodge Nicholson P. Suico', 'email' => 'dodgesuico@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '214561', 'name' => 'Reynaldo G. Lauron', 'email' => 'lauron@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '256672', 'name' => 'Khemark Ocariza', 'email' => 'khemark@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '222222', 'name' => 'Neil Vincent Canama', 'email' => 'Vincent@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '242424', 'name' => 'Marjon D. Ligan', 'email' => 'Ligan@ckcm.edu.ph', 'department' => 'College of Business Administration', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '265624', 'name' => 'Marjun Senarlo', 'email' => 'Senarlo@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'dean,instructor,admin', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '256456', 'name' => 'Bevelyn Ganuhay', 'email' => 'Ganuhay@ckcm.edu.ph', 'department' => '', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '219286', 'name' => 'Dodge Nicholson P. Suico', 'gender' => 'male', 'email' => 'dodgesuico@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '214561', 'name' => 'Reynaldo G. Lauron', 'gender' => 'male', 'email' => 'lauron@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '256672', 'name' => 'Khemark Ocariza', 'gender' => 'male', 'email' => 'khemark@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'student', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '222222', 'name' => 'Neil Vincent Canama', 'gender' => 'male', 'email' => 'Vincent@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '242424', 'name' => 'Marjon D. Ligan', 'gender' => 'male', 'email' => 'Ligan@ckcm.edu.ph', 'department' => 'College of Business Administration', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '265624', 'name' => 'Marjun Senarlo', 'gender' => 'male', 'email' => 'Senarlo@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'dean,instructor,admin', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '256456', 'name' => 'Bevelyn Ganuhay', 'gender' => 'female', 'email' => 'Ganuhay@ckcm.edu.ph', 'department' => '', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
 
             ]);
         }

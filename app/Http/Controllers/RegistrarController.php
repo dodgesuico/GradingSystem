@@ -22,7 +22,7 @@ class RegistrarController extends Controller
     public function registrar_classes()
     {
         $classes = Classes::all();
-        $instructors = User::where('role', 'instructor')->get(); // Fetch all class data
+        $instructors = User::where('role', 'LIKE', '%instructor%')->get();
         return view('registrar.registrar_classes', compact('classes', 'instructors'));
     }
 
@@ -125,6 +125,7 @@ class RegistrarController extends Controller
         $request->validate([
             "student_id" => "required",
             "name" => "required",
+            "gender" => "required",
             "email" => "required|email",
             "department" => "required",
         ]);
@@ -134,6 +135,7 @@ class RegistrarController extends Controller
         $classStudent->classID = $class->id;
         $classStudent->studentID = $request->student_id;
         $classStudent->name = $request->name;
+        $classStudent->gender = $request->gender;
         $classStudent->email = $request->email;
         $classStudent->department = $request->department;
 
@@ -348,6 +350,7 @@ class RegistrarController extends Controller
                     'academic_period' => optional($classInfo)->academic_period,
                     'schedule' => optional($classInfo)->schedule,
                     'name' => optional($studentInfo)->name,
+                    'gender' => optional($studentInfo)->gender,
                     'email' => optional($studentInfo)->email,
                     'department' => optional($studentInfo)->department,
                     'prelim' => $grade['prelim'],
@@ -397,6 +400,7 @@ class RegistrarController extends Controller
                     'academic_year' => optional($classInfo)->academic_year,
                     'schedule' => optional($classInfo)->schedule,
                     'name' => optional($studentInfo)->name,
+                    'gender' => optional($studentInfo)->gender,
                     'email' => optional($studentInfo)->email,
                     'department' => optional($studentInfo)->department,
                     'prelim' => $grade->prelim,

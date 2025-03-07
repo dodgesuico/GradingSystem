@@ -24,6 +24,7 @@
                         {{-- <th>ID</th> --}}
                         <th>Student ID</th>
                         <th>Name</th>
+                        <th>Gender</th>
                         <th>Email</th>
                         <th>Department</th>
                         <th>Class ID</th>
@@ -72,7 +73,8 @@
                             <tr>
 
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.studentID}</td>
-                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.name}</td>
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.name}</td>\
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.gender}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.email}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.department}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.classID}</td>

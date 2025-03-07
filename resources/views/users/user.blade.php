@@ -67,6 +67,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
+                    <th>Gender</th>
                     <th>Email</th>
                     <th>Department</th>
                     <th>Role</th>
@@ -79,6 +80,7 @@
                     <tr>
                         <td>{{ $user->studentID }}</td>
                         <td>{{ $user->name }}</td>
+                        <td>{{ $user->gender }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->department }}</td>
                         <td>
@@ -144,6 +146,9 @@
                 <label for="editUserName">Name:</label>
                 <input type="text" id="editUserName" name="name">
 
+                <label for="editUserGender">Gender:</label>
+                <input type="text" id="editUserGender" name="gender">
+
                 <!-- Email -->
                 <label for="editUserEmail">Email:</label>
                 <input type="email" id="editUserEmail" name="email">
@@ -197,6 +202,9 @@
             <!-- Name -->
             <label>Name:</label>
             <p id="userDetailsName"></p>
+
+            <label>Gender:</label>
+            <p id="userDetailsGender"></p>
 
             <!-- Email -->
             <label>Email:</label>
@@ -278,17 +286,15 @@
 
                 let studentID = $row.find("td:nth-child(1)").text().trim(); // ✅ Extract Student ID
                 let userName = $row.find("td:nth-child(2)").text().trim();
-                let userEmail = $row.find("td:nth-child(3)").text().trim();
-                let userDepartment = $row.find("td:nth-child(4)").text().trim();
-                let userRoles = $row.find("td:nth-child(5)").text().trim();
-
-                console.log("Student ID:", studentID); // ✅ Debugging log
-                console.log("User ID:", userId); // Debugging log
-                console.log("User Roles:", userRoles); // Debugging log
+                let userGender = $row.find("td:nth-child(3)").text().trim();
+                let userEmail = $row.find("td:nth-child(4)").text().trim();
+                let userDepartment = $row.find("td:nth-child(5)").text().trim();
+                let userRoles = $row.find("td:nth-child(6)").text().trim();
 
                 // Assign user details to modal
                 $("#userDetailsStudentID").text(studentID); // ✅ Set Student ID
                 $("#userDetailsName").text(userName);
+                $("#userDetailsGender").text(userGender);
                 $("#userDetailsEmail").text(userEmail);
                 $("#userDetailsDepartment").text(userDepartment);
 
@@ -358,30 +364,21 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     {{-- script for editing the user --}}
     <script>
         $(document).ready(function() {
             $(document).on("click", ".edit-btn", function() {
                 let userId = $(this).data("user-id");
                 let userName = $(this).closest("tr").find("td:nth-child(2)").text().trim();
-                let userEmail = $(this).closest("tr").find("td:nth-child(3)").text().trim();
-                let userDepartment = $(this).closest("tr").find("td:nth-child(4)").text().trim();
-                let userRoles = $(this).closest("tr").find("td:nth-child(5)").text().trim().split(
+                let userGender = $(this).closest("tr").find("td:nth-child(3)").text().trim();
+                let userEmail = $(this).closest("tr").find("td:nth-child(4)").text().trim();
+                let userDepartment = $(this).closest("tr").find("td:nth-child(5)").text().trim();
+                let userRoles = $(this).closest("tr").find("td:nth-child(6)").text().trim().split(
                     /\s*,\s*/);
 
                 $("#modalUserId").val(userId);
                 $("#editUserName").val(userName);
+                $("#editUserGender").val(userGender);
                 $("#editUserEmail").val(userEmail);
                 $("#editUserDepartment").val(userDepartment);
 
