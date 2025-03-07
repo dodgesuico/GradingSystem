@@ -67,7 +67,7 @@ class PDFController extends Controller
         $pdf->SetFont('helvetica', 'B', 8);
         $pdf->Cell(120, 5, "NAME: " . strtoupper($user->name), 0, 0, 'L');
         $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell(50, 5, "Sex: TBD", 0, 0, 'L');  // Adjust gender if available
+        $pdf->Cell(50, 5, "Sex: ". $user->gender, 0, 0, 'L');  // Adjust gender if available
         $pdf->Cell(50, 5, "ID No: " . $user->studentID, 0, 1, 'L');
         $pdf->SetFont('helvetica', 'B', 8);
         $pdf->Cell(100, 1, "Course: Bachelor of Science in Computer Science", 0, 1, 'L'); // Adjust course dynamically if needed
