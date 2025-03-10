@@ -1,0 +1,29 @@
+*for backup*
+Use the following Laravel command to create a backup:
+php artisan backup:run --only-db
+
+*where to find the back up*
+By default, Laravel saves the backup file in:
+C:\GradingSystem\storage\app\private\Laravel
+
+
+
+
+*for restoring the database*
+Step 1: Open PowerShell or Command Prompt
+C:\xampp\mysql\bin\mysql.exe -u root -p
+Enter your MySQL password (if no password, just press Enter).
+
+Step 2: Select Your Database
+Once inside MySQL, run:
+USE gradingsystem;
+
+Step 3: Restore the Backup
+Exit MySQL (exit;) and run this command from PowerShell or CMD:
+Get-Content "C:\GradingSystem\storage\app\private\Laravel\mysql-gradingsystem.sql" | & "C:\xampp\mysql\bin\mysql.exe" -u root -p gradingsystem
+Enter the password when prompted.
+
+
+Alternative (Direct Import)
+If you prefer a direct method, you can run:
+C:\xampp\mysql\bin\mysql.exe -u root -p gradingsystem < "C:\GradingSystem\storage\app\private\Laravel\mysql-gradingsystem.sql"

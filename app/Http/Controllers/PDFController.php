@@ -29,7 +29,7 @@ class PDFController extends Controller
 
         // Create PDF instance
         $pdf = new CustomPDF('P', 'mm', array(215.9, 330.2), true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
+        // $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor('CKCM Grading System');
         $pdf->SetTitle('Student Grades');
         $pdf->SetSubject('User Grades');
