@@ -135,10 +135,8 @@
                                     <th>Gender</th>
                                     <th>Email</th>
                                     <th>Department</th>
-
-                                    @if (Auth::user() && str_contains(Auth::user()->role, 'dean'))
                                     <th>Actions</th>
-                                    @endif
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -152,14 +150,14 @@
                                         <td>{{ $classes_students->email }}</td>
                                         <td>{{ $classes_students->department }}</td>
 
-                                        @if (Auth::user() && str_contains(Auth::user()->role, 'dean'))
+
                                             <td style="text-align:center;">
 
                                                 <button class="delete-btn"
                                                     onclick="openDeleteClassModal({{ $classes_students->id }})"><i
                                                         class="fa-solid fa-trash"></i>Remove</button>
                                             </td>
-                                        @endif
+
                                     </tr>
 
 
@@ -655,6 +653,7 @@
                     <thead>
                         <tr>
                             <th>Student</th>
+                            <th>Department</th>
                             <th>Prelim</th>
                             <th class="raw-column" style="display: none;">Midterm (Raw)</th> <!-- Display only -->
                             <th>Midterm</th>
@@ -669,6 +668,7 @@
                         @foreach ($classes_student as $student)
                             <tr>
                                 <td>{{ $student->name }}</td>
+                                <td>{{ $student->department }}</td>
                                 <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
                                 <td class="raw-column" style="display: none;">
                                     {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td>
@@ -716,7 +716,7 @@
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
 
                 {{-- ✅ Show the button only if submit_status is "Returned" --}}
-                @if ($finalGrades->isNotEmpty() && $finalGrades->first()->submit_status == 'Returned')
+                @if ($finalGrades->isNotEmpty() && (empty($finalGrades->first()->submit_status) || $finalGrades->first()->submit_status == 'Returned'))
                     {{-- ✅ Check if the user is an instructor AND their name matches the instructor --}}
                     @if (
                         Auth::check() &&

@@ -9,6 +9,7 @@ use App\Models\QuizzesAndScores;
 use App\Models\Classes_Student;
 use App\Models\Classes;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 
@@ -97,16 +98,31 @@ class RegistrarController extends Controller
         }
     }
 
+
     public function show(Request $request, Classes $class)
     {
+        $user = Auth::user();
+        $userRoles = explode(',', $user->role);
 
-        $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
+        // ✅ Check if the user has the "dean" role
+        if (in_array('dean', $userRoles)) {
+            $userDepartment = $user->department;
+
+            // ✅ Now filter the students in classes_student based on the department
+            $classes_student = Classes_Student::where('classID', $class->id)
+                ->where('department', $userDepartment)
+                ->get();
+        } else {
+            // ✅ If not a dean, show all students in the class
+            $classes_student = Classes_Student::where('classID', $class->id)->get();
+        }
+
+        // ✅ Fetch everything else
+        $enrolledStudentIds = $classes_student->pluck('studentID')->toArray();
 
         $students = User::where('role', 'student')
-            ->whereNotIn('studentID', $enrolledStudentIds)
+            ->whereIn('studentID', $enrolledStudentIds)
             ->get();
-
-        $classes_student = Classes_Student::where('classID', $class->id)->get();
 
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
 
@@ -118,6 +134,8 @@ class RegistrarController extends Controller
 
         return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'finalGrades'));
     }
+
+
 
 
     public function addstudent(Request $request, Classes $class)
