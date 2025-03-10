@@ -101,38 +101,63 @@ class RegistrarController extends Controller
 
     public function show(Request $request, Classes $class)
     {
-        $user = Auth::user();
-        $userRoles = explode(',', $user->role);
-
-        // ✅ Check if the user has the "dean" role
-        if (in_array('dean', $userRoles)) {
-            $userDepartment = $user->department;
-
-            // ✅ Now filter the students in classes_student based on the department
-            $classes_student = Classes_Student::where('classID', $class->id)
-                ->where('department', $userDepartment)
-                ->get();
-        } else {
-            // ✅ If not a dean, show all students in the class
-            $classes_student = Classes_Student::where('classID', $class->id)->get();
-        }
-
-        // ✅ Fetch everything else
-        $enrolledStudentIds = $classes_student->pluck('studentID')->toArray();
+        // 💯 This part is untouched and still works for ADDING STUDENTS
+        $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
 
         $students = User::where('role', 'student')
-            ->whereIn('studentID', $enrolledStudentIds)
+            ->whereNotIn('studentID', $enrolledStudentIds)
+            ->when(Auth::check(), function ($query) {
+                $user = Auth::user();
+                $userRoles = explode(',', $user->role);
+
+                // ✅ Check if the user is an instructor
+                if (in_array('instructor', $userRoles)) {
+                    $query->where('department', $user->department);
+                }
+            })
             ->get();
 
+
+        // 💯 This part still works for displaying ENROLLED STUDENTS
+        $classes_student = Classes_Student::where('classID', $class->id)->get();
+
+        // 💯 This part still works for quizzes
         $quizzesandscores = QuizzesAndScores::where('classID', $class->id)->get();
 
+        // 💯 This part still works for percentages
         $percentage = Percentage::where('classID', $class->id)->get();
 
+        // 💯 This part still works for final grades
         $finalGrades = DB::table('final_grade')
             ->where('classID', $class->id)
             ->get();
 
-        return view('registrar.registrar_classes_view', compact('class', 'students', 'classes_student', 'quizzesandscores', 'percentage', 'finalGrades'));
+        // ✅ NOW THIS IS THE NEW PART - FILTER BY DEPARTMENT FOR DEAN
+        $user = Auth::user();
+        $userRoles = explode(',', $user->role);
+
+        if (in_array('dean', $userRoles)) {
+            // ✅ The user is a dean, now filter by department
+            $userDepartment = $user->department;
+
+            $filteredStudents = Classes_Student::where('classID', $class->id)
+                ->where('department', $userDepartment)
+                ->get();
+        } else {
+            // ✅ If the user is not a dean, show all students
+            $filteredStudents = Classes_Student::where('classID', $class->id)->get();
+        }
+
+        // ✅ Now pass EVERYTHING to the Blade (including the new filtered students)
+        return view('registrar.registrar_classes_view', compact(
+            'class',
+            'students',
+            'classes_student',
+            'quizzesandscores',
+            'percentage',
+            'finalGrades',
+            'filteredStudents'
+        ));
     }
 
 

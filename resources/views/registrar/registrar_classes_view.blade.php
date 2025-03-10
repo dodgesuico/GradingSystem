@@ -665,7 +665,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($classes_student as $student)
+                        @foreach ($filteredStudents as $student)
                             <tr>
                                 <td>{{ $student->name }}</td>
                                 <td>{{ $student->department }}</td>
