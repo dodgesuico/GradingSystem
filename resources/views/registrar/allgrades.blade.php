@@ -22,19 +22,17 @@
                 <thead>
                     <tr>
                         {{-- <th>ID</th> --}}
+                        <th>Class ID</th>
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Gender</th>
-                        <th>Email</th>
                         <th>Department</th>
-                        <th>Class ID</th>
+
                         <th>Subject Code</th>
                         <th>Descriptive Title</th>
-                        <th>Units</th>
                         <th>Instructor</th>
                         <th>Academic Period</th>
                         <th>Academic Year</th>
-                        <th>Schedule</th>
 
                         <th>Prelim</th>
                         <th>Midterm</th>
@@ -72,24 +70,22 @@
                             gradesTable.innerHTML += `
                             <tr>
 
+                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.classID}</td>
+
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.studentID}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.name}</td>\
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.gender}</td>
-                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.email}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.department}</td>
-                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.classID}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.subject_code}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.descriptive_title}</td>
-                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.units}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.instructor}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_period}</td>
                                 <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.academic_year}</td>
-                                <td style="border: 0; border-bottom: 1px solid var(--color7);">${grade.schedule}</td>
-                                <td  style="background:var(--color9b)">${grade.prelim ?? 'N/A'}</td>
-                                <td  style="background:var(--color9b)">${grade.midterm ?? 'N/A'}</td>
-                                <td  style="background:var(--color9b)">${grade.semi_finals ?? 'N/A'}</td>
-                                <td  style="background:var(--color9b)">${grade.final ?? 'N/A'}</td>
-                                <td  style="background:var(--color9b)">${grade.remarks ?? 'N/A'}</td>
+                                <td style="background:var(--color9b)">${grade.prelim ?? 'N/A'} </td>
+                                <td style="background:var(--color9b)">${grade.midterm ?? 'N/A'} </td>
+                                <td style="background:var(--color9b)">${grade.semi_finals ?? 'N/A'} </td>
+                                <td style="background:var(--color9b)">${grade.final ?? 'N/A'} </td>
+                                <td style="background:var(--color9b)">${grade.remarks ?? 'N/A'} </td>
 
 
                             </tr>
