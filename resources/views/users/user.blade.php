@@ -12,7 +12,7 @@
                 value="{{ request('search') }}">
 
             <select name="department" id="department">
-                <option value="" {{ request('department') ? '' : 'selected' }}>Filter by Department</option>
+                <option value="" {{ is_null(request('department')) ? 'selected' : '' }}>Filter by Department</option>
                 @foreach ($departments as $dept)
                     <option value="{{ $dept }}" {{ request('department') == $dept ? 'selected' : '' }}>
                         {{ $dept }}
@@ -28,6 +28,8 @@
                     </option>
                 @endforeach
             </select>
+
+            <button>Search</button>
 
         </form>
 

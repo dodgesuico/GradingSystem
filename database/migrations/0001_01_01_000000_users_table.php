@@ -33,7 +33,7 @@ return new class extends Migration
                 ['studentID' => '222222', 'name' => 'Neil Vincent Canama', 'gender' => 'male', 'email' => 'Vincent@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
                 ['studentID' => '242424', 'name' => 'Marjon D. Ligan', 'gender' => 'male', 'email' => 'Ligan@ckcm.edu.ph', 'department' => 'College of Business Administration', 'password' => bcrypt('12345'), 'role' => 'instructor', 'created_at' => now(), 'updated_at' => now()],
                 ['studentID' => '265624', 'name' => 'Marjun Senarlo', 'gender' => 'male', 'email' => 'Senarlo@ckcm.edu.ph', 'department' => 'College of Computer Science', 'password' => bcrypt('12345'), 'role' => 'dean,instructor,admin', 'created_at' => now(), 'updated_at' => now()],
-                ['studentID' => '256456', 'name' => 'Bevelyn Ganuhay', 'gender' => 'female', 'email' => 'Ganuhay@ckcm.edu.ph', 'department' => '', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
+                ['studentID' => '256456', 'name' => 'Bevelyn Ganuhay', 'gender' => 'female', 'email' => 'Ganuhay@ckcm.edu.ph', 'department' => 'N/A', 'password' => bcrypt('12345'), 'role' => 'registrar', 'created_at' => now(), 'updated_at' => now()],
 
             ]);
         }
