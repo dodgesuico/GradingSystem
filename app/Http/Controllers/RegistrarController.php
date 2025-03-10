@@ -442,7 +442,9 @@ class RegistrarController extends Controller
         // ✅ If the Dean selects "Returned", also update submit_status to "Returned"
         if ($request->dean_status == 'Returned') {
             $updateData['submit_status'] = 'Returned';
-            $updateData['dean_status'] = '';
+        }
+        if ($request->dean_status == 'Confirmed') {
+            $updateData['dean_status'] = 'Confirmed';
         }
 
         // ✅ Update the record in the database

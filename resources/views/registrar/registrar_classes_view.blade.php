@@ -634,13 +634,18 @@
             </button>
         </div>
 
-        <h3
-            style="color: {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
+        <h3 style="color: {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
             Status:
             <strong>
                 {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'Locked' : 'Not Locked Yet' }}
             </strong>
+
+            Submit Status:
+            <strong>
+                {{ $finalGrades->isNotEmpty() && $finalGrades->first()->submit_status == 'Submitted' ? 'Submitted' : 'Returned'}}
+            </strong>
         </h3>
+
 
         <div class="grade-sheet-container">
             <form action="{{ route('finalgrade.lock') }}" method="POST">
@@ -737,7 +742,10 @@
 
 
 
-                @if ($finalGrades->isNotEmpty() && $finalGrades->first()->submit_status == 'Submitted')
+                @if ($finalGrades->isNotEmpty()
+                    && $finalGrades->first()->submit_status == 'Submitted'
+                    && $finalGrades->first()->dean_status != 'Confirmed') {{-- ✅ Hide if Confirmed --}}
+
                     {{-- ✅ Split the roles by comma and check if "dean" exists --}}
                     @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
                         <h4 style="margin-top: 20px;">Dean's Decision</h4>
@@ -767,6 +775,26 @@
                             {{-- ✅ Submit Button --}}
                             <button type="submit" class="btn btn-primary">
                                 <i class="fa-solid fa-check"></i> Submit Decision
+                            </button>
+                        </form>
+                    @endif
+                @endif
+
+                @if ($finalGrades->isNotEmpty()
+                    && $finalGrades->first()->submit_status == 'Submitted'
+                    && $finalGrades->first()->dean_status == 'Confirmed') {{-- ✅ Show only if Confirmed --}}
+
+                    {{-- ✅ Split the roles by comma and check if "instructor" exists --}}
+                    @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role))) {{-- ✅ Check if the instructor owns the class --}}
+
+                        <form style="margin-top: 10px;" action="" method="POST">
+                            @csrf
+                            @method('POST')
+                            <input type="hidden" name="classID" value="{{ $finalGrades->first()->classID }}">
+
+                            {{-- ✅ Submit Button --}}
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa-solid fa-file-export"></i> Submit Final Grades
                             </button>
                         </form>
                     @endif
