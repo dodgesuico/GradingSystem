@@ -113,7 +113,7 @@
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
                     <h2 style="margin:10px 0;">Class Students List</h2>
 
-                    @if (Auth::user() && str_contains(Auth::user()->role, 'dean'))
+                    @if (Auth::user() && str_contains(Auth::user()->role, 'dean') || str_contains(Auth::user()->role, 'instructor'))
                         <button class="add-btn" onclick="openAddStudentModal()">
                             <i class="fa-solid fa-plus"></i> Add Student
                         </button>
@@ -709,22 +709,76 @@
             </form>
 
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
-                <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0"
-                        onclick="return confirm('Are you sure you want to unlock grades?')">
-                        <i class="fa-solid fa-lock"></i> Unlock Grades
-                    </button>
-                </form>
 
-                <form action="{{ route('finalgrade.save') }}" method="POST" style="display:inline;">
-                    @csrf
-                    @method('POST')
-                    <button type="submit" class="save-btn">
-                        <i class="fa-solid fa-file-export"></i> Submit
-                    </button>
-                </form>
+                {{-- ✅ Show the button only if submit_status is "Returned" --}}
+                @if ($finalGrades->isNotEmpty() && $finalGrades->first()->submit_status == 'Returned')
+                    {{-- ✅ Check if the user is an instructor AND their name matches the instructor --}}
+                    @if (
+                        Auth::check() &&
+                        in_array('instructor', explode(',', Auth::user()->role)) &&
+                        Auth::user()->name === $finalGrades->first()->instructor
+                    )
+                        <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0"
+                                onclick="return confirm('Are you sure you want to unlock grades?')">
+                                <i class="fa-solid fa-lock"></i> Unlock Grades
+                            </button>
+                        </form>
+
+                        <form action="{{ route('finalgrade.save') }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="save-btn">
+                                <i class="fa-solid fa-file-export"></i> Submit to Dean
+                            </button>
+                        </form>
+                    @endif
+                @endif
+
+
+
+                @if ($finalGrades->isNotEmpty() && $finalGrades->first()->submit_status == 'Submitted')
+                    {{-- ✅ Split the roles by comma and check if "dean" exists --}}
+                    @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
+                        <h4 style="margin-top: 20px;">Dean's Decision</h4>
+                        <form action="{{ route('finalgrade.decision') }}" method="POST">
+                            @csrf
+                            @method('POST')
+                            <input type="hidden" name="classID" value="{{ $finalGrades->first()->classID }}">
+
+                            {{-- ✅ Radio Button for "Confirmed" --}}
+                            <div style="margin-bottom: 10px;">
+                                <input type="radio" id="confirmed" name="dean_status" value="Confirmed" required>
+                                <label for="confirmed">✔️ Confirmed</label>
+                            </div>
+
+                            {{-- ✅ Radio Button for "Returned" --}}
+                            <div style="margin-bottom: 10px;">
+                                <input type="radio" id="returned" name="dean_status" value="Returned" required>
+                                <label for="returned">❌ Returned</label>
+                            </div>
+
+                            {{-- ✅ Comment Box (only for Returned) --}}
+                            <div style="margin-bottom: 10px;">
+                                <textarea name="comment" rows="3" class="form-control"
+                                    placeholder="Add a comment (optional, only if returned)..."></textarea>
+                            </div>
+
+                            {{-- ✅ Submit Button --}}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-check"></i> Submit Decision
+                            </button>
+                        </form>
+                    @endif
+                @endif
+
+
+
+
             @endif
+
+
+
         </div>
 
         <style>

@@ -73,6 +73,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/savefinalgrade', [RegistrarController::class, 'SubmitGrades'])->name('finalgrade.save');
     Route::post('/unlockfinalgrade', [RegistrarController::class, 'UnlockGrades'])->name('finalgrade.unlock');
 
+    Route::post('/finalgrade/decision', [RegistrarController::class, 'submitDecision'])->name('finalgrade.decision');
+
     // for action access
     Route::post('/class/verify-password', [RegistrarController::class, 'verifyPassword'])->name('class.verifyPassword');
 

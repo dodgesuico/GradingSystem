@@ -384,62 +384,24 @@ class RegistrarController extends Controller
         DB::beginTransaction();
 
         try {
-            foreach ($finalGrades as $grade) {
-                $classInfo = Classes::find($grade->classID);
-                $studentInfo = Classes_Student::where('studentID', $grade->studentID)->first();
-
-                // Insert into grade_logs
-                DB::table('grade_logs')->insert([
-                    'classID' => $grade->classID,
-                    'studentID' => $grade->studentID,
-                    'subject_code' => optional($classInfo)->subject_code,
-                    'descriptive_title' => optional($classInfo)->descriptive_title,
-                    'units' => optional($classInfo)->units,
-                    'instructor' => optional($classInfo)->instructor,
-                    'academic_period' => optional($classInfo)->academic_period,
-                    'academic_year' => optional($classInfo)->academic_year,
-                    'schedule' => optional($classInfo)->schedule,
-                    'name' => optional($studentInfo)->name,
-                    'gender' => optional($studentInfo)->gender,
-                    'email' => optional($studentInfo)->email,
-                    'department' => optional($studentInfo)->department,
-                    'prelim' => $grade->prelim,
-                    'midterm' => $grade->midterm,
-                    'semi_finals' => $grade->semi_finals,
-                    'final' => $grade->final,
-                    'remarks' => $grade->remarks,
-                    'status' => 'Submitted', // Change status to indicate submission
-                    'created_at' => now(),
+            // Update only the submit_status to "Submitted"
+            DB::table('final_grade')
+                ->where('status', 'Locked')
+                ->update([
+                    'submit_status' => 'Submitted',
                     'updated_at' => now(),
                 ]);
-
-                // Delete student's quiz scores
-                DB::table('quizzes_scores')
-                    ->where('classID', $grade->classID)
-                    ->where('studentID', $grade->studentID)
-                    ->delete();
-
-                // Delete student from classes_student
-                DB::table('classes_student')
-                    ->where('classID', $grade->classID)
-                    ->where('studentID', $grade->studentID)
-                    ->delete();
-            }
-
-            // Delete all submitted grades from final_grade
-            DB::table('final_grade')->where('status', 'Locked')->delete();
 
             // Commit transaction if everything is successful
             DB::commit();
 
-            return back()->with('success', 'Final grades have been submitted, and students have been removed from the class.');
+            return back()->with('success', 'Final grades have been submitted successfully!');
         } catch (\Exception $e) {
             // Rollback transaction on failure
             DB::rollBack();
             return back()->with('error', 'An error occurred while submitting grades: ' . $e->getMessage());
         }
     }
-
 
 
 
@@ -461,5 +423,34 @@ class RegistrarController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function submitDecision(Request $request)
+    {
+        // Validate the input
+        $request->validate([
+            'dean_status' => 'required',
+            'classID' => 'required',
+            'comment' => 'nullable|string'
+        ]);
 
+        // Build the update array
+        $updateData = [
+            'dean_status' => $request->dean_status,
+            'comment' => $request->comment,
+            'updated_at' => now()
+        ];
+
+        // ✅ If the Dean selects "Returned", also update submit_status to "Returned"
+        if ($request->dean_status == 'Returned') {
+            $updateData['submit_status'] = 'Returned';
+            $updateData['dean_status'] = '';
+        }
+
+        // ✅ Update the record in the database
+        DB::table('final_grade')
+            ->where('classID', $request->classID)
+            ->update($updateData);
+
+        // ✅ Success message
+        return back()->with('success', 'Dean’s decision has been submitted successfully!');
+    }
 }

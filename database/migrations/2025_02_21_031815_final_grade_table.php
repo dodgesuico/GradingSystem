@@ -31,6 +31,10 @@ return new class extends Migration
                 $table->decimal('final', 5,2);
                 $table->string('remarks')->nullable();
                 $table->string('status')->nullable();
+                $table->string('submit_status')->nullable();
+                $table->string('dean_status')->nullable();
+                $table->string('registrar_status')->nullable();
+                $table->string('comment')->nullable();
                 $table->timestamps();
             });
         }
