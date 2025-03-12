@@ -411,6 +411,7 @@ class RegistrarController extends Controller
         return back()->with('success', 'Grades have been initialized successfully!');
     }
 
+
     public function lockInGrades(Request $request)
     {
         // Check if the grades are empty or null
@@ -457,47 +458,47 @@ class RegistrarController extends Controller
 
 
 
-    public function SubmitGrades()
+    public function SubmitGrades(Request $request)
     {
-        // Get all locked grades from final_grade table
-        $finalGrades = DB::table('final_grade')->where('status', 'Locked')->get();
+        $department = $request->input('department');
+        $classID = $request->input('classID'); // 🔥 Include classID
 
-        // Check if there are any locked grades
-        if ($finalGrades->isEmpty()) {
-            return back()->with('error', 'No locked grades found to submit.');
+        if (!$department || !$classID) {
+            return back()->with('error', 'Invalid request. No department or class selected.');
         }
 
-        // Start a transaction to ensure atomicity
-        DB::beginTransaction();
+        // Update submit_status to 'Submitted' for locked grades in the selected department and class
+        DB::table('final_grade')
+            ->where('department', $department)
+            ->where('classID', $classID) // 🔥 Ensure only this class is affected
+            ->where('status', 'Locked')
+            ->update([
+                'submit_status' => 'Submitted',
+                'updated_at' => now(),
+            ]);
 
-        try {
-            // Update only the submit_status to "Submitted"
-            DB::table('final_grade')
-                ->where('status', 'Locked')
-                ->update([
-                    'submit_status' => 'Submitted',
-                    'updated_at' => now(),
-                ]);
+        return back()->with('success', "Grades for $department (Class ID: $classID) have been submitted!");
+    }
 
-            // Commit transaction if everything is successful
-            DB::commit();
+    public function UnlockGrades(Request $request)
+    {
+        $department = $request->input('department');
+        $classID = $request->input('classID'); // 🔥 Include classID
 
-            return back()->with('success', 'Final grades have been submitted successfully!');
-        } catch (\Exception $e) {
-            // Rollback transaction on failure
-            DB::rollBack();
-            return back()->with('error', 'An error occurred while submitting grades: ' . $e->getMessage());
+        if (!$department || !$classID) {
+            return back()->with('error', 'Invalid request. No department or class selected.');
         }
+
+        // Unlock grades only for the specified department and class
+        DB::table('final_grade')
+            ->where('department', $department)
+            ->where('classID', $classID) // 🔥 Ensure only this class is affected
+            ->update(['status' => null]);
+
+        return back()->with('success', "Final grades for $department (Class ID: $classID) have been unlocked!");
     }
 
 
-
-    public function UnlockGrades()
-    {
-        DB::table('final_grade')->update(['status' => null]);
-
-        return back()->with('success', 'Final grades have been unlocked successfully!');
-    }
 
     public function verifyPassword(Request $request)
     {
@@ -510,36 +511,41 @@ class RegistrarController extends Controller
         return response()->json(['success' => true]);
     }
 
+
     public function submitDecision(Request $request)
     {
-        // Validate the input
+        // Validate input
         $request->validate([
             'dean_status' => 'required',
             'classID' => 'required',
+            'department' => 'required', // 🔥 Ensure department is required
             'comment' => 'nullable|string'
         ]);
 
-        // Build the update array
+        // Build update data
         $updateData = [
             'dean_status' => $request->dean_status,
             'comment' => $request->comment,
             'updated_at' => now()
         ];
 
-        // ✅ If the Dean selects "Returned", also update submit_status to "Returned"
+        // ✅ If "Returned", also update submit_status
         if ($request->dean_status == 'Returned') {
             $updateData['submit_status'] = 'Returned';
         }
+
+        // ✅ If "Confirmed", update submit_status to "Confirmed"
         if ($request->dean_status == 'Confirmed') {
-            $updateData['dean_status'] = 'Confirmed';
+            $updateData['submit_status'] = 'Submitted';
         }
 
-        // ✅ Update the record in the database
+        // ✅ Update only records matching classID and department
         DB::table('final_grade')
             ->where('classID', $request->classID)
+            ->where('department', $request->department)
             ->update($updateData);
 
-        // ✅ Success message
         return back()->with('success', 'Dean’s decision has been submitted successfully!');
     }
+
 }
