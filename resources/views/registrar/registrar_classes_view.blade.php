@@ -103,12 +103,16 @@
 
         @php
             $allLocked = true;
-            foreach ($finalGrades->groupBy('department') as $department => $grades) {
-                // ✅ Now we're checking if ANY grade has "Locked"
-                if ($grades->where('status', 'Locked')->isEmpty()) {
-                    $allLocked = false;
-                    break;
+            if ($finalGrades->isNotEmpty()) {
+                foreach ($finalGrades->groupBy('department') as $department => $grades) {
+                    // ✅ Check if ANY grade has "Locked"
+                    if ($grades->where('status', 'Locked')->isEmpty()) {
+                        $allLocked = false;
+                        break;
+                    }
                 }
+            } else {
+                $allLocked = false; // ✅ If no students, don't hide it
             }
         @endphp
 
@@ -121,7 +125,7 @@
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
                     <h2 style="margin:10px 0;">Class Students List</h2>
 
-                    @if (Auth::user() && str_contains(Auth::user()->role, 'dean') || str_contains(Auth::user()->role, 'instructor'))
+                    @if ((Auth::user() && str_contains(Auth::user()->role, 'dean')) || str_contains(Auth::user()->role, 'instructor'))
                         <button class="add-btn" onclick="openAddStudentModal()">
                             <i class="fa-solid fa-plus"></i> Add Student
                         </button>
@@ -159,12 +163,12 @@
                                         <td>{{ $classes_students->department }}</td>
 
 
-                                            <td style="text-align:center;">
+                                        <td style="text-align:center;">
 
-                                                <button class="delete-btn"
-                                                    onclick="openDeleteClassModal({{ $classes_students->id }})"><i
-                                                        class="fa-solid fa-trash"></i>Remove</button>
-                                            </td>
+                                            <button class="delete-btn"
+                                                onclick="openDeleteClassModal({{ $classes_students->id }})"><i
+                                                    class="fa-solid fa-trash"></i>Remove</button>
+                                        </td>
 
                                     </tr>
 
@@ -424,12 +428,33 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                let isLocked = @json($finalGrades->isNotEmpty() && $finalGrades->first()->status);
-                if (isLocked) {
+                let finalGrades = @json($finalGrades->groupBy('department'));
+
+                // ✅ If no grades exist at all, don't hide anything
+                if (Object.keys(finalGrades).length === 0) {
+                    return;
+                }
+
+                // ✅ Check if ALL departments have status "Locked"
+                let allLocked = true;
+                Object.values(finalGrades).forEach(function(grades) {
+                    let hasUnlocked = grades.some(function(grade) {
+                        return grade.status !== 'Locked';
+                    });
+
+                    // ✅ If there's at least one unlocked department, don't hide it
+                    if (hasUnlocked) {
+                        allLocked = false;
+                    }
+                });
+
+                // ✅ Now hide or show the form based on the result
+                if (allLocked) {
                     document.getElementById("grade-content").style.display = "none";
                 }
             });
         </script>
+
 
         <style>
             .grading-score-section {
@@ -625,14 +650,6 @@
 
 
 
-
-
-
-
-
-
-
-
         <h2 style="margin: 10px 0">Grades</h2>
 
         <div style="margin-bottom: 10px;">
@@ -641,22 +658,49 @@
             </button>
         </div>
 
-        <h3 style="color: {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
-            Status:
-            <strong>
-                {{ $finalGrades->isNotEmpty() && $finalGrades->first()->status ? 'Locked' : 'Not Locked Yet' }}
-            </strong>
+        <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
+            @csrf
+            @method('POST')
 
-            Submit Status:
-            <strong>
-                {{ $finalGrades->isNotEmpty() && $finalGrades->first()->submit_status == 'Submitted' ? 'Submitted' : 'Returned'}}
-            </strong>
-        </h3>
+            @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
+                @foreach ($studentsByDepartment as $student)
+                    <input type="hidden" name="grades[{{ $student->studentID }}][classID]" value="{{ $student->classID }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][studentID]" value="{{ $student->studentID }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][name]" value="{{ $student->name }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][prelim]" value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][midterm]" value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]" value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][final]" value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                    <input type="hidden" name="grades[{{ $student->studentID }}][remarks]" value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                @endforeach
+            @endforeach
+
+            <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0">
+                <i class="fa-solid fa-lock"></i> Initialize
+            </button>
+        </form>
+
 
 
         <div class="grade-sheet-container">
             @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
                 <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
+
+                @php
+                    $gradesByDepartment = $finalGrades->where('department', $department);
+                @endphp
+
+                <h3 style="color: {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
+                    Status:
+                    <strong>
+                        {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'Locked' : 'Not Locked Yet' }}
+                    </strong>
+
+                    Submit Status:
+                    <strong>
+                        {{ $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->submit_status == 'Submitted' ? 'Submitted' : 'Returned' }}
+                    </strong>
+                </h3>
 
                 <form action="{{ route('finalgrade.lock') }}" method="POST">
                     @csrf
@@ -719,8 +763,18 @@
                         </tbody>
                     </table>
 
+                    @php
+                        // Get only the grades for this specific department
+                        $departmentGrades = $finalGrades->where('department', $department);
+
+                        // Check if this department has ALL grades locked
+                        $isDepartmentLocked =
+                            $departmentGrades->isNotEmpty() &&
+                            $departmentGrades->where('status', 'Locked')->count() === $departmentGrades->count();
+                    @endphp
+
                     <!-- Lock In Button (for this department only) -->
-                    @if ($finalGrades->isEmpty() || !$finalGrades->first()->status)
+                    @if (!$isDepartmentLocked)
                         <button class="save-btn" style="margin-top: 10px">
                             <i class="fa-solid fa-unlock"></i> Lock In {{ $department }} Grades
                         </button>
@@ -732,13 +786,13 @@
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
 
                 {{-- ✅ Show the button only if submit_status is "Returned" --}}
-                @if ($finalGrades->isNotEmpty() && (empty($finalGrades->first()->submit_status) || $finalGrades->first()->submit_status == 'Returned'))
+                @if (
+                    $finalGrades->isNotEmpty() &&
+                        (empty($finalGrades->first()->submit_status) || $finalGrades->first()->submit_status == 'Returned'))
                     {{-- ✅ Check if the user is an instructor AND their name matches the instructor --}}
-                    @if (
-                        Auth::check() &&
-                        in_array('instructor', explode(',', Auth::user()->role)) &&
-                        Auth::user()->name === $finalGrades->first()->instructor
-                    )
+                    @if (Auth::check() &&
+                            in_array('instructor', explode(',', Auth::user()->role)) &&
+                            Auth::user()->name === $finalGrades->first()->instructor)
                         <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0"
@@ -758,9 +812,11 @@
 
 
 
-                @if ($finalGrades->isNotEmpty()
-                    && $finalGrades->first()->submit_status == 'Submitted'
-                    && $finalGrades->first()->dean_status != 'Confirmed') {{-- ✅ Hide if Confirmed --}}
+                @if (
+                    $finalGrades->isNotEmpty() &&
+                        $finalGrades->first()->submit_status == 'Submitted' &&
+                        $finalGrades->first()->dean_status != 'Confirmed')
+                    {{-- ✅ Hide if Confirmed --}}
 
                     {{-- ✅ Split the roles by comma and check if "dean" exists --}}
                     @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
@@ -796,12 +852,15 @@
                     @endif
                 @endif
 
-                @if ($finalGrades->isNotEmpty()
-                    && $finalGrades->first()->submit_status == 'Submitted'
-                    && $finalGrades->first()->dean_status == 'Confirmed') {{-- ✅ Show only if Confirmed --}}
+                @if (
+                    $finalGrades->isNotEmpty() &&
+                        $finalGrades->first()->submit_status == 'Submitted' &&
+                        $finalGrades->first()->dean_status == 'Confirmed')
+                    {{-- ✅ Show only if Confirmed --}}
 
                     {{-- ✅ Split the roles by comma and check if "instructor" exists --}}
-                    @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role))) {{-- ✅ Check if the instructor owns the class --}}
+                    @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
+                        {{-- ✅ Check if the instructor owns the class --}}
 
                         <form style="margin-top: 10px;" action="" method="POST">
                             @csrf

@@ -112,10 +112,14 @@ class RegistrarController extends Controller
 
                 // ✅ Check if the user is an instructor
                 if (in_array('instructor', $userRoles)) {
-                    $query->where('department', $user->department);
+                    // ✅ If the instructor has N/A department, allow all students
+                    if ($user->department !== 'N/A') {
+                        $query->where('department', $user->department);
+                    }
                 }
             })
             ->get();
+
 
 
         // 💯 This part still works for displaying ENROLLED STUDENTS
@@ -159,9 +163,6 @@ class RegistrarController extends Controller
             'filteredStudents'
         ));
     }
-
-
-
 
     public function addstudent(Request $request, Classes $class)
     {
@@ -366,6 +367,49 @@ class RegistrarController extends Controller
         return redirect()->back()->with('success', 'Scores updated successfully.');
     }
 
+    public function initializeGrades(Request $request)
+    {
+        // Check if the grades are empty or null
+        if (empty($request->grades)) {
+            return back()->with('error', 'No students yet, you can\'t initialize.');
+        }
+
+        foreach ($request->grades as $grade) {
+            $classInfo = Classes::find($grade['classID']); // Get class info
+
+            // Fetch student info correctly
+            $studentInfo = Classes_Student::where('studentID', $grade['studentID'])->first();
+
+            // Initialize all grades with "Initialized" status
+            DB::table('final_grade')->updateOrInsert(
+                [
+                    'classID' => $grade['classID'],
+                    'studentID' => $grade['studentID']
+                ],
+                [
+                    'subject_code' => optional($classInfo)->subject_code,
+                    'descriptive_title' => optional($classInfo)->descriptive_title,
+                    'instructor' => optional($classInfo)->instructor,
+                    'academic_period' => optional($classInfo)->academic_period,
+                    'schedule' => optional($classInfo)->schedule,
+                    'name' => optional($studentInfo)->name,
+                    'gender' => optional($studentInfo)->gender,
+                    'email' => optional($studentInfo)->email,
+                    'department' => optional($studentInfo)->department,
+                    'prelim' => $grade['prelim'],
+                    'midterm' => $grade['midterm'],
+                    'semi_finals' => $grade['semi_finals'],
+                    'final' => $grade['final'],
+                    'remarks' => $grade['remarks'],
+                    'status' => '', // ✅ Setting initial status here
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
+
+        return back()->with('success', 'Grades have been initialized successfully!');
+    }
 
     public function lockInGrades(Request $request)
     {
