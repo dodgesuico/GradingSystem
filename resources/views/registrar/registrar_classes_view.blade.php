@@ -683,104 +683,114 @@
 
 
         <div class="grade-sheet-container">
+            @php
+                use Illuminate\Support\Facades\Auth;
+
+                // Get the logged-in user's department
+                $loggedInUserDepartment = Auth::user()->department;
+            @endphp
+
+
             @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
-                <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
-
-                @php
-                    $gradesByDepartment = $finalGrades->where('department', $department);
-                @endphp
-
-                <h3 style="color: {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
-                    Status:
-                    <strong>
-                        {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'Locked' : 'Not Locked Yet' }}
-                    </strong>
-
-                    Submit Status:
-                    <strong>
-                        {{ $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->submit_status == 'Submitted' ? 'Submitted' : 'Returned' }}
-                    </strong>
-                </h3>
-
-                <form action="{{ route('finalgrade.lock') }}" method="POST">
-                    @csrf
-                    @method('POST')
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>Department</th>
-                                <th>Prelim</th>
-                                <th class="raw-column" style="display: none;">Midterm (Raw)</th>
-                                <th>Midterm</th>
-                                <th class="raw-column" style="display: none;">Semi-Finals (Raw)</th>
-                                <th>Semi-Finals</th>
-                                <th class="raw-column" style="display: none;">Finals (Raw)</th>
-                                <th>Final</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($studentsByDepartment as $student)
-                                <tr>
-                                    <td>{{ $student->name }}</td>
-                                    <td>{{ $student->department }}</td>
-                                    <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
-                                    <td class="raw-column" style="display: none;">
-                                        {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}
-                                    </td>
-                                    <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
-                                    <td class="raw-column" style="display: none;">
-                                        {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}
-                                    </td>
-                                    <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
-                                    <td class="raw-column" style="display: none;">
-                                        {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}
-                                    </td>
-                                    <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
-                                    <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
-
-                                    <!-- Hidden inputs -->
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
-                                        value="{{ $student->classID }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
-                                        value="{{ $student->studentID }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][name]"
-                                        value="{{ $student->name }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
-                                        value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
-                                        value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
-                                        value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][final]"
-                                        value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
-                                        value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                @if ($loggedInUserDepartment === 'N/A' || $department === $loggedInUserDepartment)
+                    <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
 
                     @php
-                        // Get only the grades for this specific department
-                        $departmentGrades = $finalGrades->where('department', $department);
-
-                        // Check if this department has ALL grades locked
-                        $isDepartmentLocked =
-                            $departmentGrades->isNotEmpty() &&
-                            $departmentGrades->where('status', 'Locked')->count() === $departmentGrades->count();
+                        $gradesByDepartment = $finalGrades->where('department', $department);
                     @endphp
 
-                    <!-- Lock In Button (for this department only) -->
-                    @if (!$isDepartmentLocked)
-                        <button class="save-btn" style="margin-top: 10px">
-                            <i class="fa-solid fa-unlock"></i> Lock In {{ $department }} Grades
-                        </button>
-                    @endif
-                </form>
-                <br><br>
+                    <h3 style="color: {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
+                        Status:
+                        <strong>
+                            {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'Locked' : 'Not Locked Yet' }}
+                        </strong>
+
+                        Submit Status:
+                        <strong>
+                            {{ $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->submit_status == 'Submitted' ? 'Submitted' : 'Returned' }}
+                        </strong>
+                    </h3>
+
+                    <form action="{{ route('finalgrade.lock') }}" method="POST">
+                        @csrf
+                        @method('POST')
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Department</th>
+                                    <th>Prelim</th>
+                                    <th class="raw-column" style="display: none;">Midterm (Raw)</th>
+                                    <th>Midterm</th>
+                                    <th class="raw-column" style="display: none;">Semi-Finals (Raw)</th>
+                                    <th>Semi-Finals</th>
+                                    <th class="raw-column" style="display: none;">Finals (Raw)</th>
+                                    <th>Final</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($studentsByDepartment as $student)
+                                    <tr>
+                                        <td>{{ $student->name }}</td>
+                                        <td>{{ $student->department }}</td>
+                                        <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
+                                        <td class="raw-column" style="display: none;">
+                                            {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}
+                                        </td>
+                                        <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
+                                        <td class="raw-column" style="display: none;">
+                                            {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}
+                                        </td>
+                                        <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
+                                        <td class="raw-column" style="display: none;">
+                                            {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}
+                                        </td>
+                                        <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
+                                        <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
+
+                                        <!-- Hidden inputs -->
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                                            value="{{ $student->classID }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                                            value="{{ $student->studentID }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                                            value="{{ $student->name }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                                            value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                                            value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                                            value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                                            value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                                            value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        @php
+                            // Get only the grades for this specific department
+                            $departmentGrades = $finalGrades->where('department', $department);
+
+                            // Check if this department has ALL grades locked
+                            $isDepartmentLocked =
+                                $departmentGrades->isNotEmpty() &&
+                                $departmentGrades->where('status', 'Locked')->count() === $departmentGrades->count();
+                        @endphp
+
+                        <!-- Lock In Button (for this department only) -->
+                        @if (!$isDepartmentLocked)
+                            <button class="save-btn" style="margin-top: 10px">
+                                <i class="fa-solid fa-unlock"></i> Lock In {{ $department }} Grades
+                            </button>
+                        @endif
+                    </form>
+                    <br><br>
+                @endif
             @endforeach
 
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
