@@ -548,4 +548,56 @@ class RegistrarController extends Controller
         return back()->with('success', 'Dean’s decision has been submitted successfully!');
     }
 
+
+    public function submitFinalGrades(Request $request)
+    {
+        // Check if the grades are empty or null
+        if (empty($request->grades)) {
+            return back()->with('error', 'No students selected, you can\'t lock.');
+        }
+
+        // 🔥 Get selected department from the form
+        $selectedDepartment = $request->department;
+
+        foreach ($request->grades as $grade) {
+            // 🔹 Ensure we only process students from the selected department
+            $studentInfo = Classes_Student::where('studentID', $grade['studentID'])
+                ->where('department', $selectedDepartment) // ✅ Only match students in selected department
+                ->first();
+
+            if ($studentInfo) {
+                $classInfo = Classes::find($grade['classID']); // Get class info
+
+                // Update or insert the active grade record
+                DB::table('grade_logs')->updateOrInsert(
+                    [
+                        'classID' => $grade['classID'],
+                        'studentID' => $grade['studentID']
+                    ],
+                    [
+                        'subject_code' => optional($classInfo)->subject_code,
+                        'descriptive_title' => optional($classInfo)->descriptive_title,
+                        'instructor' => optional($classInfo)->instructor,
+                        'academic_period' => optional($classInfo)->academic_period,
+                        'academic_year' => optional($classInfo)->academic_year,
+                        'schedule' => optional($classInfo)->schedule,
+                        'name' => $studentInfo->name,
+                        'gender' => $studentInfo->gender,
+                        'email' => $studentInfo->email,
+                        'department' => $selectedDepartment, // ✅ Save only selected department
+                        'prelim' => $grade['prelim'],
+                        'midterm' => $grade['midterm'],
+                        'semi_finals' => $grade['semi_finals'],
+                        'final' => $grade['final'],
+                        'remarks' => $grade['remarks'],
+                        'status' => 'Approved', // Add status field here
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]
+                );
+            }
+        }
+
+        return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been locked successfully!');
+    }
 }

@@ -913,15 +913,31 @@
                                 ($user->department == $department || $user->department == 'N/A') &&
                                 $user->name == $classInstructor
                             )
-                                <form style="margin-top: 10px;" action="" method="POST">
+                                <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}" method="POST">
                                     @csrf
                                     @method('POST')
-                                    <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
+
+                                        <!-- 🔥 Ensure the department is submitted with this hidden input -->
+                                        <input type="hidden" name="department" value="{{ $department }}">
+
+                                        @foreach ($studentsByDepartment as $student)
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][classID]" value="{{ $student->classID }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][studentID]" value="{{ $student->studentID }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][name]" value="{{ $student->name }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][prelim]" value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][midterm]" value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]" value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][final]" value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                            <input type="hidden" name="grades[{{ $student->studentID }}][remarks]" value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                        @endforeach
+
 
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades
+                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades for {{ $department }}
                                     </button>
+
                                 </form>
+
                             @endif
                         @endif
                     @endif
