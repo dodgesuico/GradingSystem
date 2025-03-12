@@ -101,11 +101,19 @@
             @endif
         </div>
 
-        @if (
-            !(
-                $finalGrades->where('classID', $class->id)->isNotEmpty() &&
-                $finalGrades->where('classID', $class->id)->first()->status
-            ))
+        @php
+            $allLocked = true;
+            foreach ($finalGrades->groupBy('department') as $department => $grades) {
+                // ✅ Now we're checking if ANY grade has "Locked"
+                if ($grades->where('status', 'Locked')->isEmpty()) {
+                    $allLocked = false;
+                    break;
+                }
+            }
+        @endphp
+
+
+        @if (!$allLocked)
 
             <div id="grade-content">
 
@@ -411,6 +419,7 @@
                 @endforeach
 
             </div>
+
         @endif
 
         <script>
@@ -646,72 +655,79 @@
 
 
         <div class="grade-sheet-container">
-            <form action="{{ route('finalgrade.lock') }}" method="POST">
-                @csrf
-                @method('POST')
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Department</th>
-                            <th>Prelim</th>
-                            <th class="raw-column" style="display: none;">Midterm (Raw)</th> <!-- Display only -->
-                            <th>Midterm</th>
-                            <th class="raw-column" style="display: none;">Semi-Finals (Raw)</th> <!-- Display only -->
-                            <th>Semi-Finals</th>
-                            <th class="raw-column" style="display: none;">Finals (Raw)</th> <!-- Display only -->
-                            <th>Final</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($filteredStudents as $student)
+            @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
+                <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
+
+                <form action="{{ route('finalgrade.lock') }}" method="POST">
+                    @csrf
+                    @method('POST')
+
+                    <table>
+                        <thead>
                             <tr>
-                                <td>{{ $student->name }}</td>
-                                <td>{{ $student->department }}</td>
-                                <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
-                                <td class="raw-column" style="display: none;">
-                                    {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}</td>
-                                <!-- Display only -->
-                                <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
-                                <td class="raw-column" style="display: none;">
-                                    {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}</td>
-                                <!-- Display only -->
-                                <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
-                                <td class="raw-column" style="display: none;">
-                                    {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}</td>
-                                <!-- Display only -->
-                                <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
-                                <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
-
-                                <!-- Hidden inputs (ONLY SAVING PRELIM, MIDTERM, SEMI-FINALS, FINAL, and REMARKS) -->
-                                <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
-                                    value="{{ $student->classID }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
-                                    value="{{ $student->studentID }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][name]"
-                                    value="{{ $student->name }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
-                                    value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
-                                    value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
-                                    value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][final]"
-                                    value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                                <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
-                                    value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                <th>Student</th>
+                                <th>Department</th>
+                                <th>Prelim</th>
+                                <th class="raw-column" style="display: none;">Midterm (Raw)</th>
+                                <th>Midterm</th>
+                                <th class="raw-column" style="display: none;">Semi-Finals (Raw)</th>
+                                <th>Semi-Finals</th>
+                                <th class="raw-column" style="display: none;">Finals (Raw)</th>
+                                <th>Final</th>
+                                <th>Remarks</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($studentsByDepartment as $student)
+                                <tr>
+                                    <td>{{ $student->name }}</td>
+                                    <td>{{ $student->department }}</td>
+                                    <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
+                                    <td class="raw-column" style="display: none;">
+                                        {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}
+                                    </td>
+                                    <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
+                                    <td class="raw-column" style="display: none;">
+                                        {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}
+                                    </td>
+                                    <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
+                                    <td class="raw-column" style="display: none;">
+                                        {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}
+                                    </td>
+                                    <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
+                                    <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
 
-                <!-- Lock In Button -->
-                @if ($finalGrades->isEmpty() || !$finalGrades->first()->status)
-                    <button class="save-btn" style="margin-top: 10px"><i class="fa-solid fa-unlock"></i> Lock In
-                        Grades</button>
-                @endif
-            </form>
+                                    <!-- Hidden inputs -->
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                                        value="{{ $student->classID }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                                        value="{{ $student->studentID }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                                        value="{{ $student->name }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                                        value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                                        value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                                        value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                                        value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                                        value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <!-- Lock In Button (for this department only) -->
+                    @if ($finalGrades->isEmpty() || !$finalGrades->first()->status)
+                        <button class="save-btn" style="margin-top: 10px">
+                            <i class="fa-solid fa-unlock"></i> Lock In {{ $department }} Grades
+                        </button>
+                    @endif
+                </form>
+                <br><br>
+            @endforeach
 
             @if ($finalGrades->isNotEmpty() && $finalGrades->first()->status)
 
@@ -800,14 +816,13 @@
                     @endif
                 @endif
 
-
-
-
             @endif
 
-
-
         </div>
+
+
+
+
 
         <style>
             /* Styling scoped to the grade-sheet-container to avoid affecting other elements */
