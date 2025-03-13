@@ -261,6 +261,7 @@
                                             <div class="calculation-content">
                                                 <label>Percentage (%)</label>
                                                 <input type="number"
+                                                    id="{{ $key }}_percentage_{{ $term }}"
                                                     name="{{ $key }}_percentage[{{ $term }}]"
                                                     value="{{ old($key . '_percentage.' . $term, $percentageValue) }}"
                                                     min="0" max="100" required>
@@ -268,12 +269,46 @@
                                             <div class="calculation-content">
                                                 <label>Total Score</label>
                                                 <input type="number"
+                                                    id="{{ $key }}_total_score_{{ $term }}"
                                                     name="{{ $key }}_total_score[{{ $term }}]"
                                                     value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
                                                     min="0">
                                             </div>
+                                            <script>
+                                                document.addEventListener("DOMContentLoaded", function() {
+                                                    // Function to restore input value from localStorage
+                                                    function restoreValue(inputId) {
+                                                        let storedValue = localStorage.getItem(inputId);
+                                                        if (storedValue !== null) {
+                                                            document.getElementById(inputId).value = storedValue;
+                                                        }
+                                                    }
+
+                                                    // Function to store input value in localStorage
+                                                    function storeValue(event) {
+                                                        localStorage.setItem(event.target.id, event.target.value);
+                                                    }
+
+                                                    // Target each specific input by ID
+                                                    let percentageInput = document.getElementById("{{ $key }}_percentage_{{ $term }}");
+                                                    let totalScoreInput = document.getElementById("{{ $key }}_total_score_{{ $term }}");
+
+                                                    // Restore saved values on page load
+                                                    if (percentageInput) restoreValue(percentageInput.id);
+                                                    if (totalScoreInput) restoreValue(totalScoreInput.id);
+
+                                                    // Store values when user types
+                                                    if (percentageInput) percentageInput.addEventListener("input", storeValue);
+                                                    if (totalScoreInput) totalScoreInput.addEventListener("input", storeValue);
+                                                });
+                                            </script>
+
+
+
                                         </div>
                                     @endforeach
+
+
                                 </div>
                                 <button type="submit" class="save-btn" style="margin: 5px 0 0 0"><i
                                         class="fa-solid fa-floppy-disk"></i> Save Grading and Total Score</button>
