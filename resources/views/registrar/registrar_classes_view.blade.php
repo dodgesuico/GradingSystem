@@ -828,7 +828,7 @@
                             $isDean = str_contains(auth()->user()->role, 'dean');
 
                             // Ensure we get the instructor's name from the first class record
-                            $classInstructor = $classes->first() ? $classes->first()->instructor : null;
+                            $classInstructor = $classes ? $classes->instructor : null;
 
                             // Compare instructor name safely
                             $isNotInstructor = trim(strtolower($classInstructor)) !== trim(strtolower(auth()->user()->name));
