@@ -435,10 +435,14 @@
                                                         <div class="content-container">
                                                             <div class="cell-content">
                                                                 <input type="number"
+                                                                    id="score_{{ $student ? $student->studentID : 'unknown' }}_{{ $field }}"
                                                                     name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
                                                                     value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
                                                                     min="0" step="0.01">
                                                             </div>
+
+
+
                                                             <div class="cell-content">
                                                                 <p>{{ $transmutedGrade ?? '' }}</p>
                                                             </div>
@@ -466,6 +470,8 @@
             </div>
 
         @endif
+
+
 
         <script>
             document.addEventListener("DOMContentLoaded", function() {
