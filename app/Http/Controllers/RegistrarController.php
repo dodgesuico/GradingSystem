@@ -101,6 +101,9 @@ class RegistrarController extends Controller
 
     public function show(Request $request, Classes $class)
     {
+
+        $classes = Classes::where('id', $class->id)->first();
+
         // 💯 This part is untouched and still works for ADDING STUDENTS
         $enrolledStudentIds = Classes_Student::where('classID', $class->id)->pluck('studentID')->toArray();
 
@@ -155,6 +158,7 @@ class RegistrarController extends Controller
         // ✅ Now pass EVERYTHING to the Blade (including the new filtered students)
         return view('registrar.registrar_classes_view', compact(
             'class',
+            'classes',
             'students',
             'classes_student',
             'quizzesandscores',

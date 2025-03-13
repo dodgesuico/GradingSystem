@@ -114,12 +114,18 @@
             } else {
                 $allLocked = false; // ✅ If no students, don't hide it
             }
+
+             // ✅ Check if the logged-in user is a dean and NOT the instructor
+            $isDean = str_contains(auth()->user()->role, "dean");
+            $isNotInstructor = isset($class->instructor) && $class->instructor !== auth()->user()->name;
+
+            $shouldHide = $allLocked || ($isDean && $isNotInstructor);
         @endphp
 
 
         @if (!$allLocked)
 
-            <div id="grade-content">
+            <div id="grade-content" style="{{ $shouldHide ? 'display: none;' : '' }}">
 
 
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
@@ -429,6 +435,8 @@
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 let finalGrades = @json($finalGrades->groupBy('department'));
+                let classes = @json($classes); // Get classes data
+                let loggedInUser = @json(auth()->user()); // Get logged-in user
 
                 // ✅ If no grades exist at all, don't hide anything
                 if (Object.keys(finalGrades).length === 0) {
@@ -442,18 +450,25 @@
                         return grade.status !== 'Locked';
                     });
 
-                    // ✅ If there's at least one unlocked department, don't hide it
                     if (hasUnlocked) {
                         allLocked = false;
                     }
                 });
 
-                // ✅ Now hide or show the form based on the result
-                if (allLocked) {
+                // ✅ Check if the logged-in user has a "dean" role
+                let isDean = loggedInUser.role.includes("dean");
+
+                // ✅ Check if the logged-in user is NOT the instructor of the class
+                let classInstructor = classes.length > 0 ? classes[0].instructor : null;
+                let isNotInstructor = classInstructor && classInstructor.toLowerCase().trim() !== loggedInUser.name.toLowerCase().trim();
+
+                // ✅ Hide grade calculations if ALL grades are locked OR if the logged-in user is a dean and not the instructor
+                if (allLocked || (isDean && isNotInstructor)) {
                     document.getElementById("grade-content").style.display = "none";
                 }
             });
         </script>
+
 
 
         <style>
@@ -808,14 +823,24 @@
                             $isDepartmentLocked =
                                 $departmentGrades->isNotEmpty() &&
                                 $departmentGrades->where('status', 'Locked')->count() === $departmentGrades->count();
+
+                            // Check if the logged-in user is a dean and not the instructor
+                            $isDean = str_contains(auth()->user()->role, 'dean');
+
+                            // Ensure we get the instructor's name from the first class record
+                            $classInstructor = $classes->first() ? $classes->first()->instructor : null;
+
+                            // Compare instructor name safely
+                            $isNotInstructor = trim(strtolower($classInstructor)) !== trim(strtolower(auth()->user()->name));
                         @endphp
 
                         <!-- Lock In Button (for this department only) -->
-                        @if (!$isDepartmentLocked)
+                        @if (!$isDepartmentLocked && !($isDean && $isNotInstructor))
                             <button class="save-btn" style="margin-top: 10px">
                                 <i class="fa-solid fa-unlock"></i> Lock In {{ $department }} Grades
                             </button>
                         @endif
+
                     </form>
                     <br>
                 @endif
