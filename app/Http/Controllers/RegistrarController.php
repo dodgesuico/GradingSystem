@@ -601,32 +601,29 @@ class RegistrarController extends Controller
                     ->delete();
 
                 // ✅ Save student grade logs (final grades)
-                DB::table('grade_logs')->insert(
-                    [
-                        'classID' => $grade['classID'],
-                        'studentID' => $grade['studentID']
-                    ],
-                    [
-                        'subject_code' => optional($classInfo)->subject_code,
-                        'descriptive_title' => optional($classInfo)->descriptive_title,
-                        'instructor' => optional($classInfo)->instructor,
-                        'academic_period' => optional($classInfo)->academic_period,
-                        'academic_year' => $academicYear,
-                        'schedule' => optional($classInfo)->schedule,
-                        'name' => $studentInfo->name,
-                        'gender' => $studentInfo->gender,
-                        'email' => $studentInfo->email,
-                        'department' => $selectedDepartment,
-                        'prelim' => $grade['prelim'],
-                        'midterm' => $grade['midterm'],
-                        'semi_finals' => $grade['semi_finals'],
-                        'final' => $grade['final'],
-                        'remarks' => $grade['remarks'],
-                        'status' => 'Approved',
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
+                DB::table('grade_logs')->insert([
+                    'classID' => $grade['classID'],
+                    'studentID' => $grade['studentID'],
+                    'subject_code' => optional($classInfo)->subject_code,
+                    'descriptive_title' => optional($classInfo)->descriptive_title,
+                    'units' => optional($classInfo)->units,
+                    'instructor' => optional($classInfo)->instructor,
+                    'academic_period' => optional($classInfo)->academic_period,
+                    'academic_year' => $academicYear,
+                    'schedule' => optional($classInfo)->schedule,
+                    'name' => $studentInfo->name,
+                    'gender' => $studentInfo->gender,
+                    'email' => $studentInfo->email,
+                    'department' => $selectedDepartment,
+                    'prelim' => $grade['prelim'],
+                    'midterm' => $grade['midterm'],
+                    'semi_finals' => $grade['semi_finals'],
+                    'final' => $grade['final'],
+                    'remarks' => $grade['remarks'],
+                    'status' => 'Approved',
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]);
 
                 // ✅ Remove student from `classes_student`
                 Classes_Student::where('studentID', $grade['studentID'])
