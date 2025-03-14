@@ -776,7 +776,12 @@
 
 
             @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
-                @if ($loggedInUserDepartment === 'N/A' || $department === $loggedInUserDepartment)
+                @if (
+                    $loggedInUserDepartment === 'N/A' ||
+                    $department === $loggedInUserDepartment ||
+                    (isset($class->instructor) && $class->instructor === auth()->user()->name)
+                )
+
                     <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
 
                     @php
