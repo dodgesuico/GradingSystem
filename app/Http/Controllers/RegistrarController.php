@@ -109,19 +109,8 @@ class RegistrarController extends Controller
 
         $students = User::where('role', 'student')
             ->whereNotIn('studentID', $enrolledStudentIds)
-            ->when(Auth::check(), function ($query) {
-                $user = Auth::user();
-                $userRoles = explode(',', $user->role);
-
-                // ✅ Check if the user is an instructor
-                if (in_array('instructor', $userRoles)) {
-                    // ✅ If the instructor has N/A department, allow all students
-                    if ($user->department !== 'N/A') {
-                        $query->where('department', $user->department);
-                    }
-                }
-            })
             ->get();
+
 
 
 
