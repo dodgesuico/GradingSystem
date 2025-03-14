@@ -435,11 +435,37 @@
                                                         <div class="content-container">
                                                             <div class="cell-content">
                                                                 <input type="number"
-                                                                    id="score_{{ $student ? $student->studentID : 'unknown' }}_{{ $field }}"
+                                                                    id="score_{{ $student ? $student->studentID : 'unknown' }}_{{ $field }}_{{ $term }}"
                                                                     name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
                                                                     value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
                                                                     min="0" step="0.01">
                                                             </div>
+
+                                                            <script>
+                                                                document.addEventListener("DOMContentLoaded", function() {
+                                                                    document.querySelectorAll("input[id^='score_']").forEach(input => {
+                                                                        let savedValue = localStorage.getItem(input.id);
+                                                                        if (savedValue !== null) {
+                                                                            input.value = parseFloat(savedValue).toFixed(2); // Ensure 2 decimal places
+                                                                        }
+
+                                                                        input.addEventListener("input", function() {
+                                                                            let value = parseFloat(this.value);
+                                                                            if (!isNaN(value)) {
+                                                                                localStorage.setItem(input.id, value); // Save raw value
+                                                                            }
+                                                                        });
+
+                                                                        input.addEventListener("blur", function() {
+                                                                            let value = parseFloat(this.value);
+                                                                            if (!isNaN(value)) {
+                                                                                this.value = value.toFixed(2); // Format on blur
+                                                                                localStorage.setItem(input.id, this.value);
+                                                                            }
+                                                                        });
+                                                                    });
+                                                                });
+                                                            </script>
 
 
 
