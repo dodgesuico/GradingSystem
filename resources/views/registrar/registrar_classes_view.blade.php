@@ -102,30 +102,19 @@
         </div>
 
         @php
-            $allLocked = true;
-            if ($finalGrades->isNotEmpty()) {
-                foreach ($finalGrades->groupBy('department') as $department => $grades) {
-                    // ✅ Check if ANY grade has "Locked"
-                    if ($grades->where('status', 'Locked')->isEmpty()) {
-                        $allLocked = false;
-                        break;
-                    }
-                }
-            } else {
-                $allLocked = false; // ✅ If no students, don't hide it
-            }
-
-             // ✅ Check if the logged-in user is a dean and NOT the instructor
             $isDean = str_contains(auth()->user()->role, "dean");
             $isNotInstructor = isset($class->instructor) && $class->instructor !== auth()->user()->name;
+
+            // ✅ Ensure we only hide if there are grades AND all are locked
+            $allLocked = $finalGrades->isNotEmpty() && $finalGrades->groupBy('department')
+                ->every(fn($grades) => $grades->where('status', 'Locked')->count() === $grades->count());
 
             $shouldHide = $allLocked || ($isDean && $isNotInstructor);
         @endphp
 
+        @if (!$shouldHide)
 
-        @if (!$allLocked)
-
-            <div id="grade-content" style="{{ $shouldHide ? 'display: none;' : '' }}">
+            <div id="grade-content">
 
 
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
@@ -499,42 +488,129 @@
 
 
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                let finalGrades = @json($finalGrades->groupBy('department'));
-                let classes = @json($classes); // Get classes data
-                let loggedInUser = @json(auth()->user()); // Get logged-in user
+        <!-- Add New Student Modal -->
+        <div id="addStudentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Student</h2>
+                    <button class="close" onclick="closeAddStudentModal()">&times;</button>
+                </div>
 
-                // ✅ If no grades exist at all, don't hide anything
-                if (Object.keys(finalGrades).length === 0) {
+                <form action="{{ route('class.addstudent', $class->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="info-container">
+                            <label for="studentSearch">Find Student</label>
+                            <input type="text" id="studentSearch" class="form-control"
+                                placeholder="Search for a student..." oninput="filterStudents()">
+                            <div id="studentDropdown" class="dropdown-menu"></div>
+
+                        </div>
+                        <div class="info-container">
+                            <label for="student_id">Student ID</label>
+                            <input type="text" id="student_id" name="student_id" class="form-control" required readonly>
+                        </div>
+
+                        <div class="info-container">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" class="form-control" required readonly>
+                        </div>
+                        <div class="info-container">
+                            <label for="gender">Gender</label>
+                            <input type="text" id="gender" name="gender" class="form-control" required readonly>
+                        </div>
+                        <div class="info-container">
+                            <label for="email">Email</label>
+                            <input type="text" id="email" name="email" class="form-control" required readonly>
+                        </div>
+                        <div class="info-container">
+                            <label for="department">Department</label>
+                            <input type="text" id="department" name="department" class="form-control" required readonly>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-cancel" onclick="closeAddStudentModal()">Cancel</button>
+                        <button type="submit" class="save-btn"><i class="fa-solid fa-file-arrow-up"></i> Add
+                            Student</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+
+
+        <script>
+            function openAddStudentModal() {
+                document.getElementById('addStudentModal').style.display = 'block';
+            }
+
+            function closeAddStudentModal() {
+                document.getElementById('addStudentModal').style.display = 'none';
+            }
+
+            function fillStudentInfo() {
+                const selectedOption = document.getElementById('student').selectedOptions[0];
+
+                if (selectedOption) {
+                    document.getElementById('student_id').value = selectedOption.getAttribute('data-id');
+                    document.getElementById('name').value = selectedOption.getAttribute('data-name');
+                    document.getElementById('gender').value = selectedOption.getAttribute('data-gender');
+                    document.getElementById('email').value = selectedOption.getAttribute('data-email');
+                    document.getElementById('department').value = selectedOption.getAttribute('data-department');
+                }
+            }
+
+            // Close the modal if the user clicks outside of it
+            window.onclick = function(event) {
+                const modal = document.getElementById('addStudentModal');
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            function filterStudents() {
+                let input = document.getElementById("studentSearch").value.toLowerCase();
+                let dropdown = document.getElementById("studentDropdown");
+                dropdown.innerHTML = ""; // Clear previous results
+
+                if (input.trim() === "") {
+                    dropdown.style.display = "none";
                     return;
                 }
 
-                // ✅ Check if ALL departments have status "Locked"
-                let allLocked = true;
-                Object.values(finalGrades).forEach(function(grades) {
-                    let hasUnlocked = grades.some(function(grade) {
-                        return grade.status !== 'Locked';
-                    });
+                let students = {!! json_encode($students) !!}; // Use existing Blade variable
+                let filtered = students.filter(student =>
+                    student.name.toLowerCase().includes(input) ||
+                    student.email.toLowerCase().includes(input)
+                );
 
-                    if (hasUnlocked) {
-                        allLocked = false;
-                    }
+                if (filtered.length === 0) {
+                    dropdown.style.display = "none";
+                    return;
+                }
+
+                filtered.forEach(student => {
+                    let option = document.createElement("div");
+                    option.classList.add("dropdown-item");
+                    option.textContent = student.name;
+                    option.onclick = function() {
+                        document.getElementById("studentSearch").value = student.name;
+                        document.getElementById("student_id").value = student.studentID;
+                        document.getElementById("name").value = student.name;
+                        document.getElementById("gender").value = student.gender;
+                        document.getElementById("email").value = student.email;
+                        document.getElementById("department").value = student.department;
+                        dropdown.style.display = "none";
+                    };
+                    dropdown.appendChild(option);
                 });
 
-                // ✅ Check if the logged-in user has a "dean" role
-                let isDean = loggedInUser.role.includes("dean");
-
-                // ✅ Check if the logged-in user is NOT the instructor of the class
-                let classInstructor = classes.length > 0 ? classes[0].instructor : null;
-                let isNotInstructor = classInstructor && classInstructor.toLowerCase().trim() !== loggedInUser.name.toLowerCase().trim();
-
-                // ✅ Hide grade calculations if ALL grades are locked OR if the logged-in user is a dean and not the instructor
-                if (allLocked || (isDean && isNotInstructor)) {
-                    document.getElementById("grade-content").style.display = "none";
-                }
-            });
+                dropdown.style.display = "block";
+            }
         </script>
+
 
 
 
@@ -1161,130 +1237,6 @@
         }
     </script>
 
-
-
-    <!-- Add New Student Modal -->
-    <div id="addStudentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Student</h2>
-                <button class="close" onclick="closeAddStudentModal()">&times;</button>
-            </div>
-
-            <form action="{{ route('class.addstudent', $class->id) }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="info-container">
-                        <label for="studentSearch">Find Student</label>
-                        <input type="text" id="studentSearch" class="form-control"
-                            placeholder="Search for a student..." oninput="filterStudents()">
-                        <div id="studentDropdown" class="dropdown-menu"></div>
-
-                    </div>
-                    <div class="info-container">
-                        <label for="student_id">Student ID</label>
-                        <input type="text" id="student_id" name="student_id" class="form-control" required readonly>
-                    </div>
-
-                    <div class="info-container">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" class="form-control" required readonly>
-                    </div>
-                    <div class="info-container">
-                        <label for="gender">Gender</label>
-                        <input type="text" id="gender" name="gender" class="form-control" required readonly>
-                    </div>
-                    <div class="info-container">
-                        <label for="email">Email</label>
-                        <input type="text" id="email" name="email" class="form-control" required readonly>
-                    </div>
-                    <div class="info-container">
-                        <label for="department">Department</label>
-                        <input type="text" id="department" name="department" class="form-control" required readonly>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-cancel" onclick="closeAddStudentModal()">Cancel</button>
-                    <button type="submit" class="save-btn"><i class="fa-solid fa-file-arrow-up"></i> Add
-                        Student</button>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-
-
-    <script>
-        function openAddStudentModal() {
-            document.getElementById('addStudentModal').style.display = 'block';
-        }
-
-        function closeAddStudentModal() {
-            document.getElementById('addStudentModal').style.display = 'none';
-        }
-
-        function fillStudentInfo() {
-            const selectedOption = document.getElementById('student').selectedOptions[0];
-
-            if (selectedOption) {
-                document.getElementById('student_id').value = selectedOption.getAttribute('data-id');
-                document.getElementById('name').value = selectedOption.getAttribute('data-name');
-                document.getElementById('gender').value = selectedOption.getAttribute('data-gender');
-                document.getElementById('email').value = selectedOption.getAttribute('data-email');
-                document.getElementById('department').value = selectedOption.getAttribute('data-department');
-            }
-        }
-
-        // Close the modal if the user clicks outside of it
-        window.onclick = function(event) {
-            const modal = document.getElementById('addStudentModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        function filterStudents() {
-            let input = document.getElementById("studentSearch").value.toLowerCase();
-            let dropdown = document.getElementById("studentDropdown");
-            dropdown.innerHTML = ""; // Clear previous results
-
-            if (input.trim() === "") {
-                dropdown.style.display = "none";
-                return;
-            }
-
-            let students = {!! json_encode($students) !!}; // Use existing Blade variable
-            let filtered = students.filter(student =>
-                student.name.toLowerCase().includes(input) ||
-                student.email.toLowerCase().includes(input)
-            );
-
-            if (filtered.length === 0) {
-                dropdown.style.display = "none";
-                return;
-            }
-
-            filtered.forEach(student => {
-                let option = document.createElement("div");
-                option.classList.add("dropdown-item");
-                option.textContent = student.name;
-                option.onclick = function() {
-                    document.getElementById("studentSearch").value = student.name;
-                    document.getElementById("student_id").value = student.studentID;
-                    document.getElementById("name").value = student.name;
-                    document.getElementById("gender").value = student.gender;
-                    document.getElementById("email").value = student.email;
-                    document.getElementById("department").value = student.department;
-                    dropdown.style.display = "none";
-                };
-                dropdown.appendChild(option);
-            });
-
-            dropdown.style.display = "block";
-        }
-    </script>
 
 
 @endsection
