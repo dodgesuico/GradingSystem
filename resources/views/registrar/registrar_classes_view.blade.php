@@ -821,7 +821,7 @@
 
 
 
-        @if ($finalGrades->where('status', 'Locked')->isEmpty())
+        @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty())
             <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
                 @csrf
                 @method('POST')
