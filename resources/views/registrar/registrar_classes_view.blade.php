@@ -583,7 +583,9 @@
                 let students = {!! json_encode($students) !!}; // Use existing Blade variable
                 let filtered = students.filter(student =>
                     student.name.toLowerCase().includes(input) ||
-                    student.email.toLowerCase().includes(input)
+                    student.email.toLowerCase().includes(input) ||
+                    student.studentID.toString().includes(input) ||  // 🔹 Allow searching by ID
+                    student.department.toLowerCase().includes(input) // 🔹 Allow searching by Department
                 );
 
                 if (filtered.length === 0) {
@@ -594,7 +596,7 @@
                 filtered.forEach(student => {
                     let option = document.createElement("div");
                     option.classList.add("dropdown-item");
-                    option.textContent = student.name;
+                    option.textContent = `${student.studentID} - ${student.name} (${student.department})`; // 🔹 Show ID & Department
                     option.onclick = function() {
                         document.getElementById("studentSearch").value = student.name;
                         document.getElementById("student_id").value = student.studentID;
@@ -609,6 +611,7 @@
 
                 dropdown.style.display = "block";
             }
+
         </script>
 
 
