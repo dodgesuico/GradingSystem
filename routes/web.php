@@ -13,6 +13,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AllGradesController;
 use App\Http\Controllers\MygradesController;
 use App\Http\Controllers\PDFController;
+use Illuminate\Contracts\Routing\Registrar;
+
 /*
 |--------------------------------------------------------------------------
 | Guest Routes (For Users Not Logged In)
@@ -74,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/unlockfinalgrade', [RegistrarController::class, 'UnlockGrades'])->name('finalgrade.unlock');
     Route::post('/initializegrade', [RegistrarController::class, 'initializeGrades'])->name('initialize.grade');
     Route::post('/submitfinalgrades', [RegistrarController::class, 'submitFinalGrades'])->name('submit.finalgrade');
+    Route::post('/students/import/{class}', [RegistrarController::class, 'importCSV'])->name('students.import');
 
 
     Route::post('/finalgrade/decision', [RegistrarController::class, 'submitDecision'])->name('finalgrade.decision');

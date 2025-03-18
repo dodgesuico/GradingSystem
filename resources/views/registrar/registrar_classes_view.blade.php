@@ -304,6 +304,8 @@
                                 <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first
                                     before entering the student scores.</em>
                             </form>
+
+
                             <h3 style="margin:5px 0 10px 0">{{ $term }} Scores (Raw)</h3>
                             <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
                                 @csrf
@@ -536,6 +538,14 @@
                     </div>
 
                 </form>
+
+                <form id="csvUploadForm" action="{{ route('students.import', $classes->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" id="students_csv" name="students_csv" accept=".csv" required>
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-file-arrow-up"></i> Add Multiple Students
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -613,8 +623,6 @@
             }
 
         </script>
-
-
 
 
         <style>
@@ -1397,3 +1405,45 @@
         color: var(--ckcm-color4)
     }
 </style>
+
+
+<!-- Full-screen Loader -->
+<div id="loadingScreen" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;">
+    <div class="loader"></div>
+</div>
+
+
+<!-- CSS Loader Animation -->
+<style>
+    .loader {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<!-- JavaScript to Hide Loader -->
+<script>
+    window.onload = function () {
+        setTimeout(function () {
+            document.getElementById('loadingScreen').style.display = 'none';
+        }, 1000);
+    };
+</script>

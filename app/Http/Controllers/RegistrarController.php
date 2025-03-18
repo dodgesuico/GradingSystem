@@ -111,9 +111,6 @@ class RegistrarController extends Controller
             ->whereNotIn('studentID', $enrolledStudentIds)
             ->get();
 
-
-
-
         // 💯 This part still works for displaying ENROLLED STUDENTS
         $classes_student = Classes_Student::where('classID', $class->id)->get();
 
@@ -157,6 +154,79 @@ class RegistrarController extends Controller
         ));
     }
 
+    public function importCSV(Request $request, $class)
+    {
+        // Fetch class model
+        $class = Classes::findOrFail($class);
+
+        // Validate file
+        $request->validate([
+            'students_csv' => 'required|mimes:csv,txt|max:2048'
+        ]);
+
+        // Read CSV file
+        $file = $request->file('students_csv');
+        $csvData = array_map('str_getcsv', file($file));
+
+        // Remove CSV header row
+        array_shift($csvData);
+
+        $students = [];
+        $insertedStudentIDs = [];
+
+        foreach ($csvData as $row) {
+            if (count($row) < 5) {
+                continue; // Skip invalid rows
+            }
+
+            $fullname = trim($row[2] . " " . $row[3] . " " . $row[1]);
+
+            $students[] = [
+                'studentID'  => $row[4],
+                'email'      => $row[5],
+                'name'       => $fullname,
+                'gender'     => null,
+                'department' => 'College of Computer Science',
+                'classID'    => $class->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            // Collect student IDs for periodic term insertion
+            $insertedStudentIDs[] = $row[4];
+        }
+
+        // Bulk insert students
+        Classes_Student::insert($students);
+
+        // Array of periodic terms
+        $periodicTerms = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
+
+        // Prepare data for quizzes_scores
+        $quizScores = [];
+        foreach ($insertedStudentIDs as $studentID) {
+            foreach ($periodicTerms as $term) {
+                $quizScores[] = [
+                    'classID'             => $class->id,
+                    'studentID'           => $studentID,
+                    'periodic_term'       => $term,
+                    'quizzez'             => 0,  // Default 0
+                    'attendance_behavior' => 0,  // Default 0
+                    'assignments'         => 0,  // Default 0
+                    'exam'                => 0,  // Default 0
+                    'created_at'          => now(),
+                    'updated_at'          => now(),
+                ];
+            }
+        }
+
+        // Bulk insert quiz scores
+        QuizzesAndScores::insert($quizScores);
+
+        return back()->with('success', 'Students imported successfully.');
+    }
+
+
     public function addstudent(Request $request, Classes $class)
     {
         $request->validate([
@@ -187,6 +257,10 @@ class RegistrarController extends Controller
                 $quizzesandscores->classID = $class->id;
                 $quizzesandscores->studentID = $request->student_id;
                 $quizzesandscores->periodic_term = $term;
+                $quizzesandscores->quizzez = 0;              // Default 0
+                $quizzesandscores->attendance_behavior = 0;  // Default 0
+                $quizzesandscores->assignments = 0;          // Default 0
+                $quizzesandscores->exam = 0;                 // Default 0
                 $quizzesandscores->save();
             }
 
