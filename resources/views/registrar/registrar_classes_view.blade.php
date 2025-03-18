@@ -102,12 +102,15 @@
         </div>
 
         @php
-            $isDean = str_contains(auth()->user()->role, "dean");
+            $isDean = str_contains(auth()->user()->role, 'dean');
             $isNotInstructor = isset($class->instructor) && $class->instructor !== auth()->user()->name;
 
             // ✅ Ensure we only hide if there are grades AND all are locked
-            $allLocked = $finalGrades->isNotEmpty() && $finalGrades->groupBy('department')
-                ->every(fn($grades) => $grades->where('status', 'Locked')->count() === $grades->count());
+            $allLocked =
+                $finalGrades->isNotEmpty() &&
+                $finalGrades
+                    ->groupBy('department')
+                    ->every(fn($grades) => $grades->where('status', 'Locked')->count() === $grades->count());
 
             $shouldHide = $allLocked || ($isDean && $isNotInstructor);
         @endphp
@@ -125,10 +128,9 @@
                             <i class="fa-solid fa-plus"></i> Add Student
                         </button>
                     @endif
-
                 </div>
 
-                <div class="container">
+                <div class="container" style="max-height: 300px; overflow-y: auto; border-bottom: var(--color8) 4px solid;">
                     @if ($classes_student->isEmpty())
                         <p style="color:gray">No students have been added to this class yet.</p>
                     @else
@@ -498,6 +500,18 @@
                     <button class="close" onclick="closeAddStudentModal()">&times;</button>
                 </div>
 
+                <form style="display:flex;  justify-content: space-between; flex-direction: column; gap: 10px;"
+                    id="csvUploadForm" action="{{ route('students.import', $classes->id) }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" id="students_csv" name="students_csv" accept=".csv" required>
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-file-arrow-up"></i> Add Multiple Students
+                    </button>
+                </form>
+
+                <p style="color: var(--color5); text-align:  center; margin: 10px 0;">~ or add student individually ~</p>
+
                 <form action="{{ route('class.addstudent', $class->id) }}" method="POST">
                     @csrf
                     <div class="modal-body">
@@ -510,7 +524,8 @@
                         </div>
                         <div class="info-container">
                             <label for="student_id">Student ID</label>
-                            <input type="text" id="student_id" name="student_id" class="form-control" required readonly>
+                            <input type="text" id="student_id" name="student_id" class="form-control" required
+                                readonly>
                         </div>
 
                         <div class="info-container">
@@ -527,7 +542,8 @@
                         </div>
                         <div class="info-container">
                             <label for="department">Department</label>
-                            <input type="text" id="department" name="department" class="form-control" required readonly>
+                            <input type="text" id="department" name="department" class="form-control" required
+                                readonly>
                         </div>
                     </div>
 
@@ -539,13 +555,7 @@
 
                 </form>
 
-                <form id="csvUploadForm" action="{{ route('students.import', $classes->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="file" id="students_csv" name="students_csv" accept=".csv" required>
-                    <button type="submit" class="save-btn">
-                        <i class="fa-solid fa-file-arrow-up"></i> Add Multiple Students
-                    </button>
-                </form>
+
             </div>
         </div>
 
@@ -594,7 +604,7 @@
                 let filtered = students.filter(student =>
                     student.name.toLowerCase().includes(input) ||
                     student.email.toLowerCase().includes(input) ||
-                    student.studentID.toString().includes(input) ||  // 🔹 Allow searching by ID
+                    student.studentID.toString().includes(input) || // 🔹 Allow searching by ID
                     student.department.toLowerCase().includes(input) // 🔹 Allow searching by Department
                 );
 
@@ -606,7 +616,8 @@
                 filtered.forEach(student => {
                     let option = document.createElement("div");
                     option.classList.add("dropdown-item");
-                    option.textContent = `${student.studentID} - ${student.name} (${student.department})`; // 🔹 Show ID & Department
+                    option.textContent =
+                    `${student.studentID} - ${student.name} (${student.department})`; // 🔹 Show ID & Department
                     option.onclick = function() {
                         document.getElementById("studentSearch").value = student.name;
                         document.getElementById("student_id").value = student.studentID;
@@ -621,7 +632,6 @@
 
                 dropdown.style.display = "block";
             }
-
         </script>
 
 
@@ -821,11 +831,7 @@
 
         <h2 style="margin: 10px 0">Grades</h2>
 
-        <div style="margin-bottom: 10px;">
-            <button onclick="toggleRawColumns()" class="toggle-btn">
-                <i class="fa-solid fa-eye"></i> Show Raw Columns
-            </button>
-        </div>
+
 
 
 
@@ -836,24 +842,38 @@
 
                 @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
                     @foreach ($studentsByDepartment as $student)
-                        <input type="hidden" name="grades[{{ $student->studentID }}][classID]" value="{{ $student->classID }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][studentID]" value="{{ $student->studentID }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][name]" value="{{ $student->name }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][prelim]" value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][midterm]" value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]" value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][final]" value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][remarks]" value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                            value="{{ $student->classID }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                            value="{{ $student->studentID }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                            value="{{ $student->name }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                            value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                            value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                            value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                            value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                        <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                            value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
                     @endforeach
                 @endforeach
 
-                <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0">
-                    <i class="fa-solid fa-lock"></i> Initialize
+                <button type="submit" class="btn btn-danger" style="margin: 5px 0">
+                    <i class="fa-brands fa-osi"></i> Initialize
                 </button>
+
+                <p style="color: var(--color-red)">Initialize first before locking the grades</p>
             </form>
         @endif
 
-
+        <div style="margin-bottom: 10px;">
+            <button onclick="toggleRawColumns()" class="toggle-btn">
+                <i class="fa-solid fa-eye"></i> Show Raw Columns
+            </button>
+        </div>
 
 
         <div class="grade-sheet-container">
@@ -865,22 +885,24 @@
             @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
                 @if (
                     $loggedInUserDepartment === 'N/A' ||
-                    $department === $loggedInUserDepartment ||
-                    (isset($class->instructor) && $class->instructor === auth()->user()->name)
-                )
-
+                        $department === $loggedInUserDepartment ||
+                        (isset($class->instructor) && $class->instructor === auth()->user()->name))
                     <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
 
                     @php
                         $gradesByDepartment = $finalGrades->where('department', $department);
                     @endphp
 
-                    <h3 style="color: {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'var(--color-green)' : 'gray' }}; margin-bottom:10px;">
+                    <h3 style="color: var(--color6); margin-bottom:10px; display:flex; justify-content: space-between;">
+
+                        <div class="grade-sheet-table-header">
                         Status:
                         <strong>
                             {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'Locked' : 'Not Locked Yet' }}
                         </strong>
+                        </div>
 
+                        <div class="grade-sheet-table-header">
                         Submit Status:
                         <strong>
                             @if ($gradesByDepartment->isNotEmpty())
@@ -895,28 +917,30 @@
                                 Pending
                             @endif
                         </strong>
+                        </div>
 
-                        Dean Approval:
-                        <strong>
-                            @if ($gradesByDepartment->isNotEmpty())
-                                @if ($gradesByDepartment->first()->dean_status == 'Confirmed')
-                                    Confirmed
-                                @elseif ($gradesByDepartment->first()->dean_status == 'Returned')
-                                    Returned
+                        <div class="grade-sheet-table-header">
+                            Dean Approval:
+                            <strong>
+                                @if ($gradesByDepartment->isNotEmpty())
+                                    @if ($gradesByDepartment->first()->dean_status == 'Confirmed')
+                                        Confirmed
+                                    @elseif ($gradesByDepartment->first()->dean_status == 'Returned')
+                                        Returned
+                                    @else
+                                        Pending
+                                    @endif
                                 @else
                                     Pending
                                 @endif
-                            @else
-                                Pending
-                            @endif
-                        </strong>
+                            </strong>
+                        </div>
                     </h3>
 
 
                     <form action="{{ route('finalgrade.lock') }}" method="POST">
                         @csrf
                         @method('POST')
-
                         <table>
                             <thead>
                                 <tr>
@@ -990,7 +1014,8 @@
                             $classInstructor = $classes ? $classes->instructor : null;
 
                             // Compare instructor name safely
-                            $isNotInstructor = trim(strtolower($classInstructor)) !== trim(strtolower(auth()->user()->name));
+                            $isNotInstructor =
+                                trim(strtolower($classInstructor)) !== trim(strtolower(auth()->user()->name));
                         @endphp
 
                         <!-- Lock In Button (for this department only) -->
@@ -1006,20 +1031,20 @@
 
 
                 @if (isset($gradesByDepartment) && $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->status)
-
-                     <!-- Unlock Grades (Only for this department) -->
+                    <!-- Unlock Grades (Only for this department) -->
                     @if (
                         $gradesByDepartment->isNotEmpty() &&
-                        (empty($gradesByDepartment->first()->submit_status) || $gradesByDepartment->first()->submit_status == 'Returned')
-                        )
+                            (empty($gradesByDepartment->first()->submit_status) ||
+                                $gradesByDepartment->first()->submit_status == 'Returned'))
                         @if (Auth::check() &&
-                            in_array('instructor', explode(',', Auth::user()->role)) &&
-                            Auth::user()->name === $gradesByDepartment->first()->instructor)
-
+                                in_array('instructor', explode(',', Auth::user()->role)) &&
+                                Auth::user()->name === $gradesByDepartment->first()->instructor)
                             <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
                                 @csrf
-                                <input type="hidden" name="department" value="{{ $department }}"> <!-- 🔥 Include department -->
-                                <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Include classID -->
+                                <input type="hidden" name="department" value="{{ $department }}">
+                                <!-- 🔥 Include department -->
+                                <input type="hidden" name="classID"
+                                    value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Include classID -->
 
                                 <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0"
                                     onclick="return confirm('Are you sure you want to unlock grades for {{ $department }}?')">
@@ -1029,8 +1054,10 @@
 
                             <form action="{{ route('finalgrade.save') }}" method="POST" style="display:inline;">
                                 @csrf
-                                <input type="hidden" name="department" value="{{ $department }}"> <!-- 🔥 Include department -->
-                                <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Include classID -->
+                                <input type="hidden" name="department" value="{{ $department }}">
+                                <!-- 🔥 Include department -->
+                                <input type="hidden" name="classID"
+                                    value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Include classID -->
 
                                 <button type="submit" class="save-btn">
                                     <i class="fa-solid fa-file-export"></i> Submit to Dean ({{ $department }})
@@ -1040,10 +1067,10 @@
                     @endif
 
 
-                    @if ($gradesByDepartment->isNotEmpty() &&
-                        $gradesByDepartment->first()->submit_status == 'Submitted' &&
-                        $gradesByDepartment->first()->dean_status != 'Confirmed')
-
+                    @if (
+                        $gradesByDepartment->isNotEmpty() &&
+                            $gradesByDepartment->first()->submit_status == 'Submitted' &&
+                            $gradesByDepartment->first()->dean_status != 'Confirmed')
                         @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
                             @php
                                 $userDepartment = Auth::user()->department; // Get Dean's department
@@ -1054,15 +1081,19 @@
                                 <form action="{{ route('finalgrade.decision') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="department" value="{{ $department }}">
-                                    <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Ensure correct classID -->
+                                    <input type="hidden" name="classID"
+                                        value="{{ $gradesByDepartment->first()->classID }}">
+                                    <!-- 🔥 Ensure correct classID -->
 
                                     <div style="margin-bottom: 10px;">
-                                        <input type="radio" id="confirmed_{{ $department }}" name="dean_status" value="Confirmed" required>
+                                        <input type="radio" id="confirmed_{{ $department }}" name="dean_status"
+                                            value="Confirmed" required>
                                         <label for="confirmed_{{ $department }}">✔️ Confirmed</label>
                                     </div>
 
                                     <div style="margin-bottom: 10px;">
-                                        <input type="radio" id="returned_{{ $department }}" name="dean_status" value="Returned" required>
+                                        <input type="radio" id="returned_{{ $department }}" name="dean_status"
+                                            value="Returned" required>
                                         <label for="returned_{{ $department }}">❌ Returned</label>
                                     </div>
 
@@ -1082,9 +1113,8 @@
 
                     @if (
                         $gradesByDepartment->isNotEmpty() &&
-                        $gradesByDepartment->first()->submit_status == 'Submitted' &&
-                        $gradesByDepartment->first()->dean_status == 'Confirmed'
-                    )
+                            $gradesByDepartment->first()->submit_status == 'Submitted' &&
+                            $gradesByDepartment->first()->dean_status == 'Confirmed')
                         @if (Auth::check())
                             @php
                                 $user = Auth::user();
@@ -1092,45 +1122,47 @@
                             @endphp
 
                             <!-- ✅ Allow if instructor matches by name OR if their department is 'N/A' -->
-                            @if (
-                                in_array('instructor', explode(',', $user->role)) &&
-                                ($user->department == $department || $user->department == 'N/A') &&
-                                $user->name == $classInstructor
-                            )
-                                <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}" method="POST">
+                            @if (in_array('instructor', explode(',', $user->role)) &&
+                                    ($user->department == $department || $user->department == 'N/A') &&
+                                    $user->name == $classInstructor)
+                                <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}"
+                                    method="POST">
                                     @csrf
                                     @method('POST')
 
-                                        <!-- 🔥 Ensure the department is submitted with this hidden input -->
-                                        <input type="hidden" name="department" value="{{ $department }}">
+                                    <!-- 🔥 Ensure the department is submitted with this hidden input -->
+                                    <input type="hidden" name="department" value="{{ $department }}">
 
-                                        @foreach ($studentsByDepartment as $student)
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][classID]" value="{{ $student->classID }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][studentID]" value="{{ $student->studentID }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][name]" value="{{ $student->name }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][prelim]" value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][midterm]" value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]" value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][final]" value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                                            <input type="hidden" name="grades[{{ $student->studentID }}][remarks]" value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
-                                        @endforeach
+                                    @foreach ($studentsByDepartment as $student)
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                                            value="{{ $student->classID }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                                            value="{{ $student->studentID }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                                            value="{{ $student->name }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                                            value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                                            value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                                            value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                                            value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                        <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                                            value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                    @endforeach
 
 
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades for {{ $department }}
+                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades for
+                                        {{ $department }}
                                     </button>
 
                                 </form>
-
                             @endif
                         @endif
                     @endif
-
-
-
-
                 @endif
-
             @endforeach
 
 
@@ -1408,7 +1440,8 @@
 
 
 <!-- Full-screen Loader -->
-<div id="loadingScreen" style="
+<div id="loadingScreen"
+    style="
     position: fixed;
     top: 0;
     left: 0;
@@ -1433,16 +1466,22 @@
         height: 50px;
         animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
 
 <!-- JavaScript to Hide Loader -->
 <script>
-    window.onload = function () {
-        setTimeout(function () {
+    window.onload = function() {
+        setTimeout(function() {
             document.getElementById('loadingScreen').style.display = 'none';
         }, 1000);
     };
