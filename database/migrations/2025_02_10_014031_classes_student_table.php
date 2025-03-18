@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->integer('classID');
                 $table->integer('studentID');
                 $table->string('name');
-                $table->string('gender');
+                $table->string('gender')->nullable();
                 $table->string('email');
                 $table->string('department');
                 $table->timestamps();
