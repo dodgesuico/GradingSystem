@@ -867,10 +867,6 @@
 
 
 
-
-
-
-
         <h2 style="margin: 10px 0">Grades</h2>
 
         @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty())
