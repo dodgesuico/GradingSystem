@@ -233,273 +233,316 @@
 
                 {{-- start of grading and score --}}
 
-                <h2 class="grading-title" style="margin: 20px 0">Grading & Scores</h2>
+                <h2 class="grading-title" style="margin: 20px 0; margin-top: 200px;">Grading & Scores</h2>
+
+                <div class="grading-tabs">
+                    @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $term)
+                        <button type="button" class="grading-tab" onclick="showGradingTab('{{ $term }}')"
+                            id="tab-{{ $term }}">
+                            {{ $term }}
+                        </button>
+                    @endforeach
+                </div>
 
                 @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $term)
-                    <div class="grading-score-section">
-                        <button type="button" class="grading-score-toggle"
-                            onclick="toggleSection('grading-score-{{ $term }}', this)">
-                            {{ $term }} <i class="fa-solid fa-folder"></i>
-                        </button>
-                        <div id="grading-score-{{ $term }}" class="grading-score-content">
-                            <h3>Grading</h3>
-                            <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}"
-                                method="POST">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="periodic_terms[]" value="{{ $term }}">
-                                <div class="calculation-base-container">
-                                    @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
-                                        <div class="calculation-container">
-                                            @php
-                                                $percentageValue =
-                                                    $percentage && $percentage->where('periodic_term', $term)->first()
-                                                        ? $percentage->where('periodic_term', $term)->first()
-                                                            ->{$key . '_percentage'}
-                                                        : '';
-                                            @endphp
-                                            <h4>{{ $category }}</h4>
-                                            <div class="calculation-content">
-                                                <label>Percentage (%)</label>
-                                                <input type="number"
-                                                    id="{{ $key }}_percentage_{{ $term }}"
-                                                    name="{{ $key }}_percentage[{{ $term }}]"
-                                                    value="{{ old($key . '_percentage.' . $term, $percentageValue) }}"
-                                                    min="0" max="100" required>
-                                            </div>
-                                            <div class="calculation-content">
-                                                <label>Total Score</label>
-                                                <input type="number"
-                                                    id="{{ $key }}_total_score_{{ $term }}"
-                                                    name="{{ $key }}_total_score[{{ $term }}]"
-                                                    value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
-                                                    min="0">
-                                            </div>
-                                            <script>
-                                                document.addEventListener("DOMContentLoaded", function() {
-                                                    // Function to restore input value from localStorage
-                                                    function restoreValue(inputId) {
-                                                        let storedValue = localStorage.getItem(inputId);
-                                                        if (storedValue !== null) {
-                                                            document.getElementById(inputId).value = storedValue;
-                                                        }
-                                                    }
+                    <div id="grading-content-{{ $term }}" class="grading-content"
+                        style="display: none; background-color: var(--color9b); padding: 20px; border: 1px solid var(--color7);">
 
-                                                    // Function to store input value in localStorage
-                                                    function storeValue(event) {
-                                                        localStorage.setItem(event.target.id, event.target.value);
-                                                    }
-
-                                                    // Target each specific input by ID
-                                                    let percentageInput = document.getElementById("{{ $key }}_percentage_{{ $term }}");
-                                                    let totalScoreInput = document.getElementById("{{ $key }}_total_score_{{ $term }}");
-
-                                                    // Restore saved values on page load
-                                                    if (percentageInput) restoreValue(percentageInput.id);
-                                                    if (totalScoreInput) restoreValue(totalScoreInput.id);
-
-                                                    // Store values when user types
-                                                    if (percentageInput) percentageInput.addEventListener("input", storeValue);
-                                                    if (totalScoreInput) totalScoreInput.addEventListener("input", storeValue);
-                                                });
-                                            </script>
-
-
-
+                        <h3>Grading</h3>
+                        <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="periodic_terms[]" value="{{ $term }}">
+                            <div class="calculation-base-container">
+                                @foreach (['quiz' => 'Quizzes', 'attendance' => 'Attendance/Behavior', 'assignment' => 'Assignments/Participation/Project', 'exam' => 'Exam'] as $key => $category)
+                                    <div class="calculation-container">
+                                        @php
+                                            $percentageValue =
+                                                $percentage && $percentage->where('periodic_term', $term)->first()
+                                                    ? $percentage->where('periodic_term', $term)->first()
+                                                        ->{$key . '_percentage'}
+                                                    : '';
+                                        @endphp
+                                        <h4>{{ $category }}</h4>
+                                        <div class="calculation-content">
+                                            <label>Percentage (%)</label>
+                                            <input type="number" id="{{ $key }}_percentage_{{ $term }}"
+                                                name="{{ $key }}_percentage[{{ $term }}]"
+                                                value="{{ old($key . '_percentage.' . $term, $percentageValue) }}"
+                                                min="0" max="100" required>
                                         </div>
-                                    @endforeach
+                                        <div class="calculation-content">
+                                            <label>Total Score</label>
+                                            <input type="number" id="{{ $key }}_total_score_{{ $term }}"
+                                                name="{{ $key }}_total_score[{{ $term }}]"
+                                                value="{{ old($key . '_total_score.' . $term, optional(optional($percentage)->where('periodic_term', $term)->first())->{$key . '_total_score'} ?? '') }}"
+                                                min="0">
+                                        </div>
+                                        <script>
+                                            document.addEventListener("DOMContentLoaded", function() {
+                                                // Function to restore input value from localStorage
+                                                function restoreValue(inputId) {
+                                                    let storedValue = localStorage.getItem(inputId);
+                                                    if (storedValue !== null) {
+                                                        document.getElementById(inputId).value = storedValue;
+                                                    }
+                                                }
+
+                                                // Function to store input value in localStorage
+                                                function storeValue(event) {
+                                                    localStorage.setItem(event.target.id, event.target.value);
+                                                }
+
+                                                // Target each specific input by ID
+                                                let percentageInput = document.getElementById("{{ $key }}_percentage_{{ $term }}");
+                                                let totalScoreInput = document.getElementById("{{ $key }}_total_score_{{ $term }}");
+
+                                                // Restore saved values on page load
+                                                if (percentageInput) restoreValue(percentageInput.id);
+                                                if (totalScoreInput) restoreValue(totalScoreInput.id);
+
+                                                // Store values when user types
+                                                if (percentageInput) percentageInput.addEventListener("input", storeValue);
+                                                if (totalScoreInput) totalScoreInput.addEventListener("input", storeValue);
+                                            });
+                                        </script>
 
 
-                                </div>
-                                <button type="submit" class="save-btn" style="margin: 5px 0 0 0"><i
-                                        class="fa-solid fa-floppy-disk"></i> Save Grading and Total Score</button>
-                                <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first
-                                    before entering the student scores.</em>
-                            </form>
+
+                                    </div>
+                                @endforeach
 
 
-                            <h3 style="margin:5px 0 10px 0">{{ $term }} Scores (Raw)</h3>
-                            <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
-                                @csrf
-                                @method('PUT')
+                            </div>
+                            <button type="submit" class="save-btn" style="margin: 5px 0 0 0"><i
+                                    class="fa-solid fa-floppy-disk"></i> Save Grading and Total Score</button>
+                            <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first
+                                before entering the student scores.</em>
+                        </form>
 
-                                <input type="hidden" name="periodic_term" value="{{ $term }}">
-                                <table class="score-table">
-                                    <thead>
+
+                        <h3 style="margin:5px 0 10px 0">{{ $term }} Scores (Raw)</h3>
+                        <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
+                            @csrf
+                            @method('PUT')
+
+                            <input type="hidden" name="periodic_term" value="{{ $term }}">
+                            <table class="score-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
+                                            <th>{{ $category }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        @for ($i = 0; $i < 4; $i++)
+                                            <td>
+                                                <div class="content-container">
+                                                    @foreach (['Accumulated Score', 'Transmuted Grade', 'Grade'] as $label)
+                                                        <div class="cell-content">{{ $label }}</div>
+                                                    @endforeach
+                                                </div>
+                                            </td>
+                                        @endfor
+                                    </tr>
+                                    @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
+                                        @php
+                                            $student = $classes_student->firstWhere(
+                                                'studentID',
+                                                $quizzesandscore->studentID,
+                                            );
+                                            $score = $quizzesandscores
+                                                ->where('studentID', optional($student)->studentID) // Prevent error if $student is null
+                                                ->where('periodic_term', $term)
+                                                ->first();
+                                            $computedGrade = null;
+                                        @endphp
                                         <tr>
-                                            <th>Student Name</th>
-                                            @foreach (['Quizzes', 'Attendance/Behavior', 'Assignments/Participation/Project', 'Exam'] as $category)
-                                                <th>{{ $category }}</th>
-                                            @endforeach
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td></td>
-                                            @for ($i = 0; $i < 4; $i++)
-                                                <td>
-                                                    <div class="content-container">
-                                                        @foreach (['Accumulated Score', 'Transmuted Grade', 'Grade'] as $label)
-                                                            <div class="cell-content">{{ $label }}</div>
-                                                        @endforeach
-                                                    </div>
-                                                </td>
-                                            @endfor
-                                        </tr>
-                                        @foreach ($quizzesandscores->where('periodic_term', $term) as $quizzesandscore)
-                                            @php
-                                                $student = $classes_student->firstWhere(
-                                                    'studentID',
-                                                    $quizzesandscore->studentID,
-                                                );
-                                                $score = $quizzesandscores
-                                                    ->where('studentID', optional($student)->studentID) // Prevent error if $student is null
-                                                    ->where('periodic_term', $term)
-                                                    ->first();
-                                                $computedGrade = null;
-                                            @endphp
-                                            <tr>
-                                                <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
-                                                @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
-                                                    @php
-                                                        $fieldScore = $score ? $score->$field : null;
-                                                        $transmutedGrade = null;
+                                            <td style="padding: 5px;">{{ $student ? $student->name : 'N/A' }}</td>
+                                            @foreach (['quizzez', 'attendance_behavior', 'assignments', 'exam'] as $field)
+                                                @php
+                                                    $fieldScore = $score ? $score->$field : null;
+                                                    $transmutedGrade = null;
 
-                                                        // Get percentage data for this class and period
-                                                        $percentageData = DB::table('percentage')
-                                                            ->where('classID', $class->id)
-                                                            ->where('periodic_term', $term)
+                                                    // Get percentage data for this class and period
+                                                    $percentageData = DB::table('percentage')
+                                                        ->where('classID', $class->id)
+                                                        ->where('periodic_term', $term)
+                                                        ->first();
+
+                                                    // Define field percentage and total score field
+                                                    $fieldPercentage = 0;
+                                                    $totalScoreField = null;
+
+                                                    if ($percentageData) {
+                                                        match ($field) {
+                                                            'quizzez' => [
+                                                                ($fieldPercentage =
+                                                                    $percentageData->quiz_percentage ?? 0),
+                                                                ($totalScoreField = 'quiz_total_score'),
+                                                            ],
+                                                            'attendance_behavior' => [
+                                                                ($fieldPercentage =
+                                                                    $percentageData->attendance_percentage ?? 0),
+                                                                ($totalScoreField = 'attendance_total_score'),
+                                                            ],
+                                                            'assignments' => [
+                                                                ($fieldPercentage =
+                                                                    $percentageData->assignment_percentage ?? 0),
+                                                                ($totalScoreField = 'assignment_total_score'),
+                                                            ],
+                                                            'exam' => [
+                                                                ($fieldPercentage =
+                                                                    $percentageData->exam_percentage ?? 0),
+                                                                ($totalScoreField = 'exam_total_score'),
+                                                            ],
+                                                            default => null,
+                                                        };
+                                                    }
+
+                                                    if (!empty($fieldScore) && $totalScoreField) {
+                                                        $totalScore = $percentageData->$totalScoreField ?? 0;
+
+                                                        // Try to find an exact match
+                                                        $transmutedGradeEntry = DB::table('transmuted_grade')
+                                                            ->where('score_bracket', $totalScore)
+                                                            ->where('score', $fieldScore)
                                                             ->first();
 
-                                                        // Define field percentage and total score field
-                                                        $fieldPercentage = 0;
-                                                        $totalScoreField = null;
-
-                                                        if ($percentageData) {
-                                                            match ($field) {
-                                                                'quizzez' => [
-                                                                    ($fieldPercentage =
-                                                                        $percentageData->quiz_percentage ?? 0),
-                                                                    ($totalScoreField = 'quiz_total_score'),
-                                                                ],
-                                                                'attendance_behavior' => [
-                                                                    ($fieldPercentage =
-                                                                        $percentageData->attendance_percentage ?? 0),
-                                                                    ($totalScoreField = 'attendance_total_score'),
-                                                                ],
-                                                                'assignments' => [
-                                                                    ($fieldPercentage =
-                                                                        $percentageData->assignment_percentage ?? 0),
-                                                                    ($totalScoreField = 'assignment_total_score'),
-                                                                ],
-                                                                'exam' => [
-                                                                    ($fieldPercentage =
-                                                                        $percentageData->exam_percentage ?? 0),
-                                                                    ($totalScoreField = 'exam_total_score'),
-                                                                ],
-                                                                default => null,
-                                                            };
-                                                        }
-
-                                                        if (!empty($fieldScore) && $totalScoreField) {
-                                                            $totalScore = $percentageData->$totalScoreField ?? 0;
-
-                                                            // Try to find an exact match
-                                                            $transmutedGradeEntry = DB::table('transmuted_grade')
+                                                        if (!$transmutedGradeEntry) {
+                                                            // If no exact match, get the closest lower score
+                                                            $nearestLower = DB::table('transmuted_grade')
                                                                 ->where('score_bracket', $totalScore)
-                                                                ->where('score', $fieldScore)
+                                                                ->where('score', '<=', $fieldScore)
+                                                                ->orderBy('score', 'desc') // Get the highest lower value
                                                                 ->first();
 
-                                                            if (!$transmutedGradeEntry) {
-                                                                // If no exact match, get the closest lower score
-                                                                $nearestLower = DB::table('transmuted_grade')
-                                                                    ->where('score_bracket', $totalScore)
-                                                                    ->where('score', '<=', $fieldScore)
-                                                                    ->orderBy('score', 'desc') // Get the highest lower value
-                                                                    ->first();
-
-                                                                $transmutedGrade = $nearestLower
-                                                                    ? $nearestLower->transmuted_grade
-                                                                    : null;
-                                                            } else {
-                                                                $transmutedGrade =
-                                                                    $transmutedGradeEntry->transmuted_grade;
-                                                            }
-
-                                                            if (!is_null($transmutedGrade)) {
-                                                                $computedGrade =
-                                                                    ($transmutedGrade * $fieldPercentage) / 100;
-                                                            }
+                                                            $transmutedGrade = $nearestLower
+                                                                ? $nearestLower->transmuted_grade
+                                                                : null;
+                                                        } else {
+                                                            $transmutedGrade = $transmutedGradeEntry->transmuted_grade;
                                                         }
-                                                    @endphp
+
+                                                        if (!is_null($transmutedGrade)) {
+                                                            $computedGrade =
+                                                                ($transmutedGrade * $fieldPercentage) / 100;
+                                                        }
+                                                    }
+                                                @endphp
 
 
-                                                    <td class="cell-content-container">
-                                                        <div class="content-container">
-                                                            <div class="cell-content">
-                                                                <input type="number"
-                                                                    id="score_{{ $student ? $student->studentID : 'unknown' }}_{{ $field }}_{{ $term }}"
-                                                                    name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
-                                                                    value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
-                                                                    min="0" step="0.01">
-                                                            </div>
+                                                <td class="cell-content-container">
+                                                    <div class="content-container">
+                                                        <div class="cell-content">
+                                                            <input type="number"
+                                                                id="score_{{ $student ? $student->studentID : 'unknown' }}_{{ $field }}_{{ $term }}"
+                                                                name="scores[{{ $student ? $student->studentID : '' }}][{{ $field }}]"
+                                                                value="{{ $score && $score->$field !== null ? number_format($score->$field, 2) : '0.00' }}"
+                                                                min="0" step="0.01">
+                                                        </div>
 
-                                                            <script>
-                                                                document.addEventListener("DOMContentLoaded", function() {
-                                                                    document.querySelectorAll("input[id^='score_']").forEach(input => {
-                                                                        let savedValue = localStorage.getItem(input.id);
-                                                                        if (savedValue !== null) {
-                                                                            input.value = parseFloat(savedValue).toFixed(2); // Ensure 2 decimal places
+                                                        <script>
+                                                            document.addEventListener("DOMContentLoaded", function() {
+                                                                document.querySelectorAll("input[id^='score_']").forEach(input => {
+                                                                    let savedValue = localStorage.getItem(input.id);
+                                                                    if (savedValue !== null) {
+                                                                        input.value = parseFloat(savedValue).toFixed(2); // Ensure 2 decimal places
+                                                                    }
+
+                                                                    input.addEventListener("input", function() {
+                                                                        let value = parseFloat(this.value);
+                                                                        if (!isNaN(value)) {
+                                                                            localStorage.setItem(input.id, value); // Save raw value
                                                                         }
+                                                                    });
 
-                                                                        input.addEventListener("input", function() {
-                                                                            let value = parseFloat(this.value);
-                                                                            if (!isNaN(value)) {
-                                                                                localStorage.setItem(input.id, value); // Save raw value
-                                                                            }
-                                                                        });
-
-                                                                        input.addEventListener("blur", function() {
-                                                                            let value = parseFloat(this.value);
-                                                                            if (!isNaN(value)) {
-                                                                                this.value = value.toFixed(2); // Format on blur
-                                                                                localStorage.setItem(input.id, this.value);
-                                                                            }
-                                                                        });
+                                                                    input.addEventListener("blur", function() {
+                                                                        let value = parseFloat(this.value);
+                                                                        if (!isNaN(value)) {
+                                                                            this.value = value.toFixed(2); // Format on blur
+                                                                            localStorage.setItem(input.id, this.value);
+                                                                        }
                                                                     });
                                                                 });
-                                                            </script>
+                                                            });
+                                                        </script>
 
 
 
-                                                            <div class="cell-content">
-                                                                <p>{{ $transmutedGrade ?? '' }}</p>
-                                                            </div>
-                                                            <div class="cell-content">
-                                                                <p>{{ $computedGrade !== null ? number_format($computedGrade, 2) : '' }}
-                                                                </p>
-                                                            </div>
+                                                        <div class="cell-content">
+                                                            <p>{{ $transmutedGrade ?? '' }}</p>
                                                         </div>
-                                                    </td>
-                                                @endforeach
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                                        <div class="cell-content">
+                                                            <p>{{ $computedGrade !== null ? number_format($computedGrade, 2) : '' }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
 
-                                <button type="submit" class="save-btn" style="margin: 10px 0"><i
-                                        class="fa-solid fa-arrows-rotate"></i> Calculate and Update</button>
-                                <em style="color: var(--color5); margin-left: 10px;">Note: Do not exceed with the total
-                                    score.</em>
-                            </form>
-                        </div>
+                            <button type="submit" class="save-btn" style="margin: 10px 0"><i
+                                    class="fa-solid fa-arrows-rotate"></i> Calculate and Update</button>
+                            <em style="color: var(--color5); margin-left: 10px;">Note: Do not exceed with the total
+                                score.</em>
+                        </form>
                     </div>
+
+                    <script>
+                        function showGradingTab(term) {
+                            document.querySelectorAll('.grading-content').forEach(content => {
+                                content.style.display = 'none';
+                            });
+                            document.querySelectorAll('.grading-tab').forEach(tab => {
+                                tab.classList.remove('active');
+                            });
+                            document.getElementById('grading-content-' + term).style.display = 'block';
+                            document.getElementById('tab-' + term).classList.add('active');
+                        }
+
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const firstTab = document.querySelector(".grading-tabs button");
+                            if (firstTab) {
+                                showGradingTab(firstTab.innerText);
+                            }
+                        });
+                    </script>
+
+                    <style>
+                        .grading-tab {
+                            border: 0;
+                            color: var(--color6);
+                            padding: 10px;
+                            border-radius: 0;
+                            font-size: 1.3rem;
+                        }
+
+                        .grading-tab.active {
+                            border: 1px solid var(--color7);
+                            border-bottom: 0;
+                            background-color: var(--color9b);
+                            color: var(--ckcm-color4);
+                            font-weight: bold;
+                        }
+                    </style>
                 @endforeach
+                {{-- end of students and scroll --}}
+
 
             </div>
-
         @endif
-        {{-- end of students and scroll --}}
+
+
+
+
 
 
 
@@ -705,7 +748,18 @@
             }
         </script>
 
-        {{-- end of grading and score --}}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -866,9 +920,9 @@
 
 
 
-        <h2 style="margin: 10px 0">Grades</h2>
+        <h2 style="margin: 10px 0; margin-top: 200px;">Grades</h2>
 
-        @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty())
+        @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty() && Auth::user()->id === $classes->instructor)
             <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
                 @csrf
                 @method('POST')
