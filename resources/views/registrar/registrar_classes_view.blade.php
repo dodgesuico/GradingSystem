@@ -221,6 +221,16 @@
                 </div>
 
 
+
+
+
+
+
+
+
+
+
+
                 {{-- start of grading and score --}}
 
                 <h2 class="grading-title" style="margin: 20px 0">Grading & Scores</h2>
@@ -489,6 +499,15 @@
             </div>
 
         @endif
+        {{-- end of students and scroll --}}
+
+
+
+
+
+
+
+
 
 
 
@@ -617,7 +636,7 @@
                     let option = document.createElement("div");
                     option.classList.add("dropdown-item");
                     option.textContent =
-                    `${student.studentID} - ${student.name} (${student.department})`; // 🔹 Show ID & Department
+                        `${student.studentID} - ${student.name} (${student.department})`; // 🔹 Show ID & Department
                     option.onclick = function() {
                         document.getElementById("studentSearch").value = student.name;
                         document.getElementById("student_id").value = student.studentID;
@@ -687,6 +706,16 @@
         </script>
 
         {{-- end of grading and score --}}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -829,11 +858,15 @@
 
 
 
+
+
+
+
+
+
+
+
         <h2 style="margin: 10px 0">Grades</h2>
-
-
-
-
 
         @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty())
             <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
@@ -896,27 +929,27 @@
                     <h3 style="color: var(--color6); margin-bottom:10px; display:flex; justify-content: space-between;">
 
                         <div class="grade-sheet-table-header">
-                        Status:
-                        <strong>
-                            {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'Locked' : 'Not Locked Yet' }}
-                        </strong>
+                            Status:
+                            <strong>
+                                {{ $gradesByDepartment->where('status', 'Locked')->isNotEmpty() ? 'Locked' : 'Not Locked Yet' }}
+                            </strong>
                         </div>
 
                         <div class="grade-sheet-table-header">
-                        Submit Status:
-                        <strong>
-                            @if ($gradesByDepartment->isNotEmpty())
-                                @if ($gradesByDepartment->first()->submit_status == 'Submitted')
-                                    Submitted
-                                @elseif ($gradesByDepartment->first()->submit_status == 'Returned')
-                                    Returned
+                            Submit to Dean Status:
+                            <strong>
+                                @if ($gradesByDepartment->isNotEmpty())
+                                    @if ($gradesByDepartment->first()->submit_status == 'Submitted')
+                                        Submitted
+                                    @elseif ($gradesByDepartment->first()->submit_status == 'Returned')
+                                        Returned
+                                    @else
+                                        Pending
+                                    @endif
                                 @else
                                     Pending
                                 @endif
-                            @else
-                                Pending
-                            @endif
-                        </strong>
+                            </strong>
                         </div>
 
                         <div class="grade-sheet-table-header">
@@ -1029,7 +1062,7 @@
                     <br>
                 @endif
 
-
+                {{-- submit and lock grades section --}}
                 @if (isset($gradesByDepartment) && $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->status)
                     <!-- Unlock Grades (Only for this department) -->
                     @if (
@@ -1065,8 +1098,18 @@
                             </form>
                         @endif
                     @endif
+                    {{-- end of submit and lock grades section --}}
 
 
+
+
+
+
+
+
+
+
+                    {{-- dean approval section --}}
                     @if (
                         $gradesByDepartment->isNotEmpty() &&
                             $gradesByDepartment->first()->submit_status == 'Submitted' &&
@@ -1077,38 +1120,52 @@
                             @endphp
 
                             @if ($department == $userDepartment)
-                                <h4 style="margin-top: 20px;">Dean's Decision for {{ $department }}</h4>
+                                <h4 style="margin: 10px 0; color: var(--ckcm-color4); font-size: 1.2rem;">Dean's Decision
+                                    for {{ $department }}</h4>
                                 <form action="{{ route('finalgrade.decision') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="department" value="{{ $department }}">
                                     <input type="hidden" name="classID"
                                         value="{{ $gradesByDepartment->first()->classID }}">
                                     <!-- 🔥 Ensure correct classID -->
+                                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+                                        <div style="display: flex; gap: 5px; align-items: center;">
+                                            <input style="margin: 0" type="radio" id="confirmed_{{ $department }}"
+                                                name="dean_status" value="Confirmed" required>
+                                            <label style="color: var(--color-green)"
+                                                for="confirmed_{{ $department }}">✔️ Confirmed</label>
+                                        </div>
 
-                                    <div style="margin-bottom: 10px;">
-                                        <input type="radio" id="confirmed_{{ $department }}" name="dean_status"
-                                            value="Confirmed" required>
-                                        <label for="confirmed_{{ $department }}">✔️ Confirmed</label>
+                                        <div style="display: flex; gap: 5px; align-items: center;">
+                                            <input style="margin: 0" type="radio" id="returned_{{ $department }}"
+                                                name="dean_status" value="Returned" required>
+                                            <label style="color: var(--color-red)" for="returned_{{ $department }}">❌
+                                                Returned</label>
+                                        </div>
                                     </div>
 
                                     <div style="margin-bottom: 10px;">
-                                        <input type="radio" id="returned_{{ $department }}" name="dean_status"
-                                            value="Returned" required>
-                                        <label for="returned_{{ $department }}">❌ Returned</label>
+                                        <textarea style="background: var(--ckcm-color2); color: var(--color1); padding: 5px; width: 100%;;" name="comment"
+                                            rows="3" class="form-control" placeholder="Add a comment (optional, only if returned)..."></textarea>
                                     </div>
 
-                                    <div style="margin-bottom: 10px;">
-                                        <textarea name="comment" rows="3" class="form-control"
-                                            placeholder="Add a comment (optional, only if returned)..."></textarea>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="save-btn">
                                         <i class="fa-solid fa-check"></i> Submit Decision for {{ $department }}
                                     </button>
                                 </form>
+
+                                <style>
+
+                                </style>
                             @endif
                         @endif
                     @endif
+                    {{-- end of dean approval --}}
+
+
+
+
+
 
 
                     @if (
@@ -1153,7 +1210,7 @@
                                     @endforeach
 
 
-                                    <button type="submit" class="btn btn-success">
+                                    <button type="submit" class="save-btn">
                                         <i class="fa-solid fa-file-export"></i> Submit Final Grades for
                                         {{ $department }}
                                     </button>
