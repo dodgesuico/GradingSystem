@@ -1234,8 +1234,7 @@
 
                             <!-- ✅ Allow if instructor matches by name OR if their department is 'N/A' -->
                             @if (in_array('instructor', explode(',', $user->role)) &&
-                                    ($user->department == $department || $user->department == 'N/A') &&
-                                    $user->name == $classInstructor)
+                                    $user->name === $classInstructor)
                                 <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}"
                                     method="POST">
                                     @csrf
