@@ -13,6 +13,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AllGradesController;
 use App\Http\Controllers\MygradesController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ClassArchiveController;
+use App\Models\ClassArchive;
 use Illuminate\Contracts\Routing\Registrar;
 
 /*
@@ -87,6 +89,8 @@ Route::middleware(['auth'])->group(function () {
 
     // for instructor
     Route::get("/my_class", [InstructorController::class, "index"])->name('instructor.my_class');
+    Route::get("/my_class_archive", [ClassArchiveController::class, "index"])->name('instructor.my_class_archive');
+
 
 
     Route::get('/allgrades', [AllGradesController::class, 'index'])->name('show.grades');
