@@ -1,27 +1,67 @@
 <?php
-
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
 use App\Models\ClassArchive;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // Import Auth
 
 class ClassArchiveController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch data and group by classID, periodic_term, and academic_year
-        $archivedData = ClassArchive::select(
-                'id', 'classID', 'studentID', 'periodic_term',
-                'quiz_percentage', 'quiz_total_score', 'quizzez',
-                'attendance_percentage', 'attendance_total_score', 'attendance_behavior',
-                'assignment_percentage', 'assignment_total_score', 'assignments',
-                'exam_percentage', 'exam_total_score', 'exam',
-                'academic_year', 'created_at', 'updated_at'
-            )
-            ->orderBy('academic_year', 'desc')
-            ->orderBy('classID')
-            ->orderBy('periodic_term')
-            ->get()
-            ->groupBy(['academic_year', 'classID', 'periodic_term']);
+        $termOrder = ['Prelim', 'Midterm', 'Semi-Final', 'Final'];
+
+        // Get logged-in user
+        $loggedInUser = Auth::user();
+        $loggedInInstructor = $loggedInUser->name;
+        $roles = explode(',', $loggedInUser->role); // Convert roles to an array
+
+        // Check if the user is an admin
+        $isAdmin = in_array('admin', $roles);
+
+        // Apply filters
+        $query = ClassArchive::query();
+
+        // If the user is not an admin, filter by instructor
+        if (!$isAdmin) {
+            $query->where('instructor', $loggedInInstructor);
+        }
+
+        // Apply additional filters based on the request
+        if ($request->has('academic_year') && $request->academic_year != '') {
+            $query->where('academic_year', $request->academic_year);
+        }
+
+        if ($request->has('subject_code') && $request->subject_code != '') {
+            $query->where('subject_code', 'LIKE', '%' . $request->subject_code . '%');
+        }
+
+        $records = $query->orderBy('academic_year', 'desc')
+            ->orderBy('academic_period')
+            ->orderBy('descriptive_title')
+            ->orderBy('subject_code')
+            ->get();
+
+        // Group the data
+        $archivedData = $records->groupBy('academic_year')
+            ->map(function ($yearGroup) use ($termOrder) {
+                return $yearGroup->groupBy('academic_period')
+                    ->map(function ($periodGroup) use ($termOrder) {
+                        return $periodGroup->groupBy('instructor')
+                            ->map(function ($instructorGroup) use ($termOrder) {
+                                return $instructorGroup->groupBy('descriptive_title')
+                                    ->map(function ($titleGroup) use ($termOrder) {
+                                        return $titleGroup->groupBy('subject_code')
+                                            ->map(function ($subjectGroup) use ($termOrder) {
+                                                return $subjectGroup->groupBy('periodic_term')
+                                                    ->sortBy(function ($_, $key) use ($termOrder) {
+                                                        return array_search($key, $termOrder);
+                                                    });
+                                            });
+                                    });
+                            });
+                    });
+            });
 
         return view('instructor.my_class_archive', compact('archivedData'));
     }

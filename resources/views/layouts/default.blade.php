@@ -91,7 +91,7 @@
                     {{-- End instructor --}}
 
                     {{-- If the role is "dean" --}}
-                    @if (Auth::check() && str_contains(Auth::user()->role, 'dean'))
+                    @if (Auth::check() && str_contains(Auth::user()->role, 'instructor'))
                         <a href="{{ route('instructor.my_class_archive') }}"
                             class="{{ Request::is('my_class_archive') ? 'active' : '' }}">
                             <i class="fa-solid fa-boxes-packing"></i><span>My Class Archive</span>
