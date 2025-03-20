@@ -68,17 +68,17 @@
 
         <div class="class-archive-container">
             @foreach ($archivedData as $academic_year => $periodGroups)
-                <h2 style="color: var(--ckcm-color4)">Academic Year: {{ $academic_year }}</h2>
+                <h2 style="color: var(--ckcm-color4); margin-bottom: 10px;">Academic Year: {{ $academic_year }}</h2>
                 @foreach ($periodGroups as $academic_period => $instructorGroups)
                     <h3 style="color: var(--color5); margin: 5px 0;">Academic Period: {{ $academic_period }}</h3>
                     @foreach ($instructorGroups as $instructor => $titleGroups)
-                        <h4 style="color: var(--color5); margin: 5px 0;">Instructor: {{ $instructor }}</h4>
+                        <h4 style="color: var(--color5); margin: 5px 0; font-size: 1rem;">Instructor: {{ $instructor }}</h4>
                         @foreach ($titleGroups as $descriptive_title => $subjectGroups)
-                            <h5 style="color: var(--color5); margin: 5px 0;">Course: {{ $descriptive_title }}</h5>
+                            <h5 style="color: var(--color5); margin: 5px 0; font-size: 1rem;">Course: {{ $descriptive_title }}</h5>
                             @foreach ($subjectGroups as $subject_code => $termGroups)
-                                <h6 style="color: var(--color5); margin: 5px 0;">Subject Code: {{ $subject_code }}</h6>
+                                <h6 style="color: var(--color5); margin: 5px 0; font-size: 1rem;">Subject Code: {{ $subject_code }}</h6>
                                 @foreach ($termGroups as $periodic_term => $records)
-                                    <h6 style="color: var(--color5); margin: 5px 0;">Term: {{ ucfirst($periodic_term) }}
+                                    <h6 style="color: var(--color5); margin: 5px 0; font-size: 1rem;">Term: {{ ucfirst($periodic_term) }}
                                     </h6>
                                     <table>
                                         <thead>

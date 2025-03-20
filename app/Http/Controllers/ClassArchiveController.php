@@ -42,6 +42,17 @@ class ClassArchiveController extends Controller
             ->orderBy('subject_code')
             ->get();
 
+        // Get unique instructors for the dropdown
+        $uniqueInstructors = ClassArchive::selectRaw('DISTINCT TRIM(LOWER(instructor)) as instructor')
+        ->orderBy('instructor')
+        ->pluck('instructor')
+        ->map(fn($name) => ucwords($name)) // Capitalize first letter of each word
+        ->unique()
+        ->values();
+
+
+
+
         // Group the data
         $archivedData = $records->groupBy('academic_year')
             ->map(function ($yearGroup) use ($termOrder) {
@@ -63,6 +74,6 @@ class ClassArchiveController extends Controller
                     });
             });
 
-        return view('instructor.my_class_archive', compact('archivedData'));
+        return view('instructor.my_class_archive', compact('archivedData', 'uniqueInstructors'));
     }
 }
