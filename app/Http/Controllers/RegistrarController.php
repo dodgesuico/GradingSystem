@@ -632,7 +632,11 @@ class RegistrarController extends Controller
 
             if ($studentInfo) {
                 $classInfo = Classes::find($grade['classID']); // Get class details
+                $subjectCode = optional($classInfo)->subject_code;
+                $descriptiveTitle = optional($classInfo)->descriptive_title;
+                $instructor = optional($classInfo)->instructor;
                 $academicYear = optional($classInfo)->academic_year; // ✅ Get academic year
+                $academicPeriod = optional($classInfo)->academic_period;
 
                 // ✅ Fetch quizzes and scores for this student from `quizzes_scores`
                 $quizzesScores = DB::table('quizzes_scores')
@@ -650,6 +654,9 @@ class RegistrarController extends Controller
                     // ✅ Insert archived record with percentage and total score
                     DB::table('archived_quizzesandscores')->insert([
                         'classID' => $score->classID,
+                        'subject_code' => $subjectCode,
+                        'descriptive_title' => $descriptiveTitle,
+                        'instructor' => $instructor,
                         'studentID' => $score->studentID,
                         'periodic_term' => $score->periodic_term,
                         'quiz_percentage' => $percentageData->quiz_percentage ?? null,
@@ -661,7 +668,10 @@ class RegistrarController extends Controller
                         'assignment_percentage' => $percentageData->assignment_percentage ?? null,
                         'assignment_total_score' => $percentageData->assignment_total_score ?? null,
                         'assignments' => $score->assignments,
+                        'exam_percentage' => $percentageData->exam_percentage ?? null,
+                        'exam_total_score' => $percentageData->exam_total_score ?? null,
                         'exam' => $score->exam,
+                        'academic_period' => $academicPeriod,
                         'academic_year' => $academicYear, // ✅ Save academic year
                         'created_at' => now(),
                         'updated_at' => now(),

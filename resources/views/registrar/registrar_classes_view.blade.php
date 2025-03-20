@@ -922,7 +922,7 @@
 
         <h2 style="margin: 10px 0; margin-top: 200px;">Grades</h2>
 
-        @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty() && Auth::user()->id === $classes->instructor)
+        @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty() && Auth::user()->name === $classes->instructor)
             <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
                 @csrf
                 @method('POST')

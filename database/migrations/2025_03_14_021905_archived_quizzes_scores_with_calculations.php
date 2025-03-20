@@ -15,6 +15,9 @@ return new class extends Migration
             Schema::create('archived_quizzesandscores', function (Blueprint $table) {
                 $table->id();
                 $table->integer('classID');
+                $table->string('subject_code');
+                $table->string('descriptive_title');
+                $table->string('instructor');
                 $table->integer('studentID');
                 $table->string('periodic_term');
                 $table->integer('quiz_percentage')->nullable();
@@ -32,6 +35,7 @@ return new class extends Migration
                 $table->integer('exam_percentage')->nullable();
                 $table->integer('exam_total_score')->nullable();
                 $table->decimal('exam', 5, 2)->nullable();
+                $table->string('academic_period');
                 $table->string('academic_year')->nullable();
                 $table->timestamps();
 
