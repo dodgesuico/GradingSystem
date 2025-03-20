@@ -233,7 +233,7 @@
 
                 {{-- start of grading and score --}}
 
-                <h2 class="grading-title" style="margin: 20px 0; margin-top: 200px;">Grading & Scores</h2>
+                <h2 class="grading-title" style="margin: 20px 0;">Grading & Scores</h2>
 
                 <div class="grading-tabs">
                     @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $term)
@@ -920,7 +920,7 @@
 
 
 
-        <h2 style="margin: 10px 0; margin-top: 200px;">Grades</h2>
+        <h2 style="margin: 10px 0; ">Grades</h2>
 
         @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty() && Auth::user()->name === $classes->instructor)
             <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
