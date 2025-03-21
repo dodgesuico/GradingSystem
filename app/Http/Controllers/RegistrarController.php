@@ -22,10 +22,18 @@ class RegistrarController extends Controller
 
     public function registrar_classes()
     {
+        // Fetch all classes
         $classes = Classes::all();
+
+        // Fetch all instructors with role 'instructor'
         $instructors = User::where('role', 'LIKE', '%instructor%')->get();
-        return view('registrar.registrar_classes', compact('classes', 'instructors'));
+
+        // Fetch all student-class relationships
+        $classes_student = Classes_Student::all()->groupBy('classID');
+
+        return view('registrar.registrar_classes', compact('classes', 'instructors', 'classes_student'));
     }
+
 
     public function CreateClass(Request $request)
     {

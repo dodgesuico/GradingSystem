@@ -67,52 +67,62 @@
         </div>
 
 
-        <!-- table -->
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Subject Code</th>
-                    <th>Descriptive Title</th>
-                    <th>Units</th>
-                    <th>Instructor</th>
-                    <th>Academic Peroid</th>
-                    <th>Academic Year</th>
-                    <th>Schedule</th>
-                    <th>Status</th>
-                    <th>Action</th>
+        @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
+            @php
+                $userDepartment = Auth::user()->department;
 
-                </tr>
-            </thead>
-            @foreach ($classes as $class)
-                <tr>
-                    <td>{{ $class->id }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->subject_code }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->descriptive_title }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->units }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->instructor }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->academic_period }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->academic_year }}</td>
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);">{{ $class->schedule }}</td>
+                // Filter classes where at least one student is in the same department as the logged-in dean
+                $filteredClasses = $classes->filter(function ($class) use ($userDepartment, $classes_student) {
+                    if (isset($classes_student[$class->id])) {
+                        return $classes_student[$class->id]->contains('department', $userDepartment);
+                    }
+                    return false; // Hide if no students are in the department
+                });
+            @endphp
 
-                    <td style="border: 0; border-bottom: 1px solid var(--color7);"
-                        class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
+            @if ($filteredClasses->isNotEmpty())
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Subject Code</th>
+                            <th>Descriptive Title</th>
+                            <th>Units</th>
+                            <th>Instructor</th>
+                            <th>Academic Period</th>
+                            <th>Academic Year</th>
+                            <th>Schedule</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($filteredClasses as $class)
+                            <tr>
+                                <td>{{ $class->id }}</td>
+                                <td>{{ $class->subject_code }}</td>
+                                <td>{{ $class->descriptive_title }}</td>
+                                <td>{{ $class->units }}</td>
+                                <td>{{ $class->instructor }}</td>
+                                <td>{{ $class->academic_period }}</td>
+                                <td>{{ $class->academic_year }}</td>
+                                <td>{{ $class->schedule }}</td>
+                                <td class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
+                                <td style="text-align:center; background-color: var(--color9b);">
+                                    <button class="unlock-btn" onclick="openPasswordModal({{ $class->id }})">
+                                        <i class="fa-solid fa-lock"></i> Unlock
+                                    </button>
+                                </td>
+                            </tr>
+                            @include('registrar.registrar_classes_edit_and_delete')
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        @endif
 
-                    <td id="actions-{{ $class->id }}" style="text-align:center; background-color: var(--color9b);">
-                        <button class="unlock-btn" onclick="openPasswordModal({{ $class->id }})">
-                            <i class="fa-solid fa-lock"></i> Unlock
-                        </button>
-                    </td>
 
 
-
-
-                </tr>
-
-                @include('registrar.registrar_classes_edit_and_delete')
-            @endforeach
-            </tbody>
-        </table>
 
 
 
