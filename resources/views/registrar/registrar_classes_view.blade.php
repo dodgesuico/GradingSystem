@@ -1557,7 +1557,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.8);
+    background: var(--ckcm-color1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1566,9 +1566,14 @@
 </div>
 
 
+
+
 <!-- CSS Loader Animation -->
 <style>
+
+
     .loader {
+        background: var(--ckcm-color1);
         border: 5px solid #f3f3f3;
         border-top: 5px solid #3498db;
         border-radius: 50%;
@@ -1587,6 +1592,10 @@
         }
     }
 </style>
+
+
+
+
 
 <!-- JavaScript to Hide Loader -->
 <script>

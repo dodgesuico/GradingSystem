@@ -26,6 +26,21 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <style>
     /* General Styling */
     body {
@@ -131,7 +146,7 @@
         cursor: pointer;
         font-size: 16px;
         font-weight: bold;
-       
+
 
     }
 

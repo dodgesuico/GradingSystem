@@ -66,9 +66,11 @@
                 {{-- for navigation --}}
                 <div class="nav-links">
                     <label for="">DASHBOARD</label>
+
                     <a href="{{ route('index') }}" class="{{ Request::is('/') ? 'active' : '' }}">
                         <i class="fa-solid fa-house"></i><span>Home</span>
                     </a>
+
                     {{-- If the role is "student" --}}
                     @if (Auth::check() && str_contains(Auth::user()->role, 'student'))
                         <a href="{{ route('my_grades') }}" class="{{ Request::is('my_grades') ? 'active' : '' }}">
