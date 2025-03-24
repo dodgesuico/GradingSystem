@@ -23,6 +23,7 @@ return new class extends Migration
                 $table->string('schedule');
                 $table->string('status');
                 $table->string('password');
+                $table->string('added_by');
                 $table->timestamps();
             });
         }

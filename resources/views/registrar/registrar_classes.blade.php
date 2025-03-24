@@ -70,13 +70,18 @@
         @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
             @php
                 $userDepartment = Auth::user()->department;
+                $userName = Auth::user()->name; // Get logged-in user's name
 
-                // Filter classes where at least one student is in the same department as the logged-in dean
-                $filteredClasses = $classes->filter(function ($class) use ($userDepartment, $classes_student) {
-                    if (isset($classes_student[$class->id])) {
-                        return $classes_student[$class->id]->contains('department', $userDepartment);
-                    }
-                    return false; // Hide if no students are in the department
+                // Filter classes where at least one student matches the department OR the class was added by the logged-in user
+                $filteredClasses = $classes->filter(function ($class) use ($userDepartment, $userName, $classes_student) {
+                    // Check if students exist and match the department
+                    $hasStudentsInDepartment = isset($classes_student[$class->id])
+                        && $classes_student[$class->id]->contains('department', $userDepartment);
+
+                    // Check if the class was added by the logged-in user
+                    $isAddedByUser = $class->added_by === $userName;
+
+                    return $hasStudentsInDepartment || $isAddedByUser; // Show if either condition is met
                 });
             @endphp
 
@@ -108,7 +113,7 @@
                                 <td>{{ $class->academic_year }}</td>
                                 <td>{{ $class->schedule }}</td>
                                 <td class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
-                                <td style="text-align:center; background-color: var(--color9b);">
+                                <td id="actions-{{ $class->id }}" style="text-align:center; background-color: var(--color9b);">
                                     <button class="unlock-btn" onclick="openPasswordModal({{ $class->id }})">
                                         <i class="fa-solid fa-lock"></i> Unlock
                                     </button>
@@ -120,6 +125,7 @@
                 </table>
             @endif
         @endif
+
 
 
 

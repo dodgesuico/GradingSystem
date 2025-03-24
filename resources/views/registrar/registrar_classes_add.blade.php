@@ -74,6 +74,8 @@
                 }
             </script>
 
+            <input type="hidden" name="added_by" value="{{ Auth::user()->name }}">
+
             <div class="modal-footer">
                 <button type="submit" class="save-btn"><i class="fa-solid fa-file-arrow-up"></i> Add Class</button>
                 <button type="button" class="close-btn" id="cancelModal">Cancel</button>
