@@ -9,7 +9,7 @@ class ClassArchiveController extends Controller
 {
     public function index(Request $request)
     {
-        $termOrder = ['Prelim', 'Midterm', 'Semi-Final', 'Final'];
+        $termOrder = ['Prelim', 'Midterm', 'Semi-Finals', 'Finals'];
 
         // Get logged-in user
         $loggedInUser = Auth::user();

@@ -113,11 +113,16 @@
                                 <td>{{ $class->academic_year }}</td>
                                 <td>{{ $class->schedule }}</td>
                                 <td class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
-                                <td id="actions-{{ $class->id }}" style="text-align:center; background-color: var(--color9b);">
+                                <td style="text-align: center">
+                                    <a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a> |
+                                    <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
+                                    <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
+                                </td>
+                                {{-- <td id="actions-{{ $class->id }}" style="text-align:center; background-color: var(--color9b);">
                                     <button class="unlock-btn" onclick="openPasswordModal({{ $class->id }})">
                                         <i class="fa-solid fa-lock"></i> Unlock
                                     </button>
-                                </td>
+                                </td> --}}
                             </tr>
                             @include('registrar.registrar_classes_edit_and_delete')
                         @endforeach
