@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\ClassArchive;
@@ -44,27 +45,28 @@ class ClassArchiveController extends Controller
 
         // Get unique instructors for the dropdown
         $uniqueInstructors = ClassArchive::selectRaw('DISTINCT TRIM(LOWER(instructor)) as instructor')
-        ->orderBy('instructor')
-        ->pluck('instructor')
-        ->map(fn($name) => ucwords($name)) // Capitalize first letter of each word
-        ->unique()
-        ->values();
+            ->orderBy('instructor')
+            ->pluck('instructor')
+            ->map(fn($name) => ucwords($name)) // Capitalize first letter of each word
+            ->unique()
+            ->values();
 
 
 
 
         // Group the data
+        // Group the data correctly
         $archivedData = $records->groupBy('academic_year')
             ->map(function ($yearGroup) use ($termOrder) {
                 return $yearGroup->groupBy('academic_period')
                     ->map(function ($periodGroup) use ($termOrder) {
-                        return $periodGroup->groupBy('instructor')
-                            ->map(function ($instructorGroup) use ($termOrder) {
-                                return $instructorGroup->groupBy('descriptive_title')
-                                    ->map(function ($titleGroup) use ($termOrder) {
-                                        return $titleGroup->groupBy('subject_code')
-                                            ->map(function ($subjectGroup) use ($termOrder) {
-                                                return $subjectGroup->groupBy('periodic_term')
+                        return $periodGroup->groupBy('subject_code') // Subject Code should be grouped here
+                            ->map(function ($subjectGroup) use ($termOrder) {
+                                return $subjectGroup->groupBy('instructor') // Now, group by Instructor
+                                    ->map(function ($instructorGroup) use ($termOrder) {
+                                        return $instructorGroup->groupBy('descriptive_title') // Then by Course Title
+                                            ->map(function ($titleGroup) use ($termOrder) {
+                                                return $titleGroup->groupBy('periodic_term') // Finally, group by Periodic Term
                                                     ->sortBy(function ($_, $key) use ($termOrder) {
                                                         return array_search($key, $termOrder);
                                                     });
@@ -73,6 +75,7 @@ class ClassArchiveController extends Controller
                             });
                     });
             });
+
 
         return view('instructor.my_class_archive', compact('archivedData', 'uniqueInstructors'));
     }
