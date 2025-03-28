@@ -67,21 +67,27 @@
         </div>
 
 
-        @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
+        @if (Auth::check() && (in_array('dean', explode(',', Auth::user()->role)) || in_array('registrar', explode(',', Auth::user()->role))))
             @php
                 $userDepartment = Auth::user()->department;
                 $userName = Auth::user()->name; // Get logged-in user's name
 
-                // Filter classes where at least one student matches the department OR the class was added by the logged-in user
-                $filteredClasses = $classes->filter(function ($class) use ($userDepartment, $userName, $classes_student) {
+                // Filter classes based on conditions
+                $filteredClasses = $classes->filter(function ($class) use ($userDepartment, $userName, $classes_student, $finalGrades) {
                     // Check if students exist and match the department
-                    $hasStudentsInDepartment = isset($classes_student[$class->id])
-                        && $classes_student[$class->id]->contains('department', $userDepartment);
+                    $hasStudentsInDepartment = isset($classes_student[$class->id]) && $classes_student[$class->id]->contains('department', $userDepartment);
 
                     // Check if the class was added by the logged-in user
                     $isAddedByUser = $class->added_by === $userName;
 
-                    return $hasStudentsInDepartment || $isAddedByUser; // Show if either condition is met
+                    // Get the final grade record for this class
+                    $finalGrade = $finalGrades->where('classID', $class->id)->first();
+
+                    // Check if the logged-in user is a registrar and the registrar_status is 'Pending'
+                    $isRegistrarAllowed = in_array('registrar', explode(',', Auth::user()->role)) && optional($finalGrade)->registrar_status === 'Pending';
+
+                    // Show if either condition is met
+                    return $hasStudentsInDepartment || $isAddedByUser || $isRegistrarAllowed;
                 });
             @endphp
 
@@ -118,11 +124,6 @@
                                     <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
                                     <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
                                 </td>
-                                {{-- <td id="actions-{{ $class->id }}" style="text-align:center; background-color: var(--color9b);">
-                                    <button class="unlock-btn" onclick="openPasswordModal({{ $class->id }})">
-                                        <i class="fa-solid fa-lock"></i> Unlock
-                                    </button>
-                                </td> --}}
                             </tr>
                             @include('registrar.registrar_classes_edit_and_delete')
                         @endforeach
@@ -130,6 +131,7 @@
                 </table>
             @endif
         @endif
+
 
 
 

@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/lockedfinalgrade', [RegistrarController::class, 'LockInGrades'])->name('finalgrade.lock');
     Route::post('/savefinalgrade', [RegistrarController::class, 'SubmitGrades'])->name('finalgrade.save');
+    Route::post('/savefinalgradetoregistrar', [RegistrarController::class, 'SubmitGradesRegistrar'])->name('finalgraderegistrar.save');
     Route::post('/unlockfinalgrade', [RegistrarController::class, 'UnlockGrades'])->name('finalgrade.unlock');
     Route::post('/initializegrade', [RegistrarController::class, 'initializeGrades'])->name('initialize.grade');
     Route::post('/submitfinalgrades', [RegistrarController::class, 'submitFinalGrades'])->name('submit.finalgrade');
@@ -82,7 +83,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::post('/finalgrade/decision', [RegistrarController::class, 'submitDecision'])->name('finalgrade.decision');
-
+    Route::post('/finalgrade/decisionregistrar', [RegistrarController::class, 'submitDecisionRegistrar'])->name('finalgraderegistrar.decision');
     // for action access
     Route::post('/class/verify-password', [RegistrarController::class, 'verifyPassword'])->name('class.verifyPassword');
 

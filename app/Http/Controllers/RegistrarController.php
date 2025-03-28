@@ -31,7 +31,9 @@ class RegistrarController extends Controller
         // Fetch all student-class relationships
         $classes_student = Classes_Student::all()->groupBy('classID');
 
-        return view('registrar.registrar_classes', compact('classes', 'instructors', 'classes_student'));
+        $finalGrades = DB::table('final_grade')->get();
+
+        return view('registrar.registrar_classes', compact('classes', 'instructors', 'classes_student', 'finalGrades'));
     }
 
 
@@ -575,14 +577,41 @@ class RegistrarController extends Controller
             ->update([
                 'submit_status' => 'Submitted',
                 'dean_status' => '',
-                'comment' => '',
+                'dean_comment' => '',
+                'registrar_status' => '',
+                'registrar_comment' => '',
                 'updated_at' => now(),
             ]);
 
 
         Classes::where('id', $classID)->update(['status' => 'Submitted, Waiting for approval']);
 
-        return back()->with('success', "Grades for $department (Class ID: $classID) have been submitted!");
+        return back()->with('success', "Grades for $department have been submitted to the its corresponding Dean!");
+    }
+
+    public function SubmitGradesRegistrar(Request $request)
+    {
+        $department = $request->input('department');
+        $classID = $request->input('classID'); // 🔥 Include classID
+
+        if (!$department || !$classID) {
+            return back()->with('error', 'Invalid request. No department or class selected.');
+        }
+
+        // Update submit_status to 'Submitted' for locked grades in the selected department and class
+        DB::table('final_grade')
+            ->where('department', $department)
+            ->where('classID', $classID) // 🔥 Ensure only this class is affected
+            ->where('status', 'Locked')
+            ->update([
+                'registrar_status' => 'Pending',
+                'updated_at' => now(),
+            ]);
+
+
+        Classes::where('id', $classID)->update(['status' => 'Submitted, Waiting for approval']);
+
+        return back()->with('success', "Grades for $department have been submitted to the Registrar!");
     }
 
 
@@ -593,13 +622,13 @@ class RegistrarController extends Controller
             'dean_status' => 'required',
             'classID' => 'required',
             'department' => 'required', // 🔥 Ensure department is required
-            'comment' => 'nullable|string'
+            'dean_comment' => 'nullable|string'
         ]);
 
         // Build update data
         $updateData = [
             'dean_status' => $request->dean_status,
-            'comment' => $request->comment,
+            'dean_comment' => $request->dean_comment,
             'updated_at' => now()
         ];
 
@@ -628,6 +657,49 @@ class RegistrarController extends Controller
 
         return back()->with('success', 'Dean’s decision has been submitted successfully!');
     }
+
+    public function submitDecisionRegistrar(Request $request)
+    {
+        // Validate input
+        $request->validate([
+            'registrar_status' => 'required|string|in:Approved,Rejected',
+            'classID' => 'required|integer',
+            'department' => 'required|string', // 🔥 Ensure department is required
+            'registrar_comment' => 'nullable|string'
+        ]);
+
+        // Build update data
+        $updateData = [
+            'registrar_status' => $request->registrar_status,
+            'registrar_comment' => $request->registrar_status === 'Rejected' ? $request->registrar_comment : null,
+            'updated_at' => now()
+        ];
+
+        // ✅ If "Rejected", also update submit_status & class status
+        if ($request->registrar_status == 'Rejected') {
+            $updateData['registrar_status'] = 'Rejected';
+            $updateData['dean_status'] = 'Returned';
+            // 🔥 Update class status to "Rejected"
+            Classes::where('id', $request->classID)->update(['status' => 'Rejected']);
+        }
+
+        // ✅ If "Approved", update submit_status & class status
+        if ($request->registrar_status == 'Approved') {
+            $updateData['registrar_status'] = 'Approved'; // Indicating final step before submission
+
+            // 🔥 Update class status to "Approved"
+            Classes::where('id', $request->classID)->update(['status' => 'Approved']);
+        }
+
+        // ✅ Update only records matching classID and department
+        DB::table('final_grade')
+            ->where('classID', $request->classID)
+            ->where('department', $request->department)
+            ->update($updateData);
+
+        return back()->with('success', 'Registrar’s decision has been submitted successfully!');
+    }
+
 
 
     public function submitFinalGrades(Request $request)
@@ -741,6 +813,6 @@ class RegistrarController extends Controller
 
         Classes::whereIn('id', array_unique($classIDs))->update(['status' => 'Active']);
 
-        return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been locked successfully!');
+        return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
     }
 }

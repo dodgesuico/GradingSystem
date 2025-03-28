@@ -101,14 +101,15 @@
                     @endif
                     {{-- End dean --}}
 
-                    {{-- If the role is "dean" --}}
-                    @if (Auth::check() && str_contains(Auth::user()->role, 'dean'))
+                    {{-- If the role is "dean" OR "registrar" --}}
+                    @if (Auth::check() && (str_contains(Auth::user()->role, 'dean') || str_contains(Auth::user()->role, 'registrar')))
                         <a href="{{ route('registrar_classes') }}"
                             class="{{ Request::is('registrar_classes') ? 'active' : '' }}">
                             <i class="fa-solid fa-clipboard"></i> <span>All Class</span>
                         </a>
                     @endif
-                    {{-- End dean --}}
+                    {{-- End dean and registrar --}}
+
 
                     {{-- If the role is "registrar" OR "dean" --}}
                     @if (Auth::check() && (str_contains(Auth::user()->role, 'registrar') || str_contains(Auth::user()->role, 'dean')))

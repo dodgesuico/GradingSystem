@@ -34,7 +34,8 @@ return new class extends Migration
                 $table->string('submit_status')->nullable();
                 $table->string('dean_status')->nullable();
                 $table->string('registrar_status')->nullable();
-                $table->string('comment')->nullable();
+                $table->string('dean_comment')->nullable();
+                $table->string('registrar_comment')->nullable();
                 $table->timestamps();
             });
         }
