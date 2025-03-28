@@ -528,11 +528,34 @@ class RegistrarController extends Controller
                     'created_at' => now(),
                 ]
             );
+
+            $classIDs[] = $grade['classID'];
         }
+
+        Classes::whereIn('id', $classIDs)->update(['status' => 'Locked']);
 
         return back()->with('success', 'Final grades have been locked successfully!');
     }
 
+    public function UnlockGrades(Request $request)
+    {
+        $department = $request->input('department');
+        $classID = $request->input('classID'); // 🔥 Include classID
+
+        if (!$department || !$classID) {
+            return back()->with('error', 'Invalid request. No department or class selected.');
+        }
+
+        // Unlock grades only for the specified department and class
+        DB::table('final_grade')
+            ->where('department', $department)
+            ->where('classID', $classID) // 🔥 Ensure only this class is affected
+            ->update(['status' => null]);
+
+        Classes::where('id', $classID)->update(['status' => 'Active']);
+
+        return back()->with('success', "Final grades for $department (Class ID: $classID) have been unlocked!");
+    }
 
 
     public function SubmitGrades(Request $request)
@@ -551,41 +574,15 @@ class RegistrarController extends Controller
             ->where('status', 'Locked')
             ->update([
                 'submit_status' => 'Submitted',
+                'dean_status' => '',
+                'comment' => '',
                 'updated_at' => now(),
             ]);
 
+
+        Classes::where('id', $classID)->update(['status' => 'Submitted, Waiting for approval']);
+
         return back()->with('success', "Grades for $department (Class ID: $classID) have been submitted!");
-    }
-
-    public function UnlockGrades(Request $request)
-    {
-        $department = $request->input('department');
-        $classID = $request->input('classID'); // 🔥 Include classID
-
-        if (!$department || !$classID) {
-            return back()->with('error', 'Invalid request. No department or class selected.');
-        }
-
-        // Unlock grades only for the specified department and class
-        DB::table('final_grade')
-            ->where('department', $department)
-            ->where('classID', $classID) // 🔥 Ensure only this class is affected
-            ->update(['status' => null]);
-
-        return back()->with('success', "Final grades for $department (Class ID: $classID) have been unlocked!");
-    }
-
-
-
-    public function verifyPassword(Request $request)
-    {
-        $class = Classes::find($request->id);
-
-        if (!$class || $class->password !== $request->password) {
-            return response()->json(['success' => false, 'message' => 'Incorrect password']);
-        }
-
-        return response()->json(['success' => true]);
     }
 
 
@@ -606,15 +603,22 @@ class RegistrarController extends Controller
             'updated_at' => now()
         ];
 
-        // ✅ If "Returned", also update submit_status
+        // ✅ If "Returned", also update submit_status & class status
         if ($request->dean_status == 'Returned') {
             $updateData['submit_status'] = 'Returned';
+
+            // 🔥 Update class status to "Rejected"
+            Classes::where('id', $request->classID)->update(['status' => 'Rejected']);
         }
 
-        // ✅ If "Confirmed", update submit_status to "Confirmed"
+        // ✅ If "Confirmed", update submit_status & class status
         if ($request->dean_status == 'Confirmed') {
             $updateData['submit_status'] = 'Submitted';
+
+            // 🔥 Update class status to "Approved"
+            Classes::where('id', $request->classID)->update(['status' => 'Approved']);
         }
+
 
         // ✅ Update only records matching classID and department
         DB::table('final_grade')
@@ -633,6 +637,7 @@ class RegistrarController extends Controller
         }
 
         $selectedDepartment = $request->department;
+        $classIDs = [];
 
         foreach ($request->grades as $grade) {
             // 🔹 Get student info (only from the selected department)
@@ -729,8 +734,12 @@ class RegistrarController extends Controller
                     ->where('classID', $grade['classID'])
                     ->where('studentID', $grade['studentID'])
                     ->delete();
+
+                $classIDs[] = $grade['classID'];
             }
         }
+
+        Classes::whereIn('id', array_unique($classIDs))->update(['status' => 'Active']);
 
         return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been locked successfully!');
     }

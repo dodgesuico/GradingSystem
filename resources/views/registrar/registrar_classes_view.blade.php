@@ -1118,20 +1118,41 @@
 
                 {{-- submit and lock grades section --}}
                 @if (isset($gradesByDepartment) && $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->status)
+
                     <!-- Unlock Grades (Only for this department) -->
                     @if (
-                        $gradesByDepartment->isNotEmpty() &&
-                            (empty($gradesByDepartment->first()->submit_status) ||
-                                $gradesByDepartment->first()->submit_status == 'Returned'))
+                            $gradesByDepartment->isNotEmpty() &&
+                            (empty($gradesByDepartment->first()->submit_status) || $gradesByDepartment->first()->submit_status == 'Returned')
+                        )
                         @if (Auth::check() &&
-                                in_array('instructor', explode(',', Auth::user()->role)) &&
-                                Auth::user()->name === $gradesByDepartment->first()->instructor)
+                            in_array('instructor', explode(',', Auth::user()->role)) &&
+                            Auth::user()->name === $gradesByDepartment->first()->instructor
+                        )
+                            @php
+                                $deanStatus = $gradesByDepartment->first()->dean_status;
+                            @endphp
+
+                            @if ($deanStatus == 'Returned')
+                                <!-- ❌ Instructor sees notification if grades are returned -->
+                                <div class="alert alert-danger" style="margin-top: 10px;">
+                                    <i class="fa-solid fa-exclamation-circle"></i>
+                                    The final grades have been <strong>returned by the Dean</strong>. Please review and resubmit.
+                                </div>
+
+                                <!-- 📝 Show Dean's Comment -->
+                                @if (!empty($gradesByDepartment->first()->comment))
+                                    <div class="alert alert-warning" style="margin-top: 10px;">
+                                        <i class="fa-solid fa-comment"></i>
+                                        <strong>Dean's Comment:</strong> {{ $gradesByDepartment->first()->comment }}
+                                    </div>
+                                @endif
+                            @endif
+
+
                             <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
                                 @csrf
                                 <input type="hidden" name="department" value="{{ $department }}">
-                                <!-- 🔥 Include department -->
-                                <input type="hidden" name="classID"
-                                    value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Include classID -->
+                                <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
 
                                 <button type="submit" class="btn btn-danger" style="margin: 10px 10px 0 0"
                                     onclick="return confirm('Are you sure you want to unlock grades for {{ $department }}?')">
@@ -1142,9 +1163,7 @@
                             <form action="{{ route('finalgrade.save') }}" method="POST" style="display:inline;">
                                 @csrf
                                 <input type="hidden" name="department" value="{{ $department }}">
-                                <!-- 🔥 Include department -->
-                                <input type="hidden" name="classID"
-                                    value="{{ $gradesByDepartment->first()->classID }}"> <!-- 🔥 Include classID -->
+                                <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
 
                                 <button type="submit" class="save-btn">
                                     <i class="fa-solid fa-file-export"></i> Submit to Dean ({{ $department }})
@@ -1152,15 +1171,8 @@
                             </form>
                         @endif
                     @endif
+
                     {{-- end of submit and lock grades section --}}
-
-
-
-
-
-
-
-
 
 
                     {{-- dean approval section --}}
@@ -1207,36 +1219,105 @@
                                         <i class="fa-solid fa-check"></i> Submit Decision for {{ $department }}
                                     </button>
                                 </form>
-
-                                <style>
-
-                                </style>
                             @endif
                         @endif
                     @endif
                     {{-- end of dean approval --}}
 
-
-
-
-
-
-
-                    @if (
+                    {{-- dean approval section --}}
+                    {{-- @if (
                         $gradesByDepartment->isNotEmpty() &&
                             $gradesByDepartment->first()->submit_status == 'Submitted' &&
-                            $gradesByDepartment->first()->dean_status == 'Confirmed')
+                            $gradesByDepartment->first()->dean_status != 'Confirmed')
+                        @if (Auth::check() && in_array('dean', explode(',', Auth::user()->role)))
+                            @php
+                                $userDepartment = Auth::user()->department; // Get Dean's department
+                            @endphp
+
+                            @if ($department == $userDepartment)
+                                <h4 style="margin: 10px 0; color: var(--ckcm-color4); font-size: 1.2rem;">Dean's Decision
+                                    for {{ $department }}</h4>
+                                <form action="{{ route('finalgrade.decision') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="department" value="{{ $department }}">
+                                    <input type="hidden" name="classID"
+                                        value="{{ $gradesByDepartment->first()->classID }}">
+                                    <!-- 🔥 Ensure correct classID -->
+                                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+                                        <div style="display: flex; gap: 5px; align-items: center;">
+                                            <input style="margin: 0" type="radio" id="confirmed_{{ $department }}"
+                                                name="dean_status" value="Confirmed" required>
+                                            <label style="color: var(--color-green)"
+                                                for="confirmed_{{ $department }}">✔️ Confirmed</label>
+                                        </div>
+
+                                        <div style="display: flex; gap: 5px; align-items: center;">
+                                            <input style="margin: 0" type="radio" id="returned_{{ $department }}"
+                                                name="dean_status" value="Returned" required>
+                                            <label style="color: var(--color-red)" for="returned_{{ $department }}">❌
+                                                Returned</label>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <textarea style="background: var(--ckcm-color2); color: var(--color1); padding: 5px; width: 100%;;" name="comment"
+                                            rows="3" class="form-control" placeholder="Add a comment (optional, only if returned)..."></textarea>
+                                    </div>
+
+                                    <button type="submit" class="save-btn">
+                                        <i class="fa-solid fa-check"></i> Submit Decision for {{ $department }}
+                                    </button>
+                                </form>
+                            @endif
+                        @endif
+                    @endif --}}
+                    {{-- end of dean approval --}}
+
+                    {{-- instructors notification --}}
+                    @if (
+                        $gradesByDepartment->isNotEmpty() &&
+                        $gradesByDepartment->first()->submit_status == 'Submitted' &&
+                        $gradesByDepartment->first()->dean_status == 'Confirmed'
+                    )
                         @if (Auth::check())
                             @php
                                 $user = Auth::user();
                                 $classInstructor = $gradesByDepartment->first()->instructor; // 🔥 Ensure this field exists in DB
                             @endphp
 
-                            <!-- ✅ Allow if instructor matches by name OR if their department is 'N/A' -->
-                            @if (in_array('instructor', explode(',', $user->role)) &&
-                                    $user->name === $classInstructor)
-                                <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}"
-                                    method="POST">
+
+                            @if (in_array('instructor', explode(',', $user->role)) && $user->name === $classInstructor)
+                                <!-- ✅ Instructor sees notification instead of submit button -->
+                                <div class="alert alert-success" style="margin-top: 10px;">
+                                    <i class="fa-solid fa-check-circle"></i>
+                                    The final grades have been <strong>approved by the Dean</strong> of {{ $department }}.
+                                </div>
+                                 <!-- 📝 Show Dean's Comment -->
+                                 @if (!empty($gradesByDepartment->first()->comment))
+                                    <div class="alert alert-warning" style="margin-top: 10px;">
+                                        <i class="fa-solid fa-comment"></i>
+                                        <strong>Dean's Comment:</strong> {{ $gradesByDepartment->first()->comment }}
+                                    </div>
+                                @endif
+                            @endif
+                        @endif
+                    @endif
+                    {{-- instructors notification end --}}
+
+                    {{-- dean submit to registrar start --}}
+                    @if (
+                            $gradesByDepartment->isNotEmpty() &&
+                            $gradesByDepartment->first()->submit_status == 'Submitted' &&
+                            $gradesByDepartment->first()->dean_status == 'Confirmed'
+                        )
+                        @if (Auth::check())
+                            @php
+                                $user = Auth::user();
+                            @endphp
+
+                            <!-- ✅ Allow submission ONLY if the user is a dean AND their department matches -->
+                            @if (in_array('dean', explode(',', $user->role)) && $user->department === $department)
+                                <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}" method="POST">
                                     @csrf
                                     @method('POST')
 
@@ -1262,17 +1343,18 @@
                                             value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
                                     @endforeach
 
-
                                     <button type="submit" class="save-btn">
-                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades for
-                                        {{ $department }}
+                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades for {{ $department }}
                                     </button>
-
                                 </form>
                             @endif
                         @endif
                     @endif
+                    {{-- dean submit to registrar end --}}
+
+
                 @endif
+
             @endforeach
 
 
