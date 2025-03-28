@@ -1312,7 +1312,7 @@
                                 @endif
 
                                 @if (
-                                        $gradesByDepartment->first()->registrar_status == 'Confirmed'
+                                        $gradesByDepartment->first()->registrar_status == 'Approved'
                                     )
                                     <!-- ✅ Instructor sees notification instead of submit button -->
                                     <div class="alert alert-success" style="margin-top: 10px;">
@@ -1326,7 +1326,24 @@
                                             <strong>Registrar's Comment:</strong> {{ $gradesByDepartment->first()->dean_comment }}
                                         </div>
                                     @endif
+                                @elseif (
+                                            $gradesByDepartment->first()->registrar_status == 'Rejected'
+                                        )
+                                        <!-- ✅ Instructor sees notification instead of submit button -->
+                                        <div class="alert alert-success" style="margin-top: 10px;">
+                                            <i class="fa-solid fa-check-circle"></i>
+                                            The final grades have been approved by the <strong> Registrar </strong>.
+                                        </div>
+                                        <!-- 📝 Show Dean's Comment -->
+                                        @if (!empty($gradesByDepartment->first()->dean_comment))
+                                            <div class="alert alert-warning" style="margin-top: 10px;">
+                                                <i class="fa-solid fa-comment"></i>
+                                                <strong>Registrar's Comment:</strong> {{ $gradesByDepartment->first()->dean_comment }}
+                                            </div>
+                                        @endif
                                 @endif
+
+
                             @endif
                         @endif
                     @endif
