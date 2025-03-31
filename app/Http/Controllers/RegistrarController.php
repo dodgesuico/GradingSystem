@@ -687,8 +687,117 @@ class RegistrarController extends Controller
         if ($request->registrar_status == 'Approved') {
             $updateData['registrar_status'] = 'Approved'; // Indicating final step before submission
 
-            // 🔥 Update class status to "Approved"
+            if (empty($request->grades)) {
+                return back()->with('error', 'No students selected, you can\'t lock.');
+            }
+
+            $selectedDepartment = $request->department;
+            $classIDs = [];
+
+            foreach ($request->grades as $grade) {
+                // 🔹 Get student info (only from the selected department)
+                $studentInfo = Classes_Student::where('studentID', $grade['studentID'])
+                    ->where('department', $selectedDepartment)
+                    ->first();
+
+                if ($studentInfo) {
+                    $classInfo = Classes::find($grade['classID']); // Get class details
+                    $subjectCode = optional($classInfo)->subject_code;
+                    $descriptiveTitle = optional($classInfo)->descriptive_title;
+                    $instructor = optional($classInfo)->instructor;
+                    $academicYear = optional($classInfo)->academic_year; // ✅ Get academic year
+                    $academicPeriod = optional($classInfo)->academic_period;
+
+                    // ✅ Fetch quizzes and scores for this student from `quizzes_scores`
+                    $quizzesScores = DB::table('quizzes_scores')
+                        ->where('classID', $grade['classID'])
+                        ->where('studentID', $grade['studentID'])
+                        ->get();
+
+                    // ✅ Insert into `archived_quizzesandscores`
+                    foreach ($quizzesScores as $score) {
+                        // 🔹 Fetch percentage and total score from `percentage` table
+                        $percentageData = DB::table('percentage')
+                            ->where('classID', $score->classID)
+                            ->first();
+
+                        // ✅ Insert archived record with percentage and total score
+                        DB::table('archived_quizzesandscores')->insert([
+                            'classID' => $score->classID,
+                            'subject_code' => $subjectCode,
+                            'descriptive_title' => $descriptiveTitle,
+                            'instructor' => $instructor,
+                            'studentID' => $score->studentID,
+                            'periodic_term' => $score->periodic_term,
+                            'quiz_percentage' => $percentageData->quiz_percentage ?? null,
+                            'quiz_total_score' => $percentageData->quiz_total_score ?? null,
+                            'quizzez' => $score->quizzez,
+                            'attendance_percentage' => $percentageData->attendance_percentage ?? null,
+                            'attendance_total_score' => $percentageData->attendance_total_score ?? null,
+                            'attendance_behavior' => $score->attendance_behavior,
+                            'assignment_percentage' => $percentageData->assignment_percentage ?? null,
+                            'assignment_total_score' => $percentageData->assignment_total_score ?? null,
+                            'assignments' => $score->assignments,
+                            'exam_percentage' => $percentageData->exam_percentage ?? null,
+                            'exam_total_score' => $percentageData->exam_total_score ?? null,
+                            'exam' => $score->exam,
+                            'academic_period' => $academicPeriod,
+                            'academic_year' => $academicYear, // ✅ Save academic year
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+
+                    // ✅ Delete the student's quizzes and scores after transferring
+                    DB::table('quizzes_scores')
+                        ->where('classID', $grade['classID'])
+                        ->where('studentID', $grade['studentID'])
+                        ->delete();
+
+                    // ✅ Save student grade logs (final grades)
+                    DB::table('grade_logs')->insert([
+                        'classID' => $grade['classID'],
+                        'studentID' => $grade['studentID'],
+                        'subject_code' => optional($classInfo)->subject_code,
+                        'descriptive_title' => optional($classInfo)->descriptive_title,
+                        'units' => optional($classInfo)->units,
+                        'instructor' => optional($classInfo)->instructor,
+                        'academic_period' => optional($classInfo)->academic_period,
+                        'academic_year' => $academicYear,
+                        'schedule' => optional($classInfo)->schedule,
+                        'name' => $studentInfo->name,
+                        'gender' => $studentInfo->gender,
+                        'email' => $studentInfo->email,
+                        'department' => $selectedDepartment,
+                        'prelim' => $grade['prelim'],
+                        'midterm' => $grade['midterm'],
+                        'semi_finals' => $grade['semi_finals'],
+                        'final' => $grade['final'],
+                        'remarks' => $grade['remarks'],
+                        'status' => 'Approved',
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]);
+
+                    // ✅ Remove student from `classes_student`
+                    Classes_Student::where('studentID', $grade['studentID'])
+                        ->where('classID', $grade['classID'])
+                        ->delete();
+
+                    // ✅ Remove student from `final_grades` after locking
+                    DB::table('final_grade')
+                        ->where('classID', $grade['classID'])
+                        ->where('studentID', $grade['studentID'])
+                        ->delete();
+
+                    $classIDs[] = $grade['classID'];
+                }
+            }
+
             Classes::where('id', $request->classID)->update(['status' => 'Approved']);
+
+            return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
+            // 🔥 Update class status to "Approved"
         }
 
         // ✅ Update only records matching classID and department
@@ -698,121 +807,5 @@ class RegistrarController extends Controller
             ->update($updateData);
 
         return back()->with('success', 'Registrar’s decision has been submitted successfully!');
-    }
-
-
-
-    public function submitFinalGrades(Request $request)
-    {
-        if (empty($request->grades)) {
-            return back()->with('error', 'No students selected, you can\'t lock.');
-        }
-
-        $selectedDepartment = $request->department;
-        $classIDs = [];
-
-        foreach ($request->grades as $grade) {
-            // 🔹 Get student info (only from the selected department)
-            $studentInfo = Classes_Student::where('studentID', $grade['studentID'])
-                ->where('department', $selectedDepartment)
-                ->first();
-
-            if ($studentInfo) {
-                $classInfo = Classes::find($grade['classID']); // Get class details
-                $subjectCode = optional($classInfo)->subject_code;
-                $descriptiveTitle = optional($classInfo)->descriptive_title;
-                $instructor = optional($classInfo)->instructor;
-                $academicYear = optional($classInfo)->academic_year; // ✅ Get academic year
-                $academicPeriod = optional($classInfo)->academic_period;
-
-                // ✅ Fetch quizzes and scores for this student from `quizzes_scores`
-                $quizzesScores = DB::table('quizzes_scores')
-                    ->where('classID', $grade['classID'])
-                    ->where('studentID', $grade['studentID'])
-                    ->get();
-
-                // ✅ Insert into `archived_quizzesandscores`
-                foreach ($quizzesScores as $score) {
-                    // 🔹 Fetch percentage and total score from `percentage` table
-                    $percentageData = DB::table('percentage')
-                        ->where('classID', $score->classID)
-                        ->first();
-
-                    // ✅ Insert archived record with percentage and total score
-                    DB::table('archived_quizzesandscores')->insert([
-                        'classID' => $score->classID,
-                        'subject_code' => $subjectCode,
-                        'descriptive_title' => $descriptiveTitle,
-                        'instructor' => $instructor,
-                        'studentID' => $score->studentID,
-                        'periodic_term' => $score->periodic_term,
-                        'quiz_percentage' => $percentageData->quiz_percentage ?? null,
-                        'quiz_total_score' => $percentageData->quiz_total_score ?? null,
-                        'quizzez' => $score->quizzez,
-                        'attendance_percentage' => $percentageData->attendance_percentage ?? null,
-                        'attendance_total_score' => $percentageData->attendance_total_score ?? null,
-                        'attendance_behavior' => $score->attendance_behavior,
-                        'assignment_percentage' => $percentageData->assignment_percentage ?? null,
-                        'assignment_total_score' => $percentageData->assignment_total_score ?? null,
-                        'assignments' => $score->assignments,
-                        'exam_percentage' => $percentageData->exam_percentage ?? null,
-                        'exam_total_score' => $percentageData->exam_total_score ?? null,
-                        'exam' => $score->exam,
-                        'academic_period' => $academicPeriod,
-                        'academic_year' => $academicYear, // ✅ Save academic year
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-
-                // ✅ Delete the student's quizzes and scores after transferring
-                DB::table('quizzes_scores')
-                    ->where('classID', $grade['classID'])
-                    ->where('studentID', $grade['studentID'])
-                    ->delete();
-
-                // ✅ Save student grade logs (final grades)
-                DB::table('grade_logs')->insert([
-                    'classID' => $grade['classID'],
-                    'studentID' => $grade['studentID'],
-                    'subject_code' => optional($classInfo)->subject_code,
-                    'descriptive_title' => optional($classInfo)->descriptive_title,
-                    'units' => optional($classInfo)->units,
-                    'instructor' => optional($classInfo)->instructor,
-                    'academic_period' => optional($classInfo)->academic_period,
-                    'academic_year' => $academicYear,
-                    'schedule' => optional($classInfo)->schedule,
-                    'name' => $studentInfo->name,
-                    'gender' => $studentInfo->gender,
-                    'email' => $studentInfo->email,
-                    'department' => $selectedDepartment,
-                    'prelim' => $grade['prelim'],
-                    'midterm' => $grade['midterm'],
-                    'semi_finals' => $grade['semi_finals'],
-                    'final' => $grade['final'],
-                    'remarks' => $grade['remarks'],
-                    'status' => 'Approved',
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ]);
-
-                // ✅ Remove student from `classes_student`
-                Classes_Student::where('studentID', $grade['studentID'])
-                    ->where('classID', $grade['classID'])
-                    ->delete();
-
-                // ✅ Remove student from `final_grades` after locking
-                DB::table('final_grade')
-                    ->where('classID', $grade['classID'])
-                    ->where('studentID', $grade['studentID'])
-                    ->delete();
-
-                $classIDs[] = $grade['classID'];
-            }
-        }
-
-        Classes::whereIn('id', array_unique($classIDs))->update(['status' => 'Active']);
-
-        return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
     }
 }

@@ -1402,6 +1402,25 @@
                                 <input type="hidden" name="department" value="{{ $department }}">
                                 <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
 
+                                @foreach ($studentsByDepartment as $student)
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                                        value="{{ $student->classID }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                                        value="{{ $student->studentID }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                                        value="{{ $student->name }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                                        value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                                        value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                                        value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                                        value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                    <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                                        value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                                @endforeach
+
                                 <!-- 🔥 Registrar Approval Decision -->
                                 <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
                                     <div style="display: flex; gap: 5px; align-items: center;">
@@ -1430,58 +1449,8 @@
                             </form>
                         @endif
                     @endif
-
                     {{-- registrar approval section end --}}
 
-
-                    {{-- dean submit to registrar start --}}
-                    @if (
-                            $gradesByDepartment->isNotEmpty() &&
-                            $gradesByDepartment->first()->submit_status == 'Submitted' &&
-                            $gradesByDepartment->first()->dean_status == 'Confirmed' &&
-                            $gradesByDepartment->first()->registrar_status == 'Approved'
-                        )
-                        @if (Auth::check())
-                            @php
-                                $user = Auth::user();
-                            @endphp
-
-                            <!-- ✅ Allow submission ONLY if the user is a dean AND their department matches -->
-                            @if (in_array('dean', explode(',', $user->role)) && $user->department === $department)
-                                <form style="margin-top: 10px;" action="{{ route('submit.finalgrade') }}" method="POST">
-                                    @csrf
-                                    @method('POST')
-
-                                    <!-- 🔥 Ensure the department is submitted with this hidden input -->
-                                    <input type="hidden" name="department" value="{{ $department }}">
-
-                                    @foreach ($studentsByDepartment as $student)
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
-                                            value="{{ $student->classID }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
-                                            value="{{ $student->studentID }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][name]"
-                                            value="{{ $student->name }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
-                                            value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
-                                            value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
-                                            value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][final]"
-                                            value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                                        <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
-                                            value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
-                                    @endforeach
-
-                                    <button type="submit" class="save-btn">
-                                        <i class="fa-solid fa-file-export"></i> Submit Final Grades for {{ $department }}
-                                    </button>
-                                </form>
-                            @endif
-                        @endif
-                    @endif
-                    {{-- dean submit to registrar end --}}
 
                 @endif
 
