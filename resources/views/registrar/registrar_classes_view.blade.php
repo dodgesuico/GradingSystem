@@ -966,14 +966,21 @@
         <div class="grade-sheet-container">
             @php
                 $loggedInUserDepartment = Auth::user()->department;
+                $isRegistrar = in_array('registrar', explode(',', Auth::user()->role)); // Check if user is a registrar
             @endphp
 
 
             @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
+                @php
+                    // Check if any student in this department has registrar_status 'Pending'
+                    $hasPendingApproval = $finalGrades->where('department', $department)
+                                                    ->contains('registrar_status', 'Pending');
+                @endphp
+
                 @if (
-                    $loggedInUserDepartment === 'N/A' ||
-                        $department === $loggedInUserDepartment ||
-                        (isset($class->instructor) && $class->instructor === auth()->user()->name))
+                    (!$isRegistrar && ($loggedInUserDepartment === 'N/A' || $department === $loggedInUserDepartment || (isset($class->instructor) && $class->instructor === auth()->user()->name)))
+                    || ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
+                )
 
                     <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
 

@@ -80,11 +80,9 @@
                     // Check if the class was added by the logged-in user
                     $isAddedByUser = $class->added_by === $userName;
 
-                    // Get the final grade record for this class
-                    $finalGrade = $finalGrades->where('classID', $class->id)->first();
-
-                    // Check if the logged-in user is a registrar and the registrar_status is 'Pending'
-                    $isRegistrarAllowed = in_array('registrar', explode(',', Auth::user()->role)) && optional($finalGrade)->registrar_status === 'Pending';
+                    // Check if any final grade record for this class has 'Pending' status
+                    $isRegistrarAllowed = in_array('registrar', explode(',', Auth::user()->role))
+                        && $finalGrades->where('classID', $class->id)->contains('registrar_status', 'Pending');
 
                     // Show if either condition is met
                     return $hasStudentsInDepartment || $isAddedByUser || $isRegistrarAllowed;
