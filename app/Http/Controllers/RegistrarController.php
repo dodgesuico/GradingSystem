@@ -796,7 +796,8 @@ class RegistrarController extends Controller
 
             Classes::where('id', $request->classID)->update(['status' => 'Approved']);
 
-            return back()->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
+            return redirect()->route('registrar_classes')->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
+
             // 🔥 Update class status to "Approved"
         }
 
