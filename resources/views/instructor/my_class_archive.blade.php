@@ -91,7 +91,7 @@
                                         @foreach ($titleGroups as $descriptive_title => $termGroups)
                                             <h5 style="color: var(--color1); font-size: 1rem;">Descriptive Title:
                                                 {{ $descriptive_title }}</h5>
-                                            {{-- @foreach ($termGroups as $periodic_term => $records)
+                                            @foreach ($termGroups as $periodic_term => $records)
                                                 <h6 style="color: var(--color1); padding: 10px 0; font-size: 1rem;;">Term:
                                                     {{ ucfirst($periodic_term) }}</h6>
                                                 <div class="table-container">
@@ -142,144 +142,7 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                            @endforeach --}}
-
-
-                                            <div class="tabs">
-                                                <ul class="tab-titles">
-                                                    @foreach ($termGroups as $periodic_term => $records)
-                                                        <li class="tab-title" data-tab="{{ $periodic_term }}" style="cursor: pointer;">{{ ucfirst($periodic_term) }}</li>
-                                                    @endforeach
-                                                </ul>
-
-                                                <div class="tab-content">
-                                                    @foreach ($termGroups as $periodic_term => $records)
-                                                        <div class="tab-pane" id="{{ $periodic_term }}" style="display: none;">
-                                                            <h6 style="color: var(--color1); padding: 10px 0; font-size: 1rem;">Term: {{ ucfirst($periodic_term) }}</h6>
-                                                            <div class="table-container">
-                                                                <table>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Student ID</th>
-                                                                            <th>Quiz (%)</th>
-                                                                            <th>Quiz Score</th>
-                                                                            <th>Quizzes</th>
-                                                                            <th>Attendance (%)</th>
-                                                                            <th>Attendance Total Score</th>
-                                                                            <th>Attendance Score</th>
-                                                                            <th>Assignments (%)</th>
-                                                                            <th>Assignment Total Score</th>
-                                                                            <th>Assignments Score</th>
-                                                                            <th>Exam (%)</th>
-                                                                            <th>Exam Total Score</th>
-                                                                            <th>Exam Score</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @foreach ($records as $record)
-                                                                            <tr>
-                                                                                <td>{{ $record->studentID }}</td>
-                                                                                <td>{{ $record->quiz_percentage }}%</td>
-                                                                                <td>{{ $record->quiz_total_score }}</td>
-                                                                                <td style="color: var(--color-green); border: 1px solid var(--color7);">{{ $record->quizzez }}</td>
-                                                                                <td>{{ $record->attendance_percentage }}%</td>
-                                                                                <td>{{ $record->attendance_total_score }}</td>
-                                                                                <td style=" color: var(--color-green); border: 1px solid var(--color7);">{{ $record->attendance_behavior }}</td>
-                                                                                <td>{{ $record->assignment_percentage }}%</td>
-                                                                                <td>{{ $record->assignment_total_score }}</td>
-                                                                                <td style=" color: var(--color-green); border: 1px solid var(--color7);">{{ $record->assignments }}</td>
-                                                                                <td>{{ $record->exam_percentage }}</td>
-                                                                                <td>{{ $record->exam_total_score }}</td>
-                                                                                <td style=" color: var(--color-green); border: 1px solid var(--color7);">{{ $record->exam }}</td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-
-                                            <script>
-                                                // JavaScript to handle tab switching
-                                                document.querySelectorAll('.tab-title').forEach(tab => {
-                                                    tab.addEventListener('click', function() {
-                                                        const tabId = this.getAttribute('data-tab');
-
-                                                        // Hide all tabs
-                                                        document.querySelectorAll('.tab-pane').forEach(pane => {
-                                                            pane.style.display = 'none';
-                                                        });
-
-                                                        // Show the selected tab
-                                                        document.getElementById(tabId).style.display = 'block';
-
-                                                        // Remove active class from all tab titles
-                                                        document.querySelectorAll('.tab-title').forEach(title => {
-                                                            title.classList.remove('active');
-                                                        });
-
-                                                        // Add active class to the clicked tab title
-                                                        this.classList.add('active');
-                                                    });
-                                                });
-
-                                                // Display the first tab by default
-                                                document.querySelector('.tab-title').click();
-                                            </script>
-
-                                            <style>
-                                                .tabs {
-                                                    display: flex;
-                                                    flex-direction: column;
-                                                }
-
-                                                .tab-titles {
-                                                    list-style: none;
-                                                    display: flex;
-                                                    justify-content: space-around;
-                                                    margin: 0;
-                                                    padding: 0;
-                                                }
-
-                                                .tab-title {
-                                                    padding: 10px;
-                                                    background: #f0f0f0;
-                                                    border: 1px solid #ddd;
-                                                    cursor: pointer;
-                                                    flex: 1;
-                                                    text-align: center;
-                                                }
-
-                                                .tab-title.active {
-                                                    background: #4CAF50;
-                                                    color: white;
-                                                }
-
-                                                .tab-content {
-                                                    margin-top: 20px;
-                                                }
-
-                                                .tab-pane {
-                                                    display: none;
-                                                }
-
-                                                .table-container {
-                                                    overflow-x: auto;
-                                                }
-
-                                                table {
-                                                    width: 100%;
-                                                    border-collapse: collapse;
-                                                }
-
-                                                th, td {
-                                                    padding: 8px;
-                                                    border: 1px solid #ddd;
-                                                }
-                                            </style>
-
+                                            @endforeach
 
                                             {{-- Final Grades Table --}}
                                             <div class="table-container" style="margin-top: 20px;">
