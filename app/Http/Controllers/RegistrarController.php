@@ -695,37 +695,36 @@ class RegistrarController extends Controller
             $classIDs = [];
 
             foreach ($request->grades as $grade) {
-                // 🔹 Get student info (only from the selected department)
+                // Get student info for each department
                 $studentInfo = Classes_Student::where('studentID', $grade['studentID'])
                     ->where('department', $selectedDepartment)
                     ->first();
 
                 if ($studentInfo) {
-                    $classInfo = Classes::find($grade['classID']); // Get class details
+                    $classInfo = Classes::find($grade['classID']);
                     $subjectCode = optional($classInfo)->subject_code;
                     $descriptiveTitle = optional($classInfo)->descriptive_title;
+                    $units = optional($classInfo)->units;
                     $instructor = optional($classInfo)->instructor;
-                    $academicYear = optional($classInfo)->academic_year; // ✅ Get academic year
+                    $academicYear = optional($classInfo)->academic_year;
                     $academicPeriod = optional($classInfo)->academic_period;
 
-                    // ✅ Fetch quizzes and scores for this student from `quizzes_scores`
+                    // Handle quizzes and scores for the student
                     $quizzesScores = DB::table('quizzes_scores')
                         ->where('classID', $grade['classID'])
                         ->where('studentID', $grade['studentID'])
                         ->get();
 
-                    // ✅ Insert into `archived_quizzesandscores`
                     foreach ($quizzesScores as $score) {
-                        // 🔹 Fetch percentage and total score from `percentage` table
                         $percentageData = DB::table('percentage')
                             ->where('classID', $score->classID)
                             ->first();
 
-                        // ✅ Insert archived record with percentage and total score
                         DB::table('archived_quizzesandscores')->insert([
                             'classID' => $score->classID,
                             'subject_code' => $subjectCode,
                             'descriptive_title' => $descriptiveTitle,
+                            'units' => $units,
                             'instructor' => $instructor,
                             'studentID' => $score->studentID,
                             'periodic_term' => $score->periodic_term,
@@ -742,29 +741,28 @@ class RegistrarController extends Controller
                             'exam_total_score' => $percentageData->exam_total_score ?? null,
                             'exam' => $score->exam,
                             'academic_period' => $academicPeriod,
-                            'academic_year' => $academicYear, // ✅ Save academic year
+                            'academic_year' => $academicYear,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
                     }
 
-                    // ✅ Delete the student's quizzes and scores after transferring
+                    // Remove the student's quizzes and scores after transferring
                     DB::table('quizzes_scores')
                         ->where('classID', $grade['classID'])
                         ->where('studentID', $grade['studentID'])
                         ->delete();
 
-                    // ✅ Save student grade logs (final grades)
-                    DB::table('grade_logs')->insert([
+                    // Insert into final archived grades
+                    DB::table('archived_final_grades')->insert([
                         'classID' => $grade['classID'],
                         'studentID' => $grade['studentID'],
-                        'subject_code' => optional($classInfo)->subject_code,
-                        'descriptive_title' => optional($classInfo)->descriptive_title,
-                        'units' => optional($classInfo)->units,
-                        'instructor' => optional($classInfo)->instructor,
-                        'academic_period' => optional($classInfo)->academic_period,
+                        'subject_code' => $subjectCode,
+                        'descriptive_title' => $descriptiveTitle,
+                        'units' => $units,
+                        'instructor' => $instructor,
                         'academic_year' => $academicYear,
-                        'schedule' => optional($classInfo)->schedule,
+                        'academic_period' => $academicPeriod,
                         'name' => $studentInfo->name,
                         'gender' => $studentInfo->gender,
                         'email' => $studentInfo->email,
@@ -781,8 +779,8 @@ class RegistrarController extends Controller
 
                     // ✅ Remove student from `classes_student`
                     Classes_Student::where('studentID', $grade['studentID'])
-                        ->where('classID', $grade['classID'])
-                        ->delete();
+                    ->where('classID', $grade['classID'])
+                    ->delete();
 
                     // ✅ Remove student from `final_grades` after locking
                     DB::table('final_grade')
@@ -794,11 +792,18 @@ class RegistrarController extends Controller
                 }
             }
 
+            // ✅ Check if the class still has students
+            $classHasStudents = Classes_Student::whereIn('classID', $classIDs)->exists();
+
+            if (!$classHasStudents) {
+                // If no students left, delete the class
+                Classes::whereIn('id', $classIDs)->delete();
+            }
+
+            // Update class status to "Approved"
             Classes::where('id', $request->classID)->update(['status' => 'Approved']);
 
             return redirect()->route('registrar_classes')->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
-
-            // 🔥 Update class status to "Approved"
         }
 
         // ✅ Update only records matching classID and department
@@ -806,6 +811,7 @@ class RegistrarController extends Controller
             ->where('classID', $request->classID)
             ->where('department', $request->department)
             ->update($updateData);
+
 
         return back()->with('success', 'Registrar’s decision has been submitted successfully!');
     }

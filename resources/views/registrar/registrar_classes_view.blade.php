@@ -978,9 +978,9 @@
                 @endphp
 
                 @if (
-                    (!$isRegistrar && ($loggedInUserDepartment === 'N/A' || $department === $loggedInUserDepartment || (isset($class->instructor) && $class->instructor === auth()->user()->name)))
-                    || ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
-                )
+                        (!$isRegistrar && ($loggedInUserDepartment === 'N/A' || $department === $loggedInUserDepartment || (isset($class->instructor) && $class->instructor === auth()->user()->name)))
+                        || ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
+                    )
 
                     <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
 
@@ -1140,6 +1140,7 @@
                     </form>
                     <br>
                 @endif
+
 
                 {{-- submit and lock grades section --}}
                 @if (isset($gradesByDepartment) && $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->status)
@@ -1387,74 +1388,73 @@
                     @endif
                     {{-- dean submit to registrar end --}}
 
-
-                    {{-- registrar approval section --}}
-                    @if (
-                            $gradesByDepartment->isNotEmpty() &&
-                            $gradesByDepartment->first()->submit_status == 'Submitted' &&
-                            $gradesByDepartment->first()->dean_status == 'Confirmed' &&
-                            $gradesByDepartment->first()->registrar_status == 'Pending'
-                        )
-                        @if (Auth::check() && in_array('registrar', explode(',', Auth::user()->role)))
-                            <h4 style="margin: 10px 0; color: var(--ckcm-color4); font-size: 1.2rem;">Registrar's Approval for {{ $department }}</h4>
-                            <form action="{{ route('finalgraderegistrar.decision') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="department" value="{{ $department }}">
-                                <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
-
-                                @foreach ($studentsByDepartment as $student)
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
-                                        value="{{ $student->classID }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
-                                        value="{{ $student->studentID }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][name]"
-                                        value="{{ $student->name }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
-                                        value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
-                                        value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
-                                        value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][final]"
-                                        value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                                    <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
-                                        value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
-                                @endforeach
-
-                                <!-- 🔥 Registrar Approval Decision -->
-                                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
-                                    <div style="display: flex; gap: 5px; align-items: center;">
-                                        <input style="margin: 0" type="radio" id="registrar_approved_{{ $department }}"
-                                            name="registrar_status" value="Approved" required>
-                                        <label style="color: var(--color-green)" for="registrar_approved_{{ $department }}">✔️ Approved</label>
-                                    </div>
-
-                                    <div style="display: flex; gap: 5px; align-items: center;">
-                                        <input style="margin: 0" type="radio" id="registrar_rejected_{{ $department }}"
-                                            name="registrar_status" value="Rejected" required>
-                                        <label style="color: var(--color-red)" for="registrar_rejected_{{ $department }}">❌ Rejected</label>
-                                    </div>
-                                </div>
-
-                                <!-- Optional Comment for Rejection -->
-                                <div style="margin-bottom: 10px;">
-                                    <textarea style="background: var(--ckcm-color2); color: var(--color1); padding: 5px; width: 100%;"
-                                        name="registrar_comment" rows="3" class="form-control"
-                                        placeholder="Add a comment (optional, only if rejected)..."></textarea>
-                                </div>
-
-                                <button type="submit" class="save-btn">
-                                    <i class="fa-solid fa-check"></i> Submit Decision for {{ $department }}
-                                </button>
-                            </form>
-                        @endif
-                    @endif
-                    {{-- registrar approval section end --}}
-
-
                 @endif
 
+                @if (
+                        ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
+                    )
+                    @if (Auth::check() && in_array('registrar', explode(',', Auth::user()->role)))
+                        <h4 style="margin: 10px 0; color: var(--ckcm-color4); font-size: 1.2rem;">Registrar's Approval</h4>
+                        <form action="{{ route('finalgraderegistrar.decision') }}" method="POST">
+                            @csrf
+
+                            <!-- Hidden input for departments as an array -->
+                            <input type="hidden" name="department" value="{{ $department }}">
+
+                            <!-- Example for sending the classID of the first student in the department group -->
+                            <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
+
+                            @foreach ($studentsByDepartment as $student)
+                                <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                                    value="{{ $student->classID }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                                    value="{{ $student->studentID }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                                    value="{{ $student->name }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                                    value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                                    value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                                    value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                                    value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                                <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                                    value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                            @endforeach
+
+                            <!-- 🔥 Registrar Approval Decision -->
+                            <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+                                <div style="display: flex; gap: 5px; align-items: center;">
+                                    <input style="margin: 0" type="radio" id="registrar_approved_{{ $department }}"
+                                        name="registrar_status" value="Approved" required>
+                                    <label style="color: var(--color-green)" for="registrar_approved_{{ $department }}">✔️ Approved</label>
+                                </div>
+
+                                <div style="display: flex; gap: 5px; align-items: center;">
+                                    <input style="margin: 0" type="radio" id="registrar_rejected_{{ $department }}"
+                                        name="registrar_status" value="Rejected" required>
+                                    <label style="color: var(--color-red)" for="registrar_rejected_{{ $department }}">❌ Rejected</label>
+                                </div>
+                            </div>
+
+                            <!-- Optional Comment for Rejection -->
+                            <div style="margin-bottom: 10px;">
+                                <textarea style="background: var(--ckcm-color2); color: var(--color1); padding: 5px; width: 100%;"
+                                    name="registrar_comment" rows="3" class="form-control"
+                                    placeholder="Add a comment (optional, only if rejected)..."></textarea>
+                            </div>
+
+                            <button type="submit" class="save-btn">
+                                <i class="fa-solid fa-check"></i> Submit Decision
+                            </button>
+                        </form>
+                    @endif
+                @endif
+                {{-- registrar approval section end --}}
+
             @endforeach
+
 
 
 

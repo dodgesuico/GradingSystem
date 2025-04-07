@@ -17,6 +17,7 @@ return new class extends Migration
                 $table->integer('classID');
                 $table->string('subject_code');
                 $table->string('descriptive_title');
+                $table->integer('units');
                 $table->string('instructor');
                 $table->integer('studentID');
                 $table->string('periodic_term');
@@ -37,6 +38,7 @@ return new class extends Migration
                 $table->decimal('exam', 5, 2)->nullable();
                 $table->string('academic_period');
                 $table->string('academic_year')->nullable();
+
                 $table->timestamps();
 
 
