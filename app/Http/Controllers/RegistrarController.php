@@ -705,6 +705,7 @@ class RegistrarController extends Controller
                     $subjectCode = optional($classInfo)->subject_code;
                     $descriptiveTitle = optional($classInfo)->descriptive_title;
                     $units = optional($classInfo)->units;
+                    $schedule = optional($classInfo)->schedule;
                     $instructor = optional($classInfo)->instructor;
                     $academicYear = optional($classInfo)->academic_year;
                     $academicPeriod = optional($classInfo)->academic_period;
@@ -760,6 +761,32 @@ class RegistrarController extends Controller
                         'subject_code' => $subjectCode,
                         'descriptive_title' => $descriptiveTitle,
                         'units' => $units,
+                        'schedule' => $schedule,
+                        'instructor' => $instructor,
+                        'academic_year' => $academicYear,
+                        'academic_period' => $academicPeriod,
+                        'name' => $studentInfo->name,
+                        'gender' => $studentInfo->gender,
+                        'email' => $studentInfo->email,
+                        'department' => $selectedDepartment,
+                        'prelim' => $grade['prelim'],
+                        'midterm' => $grade['midterm'],
+                        'semi_finals' => $grade['semi_finals'],
+                        'final' => $grade['final'],
+                        'remarks' => $grade['remarks'],
+                        'status' => 'Approved',
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]);
+
+                    // Insert into final archived grades
+                    DB::table('grade_logs')->insert([
+                        'classID' => $grade['classID'],
+                        'studentID' => $grade['studentID'],
+                        'subject_code' => $subjectCode,
+                        'descriptive_title' => $descriptiveTitle,
+                        'units' => $units,
+                        'schedule' => $schedule,
                         'instructor' => $instructor,
                         'academic_year' => $academicYear,
                         'academic_period' => $academicPeriod,
