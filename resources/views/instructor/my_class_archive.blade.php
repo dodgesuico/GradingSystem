@@ -68,12 +68,13 @@
 
         <div class="class-archive-container">
             @foreach ($archivedData as $academic_year => $periodGroups)
-                <div class="folder"  onclick="toggleFolder('year-{{ $academic_year }}')">
+                <div class="folder" onclick="toggleFolder('year-{{ $academic_year }}')">
                     📁 Academic Year: {{ $academic_year }}
                 </div>
                 <div class="folder-content" id="year-{{ $academic_year }}">
                     @foreach ($periodGroups as $academic_period => $subjectGroups)
-                        <div class="folder" style="background:var(--color7)" onclick="toggleFolder('period-{{ $academic_year }}-{{ $academic_period }}')">
+                        <div class="folder" style="background:var(--color7)"
+                            onclick="toggleFolder('period-{{ $academic_year }}-{{ $academic_period }}')">
                             📂 Academic Period: {{ $academic_period }}
                         </div>
                         <div class="folder-content" id="period-{{ $academic_year }}-{{ $academic_period }}">
@@ -85,11 +86,14 @@
                                 <div class="folder-content" style=" background: var(--color9b); padding:10px 20px;"
                                     id="subject-{{ $academic_year }}-{{ $academic_period }}-{{ $subject_code }}">
                                     @foreach ($instructorGroups as $instructor => $titleGroups)
-                                        <h4 style="color: var(--color1); font-size: 1rem;">Instructor: {{ $instructor }}</h4>
+                                        <h4 style="color: var(--color1); font-size: 1rem;">Instructor: {{ $instructor }}
+                                        </h4>
                                         @foreach ($titleGroups as $descriptive_title => $termGroups)
-                                            <h5  style="color: var(--color1); font-size: 1rem;">Descriptive Title: {{ $descriptive_title }}</h5>
+                                            <h5 style="color: var(--color1); font-size: 1rem;">Descriptive Title:
+                                                {{ $descriptive_title }}</h5>
                                             @foreach ($termGroups as $periodic_term => $records)
-                                                <h6  style="color: var(--color1); padding: 10px 0; font-size: 1rem;;">Term: {{ ucfirst($periodic_term) }}</h6>
+                                                <h6 style="color: var(--color1); padding: 10px 0; font-size: 1rem;;">Term:
+                                                    {{ ucfirst($periodic_term) }}</h6>
                                                 <div class="table-container">
                                                     <table>
                                                         <thead>
@@ -139,6 +143,55 @@
                                                     </table>
                                                 </div>
                                             @endforeach
+
+                                            {{-- Final Grades Table --}}
+                                            <div class="table-container" style="margin-top: 20px;">
+                                                <h6 style="color: var(--color1); font-size: 1.2rem; margin-bottom: 10px;">Final Grades</h6>
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Student ID</th>
+                                                            <th>Prelim</th>
+                                                            <th>Midterm</th>
+                                                            <th>Semi-Finals</th>
+                                                            <th>Final</th>
+                                                            <th>Remarks</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($records as $record)
+                                                            @php
+                                                                // Rebuild the key used for matching archived final grades
+                                                                $finalKey =
+                                                                    $academic_year .
+                                                                    '|' .
+                                                                    $academic_period .
+                                                                    '|' .
+                                                                    $subject_code .
+                                                                    '|' .
+                                                                    $instructor .
+                                                                    '|' .
+                                                                    $descriptive_title .
+                                                                    '|' .
+                                                                    $record->studentID;
+                                                                $finalGrade = $finalGrades[$finalKey][0] ?? null;
+                                                            @endphp
+                                                            @if ($finalGrade)
+                                                                <tr>
+                                                                    <td>{{ $record->studentID }}</td>
+                                                                    <td>{{ $finalGrade->prelim }}</td>
+                                                                    <td>{{ $finalGrade->midterm }}</td>
+                                                                    <td>{{ $finalGrade->semi_finals }}</td>
+                                                                    <td>{{ $finalGrade->final }}</td>
+                                                                    <td>{{ $finalGrade->remarks }}</td>
+                                                                    <td>{{ $finalGrade->status }}</td>
+                                                                </tr>
+                                                            @endif
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         @endforeach
                                     @endforeach
                                 </div>

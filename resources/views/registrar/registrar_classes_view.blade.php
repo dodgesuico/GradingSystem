@@ -982,7 +982,7 @@
                         || ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
                     )
 
-                    <h3 style="margin-bottom: 10px;">{{ $department }} Department</h3>
+                    <h3 style="margin: 50px 0 10px 0 ;">{{ $department }} Department</h3>
 
                     @php
                         $gradesByDepartment = $finalGrades->where('department', $department);
