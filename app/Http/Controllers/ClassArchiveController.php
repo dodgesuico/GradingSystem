@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ClassArchive;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Import Auth
+use App\Models\ArchivedFinalGrade;
+
 
 class ClassArchiveController extends Controller
 {
@@ -43,6 +45,9 @@ class ClassArchiveController extends Controller
             ->orderBy('subject_code')
             ->get();
 
+
+
+
         // Get unique instructors for the dropdown
         $uniqueInstructors = ClassArchive::selectRaw('DISTINCT TRIM(LOWER(instructor)) as instructor')
             ->orderBy('instructor')
@@ -77,6 +82,13 @@ class ClassArchiveController extends Controller
             });
 
 
-        return view('instructor.my_class_archive', compact('archivedData', 'uniqueInstructors'));
+        $finalGrades = ArchivedFinalGrade::all()->groupBy(function ($item) {
+            return $item->academic_year . '|' . $item->academic_period . '|' . $item->subject_code . '|' . $item->instructor . '|' . $item->descriptive_title . '|' . $item->studentID;
+        });
+
+
+
+        return view('instructor.my_class_archive', compact('archivedData', 'uniqueInstructors', 'finalGrades'));
+
     }
 }
