@@ -91,62 +91,157 @@
                                         @foreach ($titleGroups as $descriptive_title => $termGroups)
                                             <h5 style="color: var(--color1); font-size: 1rem;">Descriptive Title:
                                                 {{ $descriptive_title }}</h5>
-                                            @foreach ($termGroups as $periodic_term => $records)
-                                                <h6 style="color: var(--color1); padding: 10px 0; font-size: 1rem;;">Term:
-                                                    {{ ucfirst($periodic_term) }}</h6>
-                                                <div class="table-container">
-                                                    <table>
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Student ID</th>
-                                                                <th>Quiz (%)</th>
-                                                                <th>Quiz Score</th>
-                                                                <th>Quizzes</th>
-                                                                <th>Attendance (%)</th>
-                                                                <th>Attendance Total Score</th>
-                                                                <th>Attendance Score</th>
-                                                                <th>Assignments (%)</th>
-                                                                <th>Assignment Total Score</th>
-                                                                <th>Assignments Score</th>
-                                                                <th>Exam (%)</th>
-                                                                <th>Exam Total Score</th>
-                                                                <th>Exam Score</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($records as $record)
-                                                                <tr>
-                                                                    <td>{{ $record->studentID }}</td>
-                                                                    <td>{{ $record->quiz_percentage }}%</td>
-                                                                    <td>{{ $record->quiz_total_score }}</td>
-                                                                    <td
-                                                                        style="color: var(--color-green); border: 1px solid var(--color7);">
-                                                                        {{ $record->quizzez }}</td>
-                                                                    <td>{{ $record->attendance_percentage }}%</td>
-                                                                    <td>{{ $record->attendance_total_score }}</td>
-                                                                    <td
-                                                                        style=" color: var(--color-green); border: 1px solid var(--color7);">
-                                                                        {{ $record->attendance_behavior }}</td>
-                                                                    <td>{{ $record->assignment_percentage }}%</td>
-                                                                    <td>{{ $record->assignment_total_score }}</td>
-                                                                    <td
-                                                                        style=" color: var(--color-green); border: 1px solid var(--color7);">
-                                                                        {{ $record->assignments }}</td>
-                                                                    <td>{{ $record->exam_percentage }}</td>
-                                                                    <td>{{ $record->exam_total_score }}</td>
-                                                                    <td
-                                                                        style=" color: var(--color-green); border: 1px solid var(--color7);">
-                                                                        {{ $record->exam }}</td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
+
+
+
+
+                                            {{-- for tabbing in class score archive --}}
+                                            <style>
+                                                .tab-buttons {
+                                                    display: flex;
+                                                    gap: 10px;
+                                                    margin: 10px 0 0 0;
+                                                    flex-wrap: wrap;
+                                                }
+
+                                                .tab-buttons button {
+                                                    padding: 5px 10px;
+                                                    background-color: var(--color9b);
+                                                    color: white;
+                                                    border: none;
+                                                    cursor: pointer;
+                                                    font-weight: bold;
+                                                    transition: background 0.3s ease;
+                                                }
+
+                                                .tab-buttons button.active {
+                                                    background-color: var(--color8);
+                                                    border: 1px solid var(--ckcm-color4);
+                                                    color: var(--ckcm-color4);
+
+                                                }
+
+                                                .tab-content {
+                                                    display: none;
+                                                }
+
+                                                .tab-content.active {
+                                                    display: block;
+                                                }
+
+                                                .table-container {
+                                                    overflow-x: auto;
+                                                    margin-bottom: 2rem;
+                                                }
+
+                                                table {
+                                                    width: 100%;
+                                                    border-collapse: collapse;
+                                                }
+
+                                                th,
+                                                td {
+                                                    padding: 8px;
+                                                    border: 1px solid var(--color7);
+                                                    text-align: center;
+                                                }
+                                            </style>
+
+                                            <div class="tabbed-wrapper">
+                                                <div class="tab-buttons">
+                                                    @foreach ($termGroups as $term => $group)
+                                                        <button class="{{ $loop->first ? 'active' : '' }}"
+                                                            data-term="{{ $term }}" onclick="showTab(this)">
+                                                            {{ ucfirst($term) }}
+                                                        </button>
+                                                    @endforeach
                                                 </div>
-                                            @endforeach
+
+                                                @foreach ($termGroups as $term => $records)
+                                                    <div class="tab-content {{ $loop->first ? 'active' : '' }}"
+                                                        data-term="{{ $term }}">
+                                                        <h6 style="color: var(--color1); padding: 10px 0; font-size: 1.2rem;">
+                                                            Term: {{ ucfirst($term) }}
+                                                        </h6>
+                                                        <div class="table-container">
+                                                            <table>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Student ID</th>
+                                                                        <th>Quiz (%)</th>
+                                                                        <th>Quiz Score</th>
+                                                                        <th>Quizzes</th>
+                                                                        <th>Attendance (%)</th>
+                                                                        <th>Attendance Total Score</th>
+                                                                        <th>Attendance Score</th>
+                                                                        <th>Assignments (%)</th>
+                                                                        <th>Assignment Total Score</th>
+                                                                        <th>Assignments Score</th>
+                                                                        <th>Exam (%)</th>
+                                                                        <th>Exam Total Score</th>
+                                                                        <th>Exam Score</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach ($records as $record)
+                                                                        <tr>
+                                                                            <td>{{ $record->studentID }}</td>
+                                                                            <td>{{ $record->quiz_percentage }}%</td>
+                                                                            <td>{{ $record->quiz_total_score }}</td>
+                                                                            <td
+                                                                                style="color: var(--color-green); border: 1px solid var(--color7);">
+                                                                                {{ $record->quizzez }}</td>
+                                                                            <td>{{ $record->attendance_percentage }}%</td>
+                                                                            <td>{{ $record->attendance_total_score }}</td>
+                                                                            <td
+                                                                                style="color: var(--color-green); border: 1px solid var(--color7);">
+                                                                                {{ $record->attendance_behavior }}</td>
+                                                                            <td>{{ $record->assignment_percentage }}%</td>
+                                                                            <td>{{ $record->assignment_total_score }}</td>
+                                                                            <td
+                                                                                style="color: var(--color-green); border: 1px solid var(--color7);">
+                                                                                {{ $record->assignments }}</td>
+                                                                            <td>{{ $record->exam_percentage }}</td>
+                                                                            <td>{{ $record->exam_total_score }}</td>
+                                                                            <td
+                                                                                style="color: var(--color-green); border: 1px solid var(--color7);">
+                                                                                {{ $record->exam }}</td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            <script>
+                                                function showTab(button) {
+                                                    const term = button.getAttribute('data-term');
+                                                    const wrapper = button.closest('.tabbed-wrapper');
+
+                                                    const buttons = wrapper.querySelectorAll('.tab-buttons button');
+                                                    const contents = wrapper.querySelectorAll('.tab-content');
+
+                                                    buttons.forEach(btn => btn.classList.remove('active'));
+                                                    contents.forEach(content => content.classList.remove('active'));
+
+                                                    button.classList.add('active');
+                                                    wrapper.querySelector(`.tab-content[data-term="${term}"]`).classList.add('active');
+                                                }
+                                            </script>
+
+                                            {{-- end for tabbing in class score archive --}}
+
+
+
+
+
 
                                             {{-- Final Grades Table --}}
                                             <div class="table-container" style="margin-top: 20px;">
-                                                <h6 style="color: var(--color1); font-size: 1.2rem; margin-bottom: 10px;">Final Grades</h6>
+                                                <h6 style="color: var(--color1); font-size: 1.2rem; margin-bottom: 10px;">
+                                                    Final Grades</h6>
                                                 <table>
                                                     <thead>
                                                         <tr>
@@ -156,7 +251,7 @@
                                                             <th>Semi-Finals</th>
                                                             <th>Final</th>
                                                             <th>Remarks</th>
-                                                            <th>Status</th>
+                                                            {{-- <th>Status</th> --}}
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -185,7 +280,7 @@
                                                                     <td>{{ $finalGrade->semi_finals }}</td>
                                                                     <td>{{ $finalGrade->final }}</td>
                                                                     <td>{{ $finalGrade->remarks }}</td>
-                                                                    <td>{{ $finalGrade->status }}</td>
+                                                                    {{-- <td>{{ $finalGrade->status }}</td> --}}
                                                                 </tr>
                                                             @endif
                                                         @endforeach
