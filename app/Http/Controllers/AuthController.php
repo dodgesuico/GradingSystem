@@ -17,30 +17,34 @@ class AuthController extends Controller
     function LoginPost(Request $request)
     {
         $request->validate([
-            "email" => "required|email",
+            "login" => "required",
             "password" => "required",
         ]);
-        
-        // Check if the email exists first
-        $user = User::where('email', $request->email)->first();
-        
+
+        $login = $request->login;
+        $password = $request->password;
+
+        $user = User::where(function ($query) use ($login) {
+            $query->where('email', $login)->orWhere('studentID', $login);
+        })->first();
+
         if (!$user) {
-            return redirect()->back()->withErrors(['email' => 'The email does not exist.']);
+            return back()->withErrors(['login' => 'No account found for the provided email or student ID.']);
         }
-        
-        // Check if the password is correct
-        if (!\Hash::check($request->password, $user->password)) {
-            return redirect()->back()->withErrors(['password' => 'The password is incorrect.']);
+
+        // Check for email domain if login was via email
+        if (filter_var($login, FILTER_VALIDATE_EMAIL) && !preg_match('/@ckcm\.edu\.ph$/', $login)) {
+            return back()->withErrors(['login' => 'Only @ckcm.edu.ph emails are allowed.']);
         }
-        
-        // Attempt to log in
-        if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect(route('index'))->with('success', 'Login Success');
+
+        if (!\Hash::check($password, $user->password)) {
+            return back()->withErrors(['password' => 'Incorrect password.']);
         }
-        
-        return redirect(route('login'))->withErrors(['error' => 'Login failed. Please try again.']);
-      
+
+        Auth::login($user);
+        return redirect()->route('index')->with('success', 'Login Success');
     }
+
 
     public function register()
     {

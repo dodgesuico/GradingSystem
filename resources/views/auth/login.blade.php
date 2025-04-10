@@ -20,7 +20,7 @@
                 <!-- Email Input -->
                 <div class="input-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="name@email.com" required>
+                    <input type="text" id="email" name="login" placeholder="name@email.com" required>
                 </div>
 
                 <!-- Password Input -->
