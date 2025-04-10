@@ -58,21 +58,6 @@
                 <label for="status">Status: <em>*automatically active upon adding*</em></label>
                 <input type="status" id="status" name="status" value="Active" readonly>
             </div>
-            <div class="info-container">
-                <label for="status">Password: <em>*for security purposes*</em></label>
-                <input  id="password" name="password" ><button type="button" id="generate-password" onclick="generateRandomPassword()"> Generate Password</button>
-            </div>
-
-            <script>
-                function generateRandomPassword(){
-                    const characters = 'ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
-                    let password ='';
-                    for (let i = 0; i < 10; i++){
-                        password += characters.charAt(Math.floor(Math.random() * characters.length));
-                    }
-                    document.getElementById('password').value = password;
-                }
-            </script>
 
             <input type="hidden" name="added_by" value="{{ Auth::user()->name }}">
 

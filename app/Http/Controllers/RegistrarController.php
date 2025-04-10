@@ -48,7 +48,6 @@ class RegistrarController extends Controller
             "academic_year" => "required",
             "schedule" => "required",
             "status" => "required",
-            "password" => "required",
             "added_by" => "required"
         ]);
 
@@ -61,7 +60,6 @@ class RegistrarController extends Controller
         $class->academic_year = $request->academic_year;
         $class->schedule = $request->schedule;
         $class->status = $request->status;
-        $class->password = $request->password;
         $class->added_by = $request->added_by;
 
         if ($class->save()) {
@@ -584,7 +582,7 @@ class RegistrarController extends Controller
             ]);
 
 
-        Classes::where('id', $classID)->update(['status' => 'Submitted, Waiting for approval']);
+        Classes::where('id', $classID)->update(['status' => 'Grades Submitted, Waiting for dean`s approval']);
 
         return back()->with('success', "Grades for $department have been submitted to the its corresponding Dean!");
     }
@@ -609,7 +607,7 @@ class RegistrarController extends Controller
             ]);
 
 
-        Classes::where('id', $classID)->update(['status' => 'Submitted, Waiting for approval']);
+        Classes::where('id', $classID)->update(['status' => 'Grades has been submitted to the registrar, Waiting for approval']);
 
         return back()->with('success', "Grades for $department have been submitted to the Registrar!");
     }
@@ -645,7 +643,7 @@ class RegistrarController extends Controller
             $updateData['submit_status'] = 'Submitted';
 
             // 🔥 Update class status to "Approved"
-            Classes::where('id', $request->classID)->update(['status' => 'Approved']);
+            Classes::where('id', $request->classID)->update(['status' => 'Dean approved the submitted grade']);
         }
 
 
@@ -828,7 +826,7 @@ class RegistrarController extends Controller
             }
 
             // Update class status to "Approved"
-            Classes::where('id', $request->classID)->update(['status' => 'Approved']);
+            Classes::where('id', $request->classID)->update(['status' => 'The Registrar approved the submitted grade of' . $selectedDepartment . 'department']);
 
             return redirect()->route('registrar_classes')->with('success', 'Final grades for ' . $selectedDepartment . ' have been submitted successfully!');
         }
