@@ -144,10 +144,14 @@ tr:nth-child(odd) {
 
 
 /* status color */
+
+
 .status.active {
     color: green;
     font-weight: bold;
 }
+
+
 
 .status.ended {
     color: gray;
@@ -158,6 +162,11 @@ tr:nth-child(odd) {
     color: red;
     font-weight: bold;
 }
+.status.Rejected{
+    color: orangered;
+
+}
+
 
 
 /* message */
@@ -201,13 +210,17 @@ tr:nth-child(odd) {
 }
 
 .save-btn{
+    border:1px solid var(--color-green);
     color: var(--color-green);
-
-
+    margin-top: 20px;
+    align-self: center;
 }
 
 .save-btn:hover {
-    color: var(--color-green-hover);
+    transform: translateY(-5px);
+    transition: ease-in-out 0.3s;
+    color: var(--color1);
+    background-color: var(--color-green-hover);
 }
 
 

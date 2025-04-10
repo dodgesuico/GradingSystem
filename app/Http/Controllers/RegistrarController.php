@@ -582,7 +582,8 @@ class RegistrarController extends Controller
             ]);
 
 
-        Classes::where('id', $classID)->update(['status' => 'Grades Submitted, Waiting for dean`s approval']);
+        Classes::where('id', $classID)->update(['status' => 'Grades Submitted, Waiting for dean\'s approval']);
+
 
         return back()->with('success', "Grades for $department have been submitted to the its corresponding Dean!");
     }
@@ -804,8 +805,8 @@ class RegistrarController extends Controller
 
                     // ✅ Remove student from `classes_student`
                     Classes_Student::where('studentID', $grade['studentID'])
-                    ->where('classID', $grade['classID'])
-                    ->delete();
+                        ->where('classID', $grade['classID'])
+                        ->delete();
 
                     // ✅ Remove student from `final_grades` after locking
                     DB::table('final_grade')
