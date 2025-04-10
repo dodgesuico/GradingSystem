@@ -982,7 +982,7 @@
                         || ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
                     )
 
-                    <h3 style="margin: 50px 0 10px 0 ;">{{ $department }} Department</h3>
+                    <h3 style="margin: 10px 0 10px 0 ;">{{ $department }} Department</h3>
 
                     @php
                         $gradesByDepartment = $finalGrades->where('department', $department);
@@ -1158,6 +1158,20 @@
                                 $deanStatus = $gradesByDepartment->first()->dean_status;
                             @endphp
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            {{-- instructors view --}}
                             @if ($deanStatus == 'Returned')
                                 <!-- ❌ Instructor sees notification if grades are returned -->
                                 <div class="alert alert-danger" style="margin-top: 10px;">
@@ -1167,17 +1181,61 @@
 
                                 <!-- 📝 Show Dean's Comment -->
                                 @if (!empty($gradesByDepartment->first()->dean_comment))
-                                    <div class="alert alert-warning" style="margin-top: 10px;">
-                                        <i class="fa-solid fa-comment"></i>
-                                        <strong>Dean's Comment:</strong> {{ $gradesByDepartment->first()->dean_comment }}
-                                    </div>
+                                <div class="alert alert-warning" style="margin-top: 10px; background-color: var(--color9b); text-align: left; font-size: 1.2rem; padding: 10px; border: 1px dashed var(--ckcm-color4);">
+                                    <strong style="color: var(--ckcm-color4);">
+                                        <i class="fa-solid fa-comment"></i> Dean's Comment:
+                                    </strong>
+                                    <p class="comment-text" style="color: var(--color5) ; padding-left: 5px; ">
+                                        <span class="short-text">{{ Str::limit($gradesByDepartment->first()->dean_comment, 100) }}</span> <!-- Show first 100 chars -->
+                                        <span class="full-text" style="display: none;">{{ $gradesByDepartment->first()->dean_comment }}</span>
+                                        <a style="text-decoration: underline;" href="javascript:void(0);" class="see-more" onclick="toggleComment()">See more</a>
+                                    </p>
+
+
+                                </div>
+
+                                <!-- Inline CSS -->
+                                <style>
+                                    .see-more {
+                                        color: gray;
+
+                                        cursor: pointer;
+                                        font-size: 1.1rem;
+                                        padding-left: 10px;
+                                        font-weight: 100;
+                                    }
+                                </style>
+
+                                <!-- JavaScript -->
+                                <script>
+                                    function toggleComment() {
+                                        var shortText = document.querySelector('.short-text');
+                                        var fullText = document.querySelector('.full-text');
+                                        var seeMoreLink = document.querySelector('.see-more');
+
+                                        // Toggle the display between short and full text
+                                        if (fullText.style.display === 'none') {
+                                            fullText.style.display = 'inline';
+                                            shortText.style.display = 'none';
+                                            seeMoreLink.innerHTML = 'See less';  // Change link text to 'See less'
+                                        } else {
+                                            fullText.style.display = 'none';
+                                            shortText.style.display = 'inline';
+                                            seeMoreLink.innerHTML = 'See more';  // Revert back to 'See more'
+                                        }
+                                    }
+                                </script>
+
                                 @endif
                             @endif
+
+
 
                             @php
                                 $registrarStatus = $gradesByDepartment->first()->registrar_status;
                             @endphp
 
+                            {{-- instructors view --}}
                             @if ($registrarStatus == 'Rejected')
                                 <!-- ❌ Instructor sees notification if grades are returned -->
                                 <div class="alert alert-danger" style="margin-top: 10px;">
@@ -1185,14 +1243,70 @@
                                     The final grades have been <strong> rejected by the Registrar</strong>. Please review and resubmit.
                                 </div>
 
-                                <!-- 📝 Show Dean's Comment -->
+                                <!-- 📝 Show Registrar's Comment -->
                                 @if (!empty($gradesByDepartment->first()->registrar_comment))
-                                    <div class="alert alert-warning" style="margin-top: 10px;">
-                                        <i class="fa-solid fa-comment"></i>
-                                        <strong>Registrar's Comment:</strong> {{ $gradesByDepartment->first()->registrar_comment }}
-                                    </div>
+                                <div class="alert alert-warning" style="margin-top: 10px; background-color: var(--color9b); text-align: left; font-size: 1.2rem; padding: 10px; border: 1px dashed var(--ckcm-color4);">
+                                    <i class="fa-solid fa-comment"></i>
+                                    <strong style="color: var(--ckcm-color4);">
+                                        Registrar's Comment:
+                                    </strong>
+                                    <p class="comment-text" style="color: var(--color5); padding-left: 5px;">
+                                        <span class="short-text">{{ Str::limit($gradesByDepartment->first()->registrar_comment, 100) }}</span> <!-- Show first 100 chars -->
+                                        <span class="full-text" style="display: none;">{{ $gradesByDepartment->first()->registrar_comment }}</span>
+                                        <a style="text-decoration: underline;" href="javascript:void(0);" class="see-more" onclick="toggleCommentRegistrar()">See more</a>
+                                    </p>
+                                </div>
+
+                                <!-- Inline CSS -->
+                                <style>
+                                    .see-more {
+                                        color: gray;
+                                        cursor: pointer;
+                                        font-size: 1.1rem;
+                                        padding-left: 10px;
+                                        font-weight: 100;
+                                    }
+                                </style>
+
+                                <!-- JavaScript -->
+                                <script>
+                                    function toggleCommentRegistrar() {
+                                        var shortText = document.querySelectorAll('.short-text')[1]; // Target the second short-text (Registrar's Comment)
+                                        var fullText = document.querySelectorAll('.full-text')[1]; // Target the second full-text (Registrar's Comment)
+                                        var seeMoreLink = document.querySelectorAll('.see-more')[1]; // Target the second see-more link (Registrar's Comment)
+
+                                        // Toggle the display between short and full text
+                                        if (fullText.style.display === 'none') {
+                                            fullText.style.display = 'inline';
+                                            shortText.style.display = 'none';
+                                            seeMoreLink.innerHTML = 'See less';  // Change link text to 'See less'
+                                        } else {
+                                            fullText.style.display = 'none';
+                                            shortText.style.display = 'inline';
+                                            seeMoreLink.innerHTML = 'See more';  // Revert back to 'See more'
+                                        }
+                                    }
+                                </script>
+
                                 @endif
                             @endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                             <form action="{{ route('finalgrade.unlock') }}" method="POST" style="display:inline;">
@@ -1244,51 +1358,216 @@
 
                                 <!-- 📝 Show Dean's Comment -->
                                 @if (!empty($gradesByDepartment->first()->registrar_comment))
-                                    <div class="alert alert-warning" style="margin-top: 10px;">
-                                        <i class="fa-solid fa-comment"></i>
-                                        <strong>Registrar's Comment:</strong> {{ $gradesByDepartment->first()->registrar_comment }}
-                                    </div>
+                                <div class="alert alert-warning" style="margin-top: 10px; background-color: var(--color9b); text-align: left; font-size: 1.2rem; padding: 10px; border: 1px dashed var(--ckcm-color4);">
+                                    <i class="fa-solid fa-comment"></i>
+                                    <strong style="color: var(--ckcm-color4);">
+                                        Registrar's Comment:
+                                    </strong>
+                                    <p class="comment-text" style="color: var(--color5); padding-left: 5px;">
+                                        <span class="short-text">{{ Str::limit($gradesByDepartment->first()->registrar_comment, 100) }}</span>
+                                        <span class="full-text" style="display: none;">{{ $gradesByDepartment->first()->registrar_comment }}</span>
+                                        <a style="text-decoration: underline;" href="javascript:void(0);" class="see-more">See more</a>
+                                    </p>
+                                </div>
+
+                                <style>
+                                    .see-more {
+                                        color: gray;
+                                        cursor: pointer;
+                                        font-size: 1.1rem;
+                                        padding-left: 10px;
+                                        font-weight: 100;
+                                    }
+                                </style>
+
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function () {
+                                        document.querySelectorAll('.see-more').forEach(link => {
+                                            link.addEventListener('click', function () {
+                                                const commentText = this.closest('.comment-text');
+                                                const shortText = commentText.querySelector('.short-text');
+                                                const fullText = commentText.querySelector('.full-text');
+
+                                                const isExpanded = fullText.style.display === 'inline';
+
+                                                shortText.style.display = isExpanded ? 'inline' : 'none';
+                                                fullText.style.display = isExpanded ? 'none' : 'inline';
+                                                this.textContent = isExpanded ? 'See more' : 'See less';
+                                            });
+                                        });
+                                    });
+                                </script>
+
+
                                 @endif
                             @endif
 
                             @if ($department == $userDepartment)
                                 <h4 style="margin: 10px 0; color: var(--ckcm-color4); font-size: 1.2rem;">Dean's Decision
                                     for {{ $department }}</h4>
-                                <form action="{{ route('finalgrade.decision') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="department" value="{{ $department }}">
-                                    <input type="hidden" name="classID"
-                                        value="{{ $gradesByDepartment->first()->classID }}">
-                                    <!-- 🔥 Ensure correct classID -->
-                                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
-                                        <div style="display: flex; gap: 5px; align-items: center;">
-                                            <input style="margin: 0" type="radio" id="confirmed_{{ $department }}"
-                                                name="dean_status" value="Confirmed" required>
-                                            <label style="color: var(--color-green)"
-                                                for="confirmed_{{ $department }}">✔️ Confirmed</label>
+                                    <form action="{{ route('finalgrade.decision') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="department" value="{{ $department }}">
+                                        <input type="hidden" name="classID" value="{{ $gradesByDepartment->first()->classID }}">
+
+                                        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px; padding-left: 10px;">
+                                            <style>
+                                                .custom-radio-group {
+                                                    display: flex;
+                                                    gap: 20px;
+                                                    align-items: center;
+                                                }
+
+                                                .custom-radio {
+                                                    display: flex;
+                                                    align-items: center;
+                                                    gap: 8px;
+                                                    cursor: pointer;
+                                                    position: relative;
+                                                    font-weight: 500;
+                                                    user-select: none;
+                                                }
+
+                                                .custom-radio input[type="radio"] {
+                                                    opacity: 0;
+                                                    position: absolute;
+                                                    cursor: pointer;
+                                                }
+
+                                                .custom-radio span.radio-mark {
+                                                    height: 18px;
+                                                    width: 18px;
+                                                    border-radius: 50%;
+                                                    border: 2px solid #ccc;
+                                                    display: inline-block;
+                                                    transition: border-color 0.3s, background-color 0.3s;
+                                                    position: relative;
+                                                }
+
+                                                .custom-radio input[type="radio"]:checked + span.radio-mark {
+                                                    border-color: #4CAF50;
+                                                    background-color: #4CAF50;
+                                                }
+
+                                                .custom-radio.green input[type="radio"]:checked + span.radio-mark {
+                                                    border-color: var(--color-green);
+                                                    background-color: var(--color-green);
+                                                }
+
+                                                .custom-radio.red input[type="radio"]:checked + span.radio-mark {
+                                                    border-color: var(--color-red);
+                                                    background-color: var(--color-red);
+                                                }
+
+                                                .custom-radio span.radio-mark::after {
+                                                    content: "";
+                                                    position: absolute;
+                                                    top: 3px;
+                                                    left: 3px;
+                                                    width: 8px;
+                                                    height: 8px;
+                                                    border-radius: 50%;
+                                                    background: white;
+                                                    display: none;
+                                                }
+
+                                                .custom-radio input[type="radio"]:checked + span.radio-mark::after {
+                                                    display: block;
+                                                }
+
+                                                .custom-radio-label {
+                                                    color: inherit;
+                                                }
+
+                                                .custom-radio.green .custom-radio-label {
+                                                    color: var(--color-green);
+                                                }
+
+                                                .custom-radio.red .custom-radio-label {
+                                                    color: var(--color-red);
+                                                }
+
+                                                .comment-box {
+                                                    display: none;
+                                                    margin-bottom: 10px;
+                                                }
+                                            </style>
+
+                                            <div class="custom-radio-group">
+                                                <label class="custom-radio green">
+                                                    <input type="radio" name="dean_status" value="Confirmed" required>
+                                                    <span class="radio-mark"></span>
+                                                    <span class="custom-radio-label">✔️ Confirmed</span>
+                                                </label>
+
+                                                <label class="custom-radio red">
+                                                    <input type="radio" name="dean_status" value="Returned" required>
+                                                    <span class="radio-mark"></span>
+                                                    <span class="custom-radio-label">❌ Returned</span>
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div style="display: flex; gap: 5px; align-items: center;">
-                                            <input style="margin: 0" type="radio" id="returned_{{ $department }}"
-                                                name="dean_status" value="Returned" required>
-                                            <label style="color: var(--color-red)" for="returned_{{ $department }}">❌
-                                                Returned</label>
+                                        <div class="comment-box-wrapper">
+                                            <div class="comment-box">
+                                                <textarea style="background: var(--color9b); color: var(--color1); padding: 5px; width: 100%; border: 1px dashed var(--color6); padding: 10px;"
+                                                    name="dean_comment" rows="3" class="form-control" placeholder="Add a comment (optional, only if returned)..."></textarea>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div style="margin-bottom: 10px;">
-                                        <textarea style="background: var(--ckcm-color2); color: var(--color1); padding: 5px; width: 100%;;" name="dean_comment"
-                                            rows="3" class="form-control" placeholder="Add a comment (optional, only if returned)..."></textarea>
-                                    </div>
+                                        <button type="submit" class="save-btn">
+                                            <i class="fa-solid fa-check"></i> Submit Decision for {{ $department }}
+                                        </button>
+                                    </form>
 
-                                    <button type="submit" class="save-btn">
-                                        <i class="fa-solid fa-check"></i> Submit Decision for {{ $department }}
-                                    </button>
-                                </form>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            document.querySelectorAll('form').forEach(form => {
+                                                const radios = form.querySelectorAll('input[name="dean_status"]');
+                                                const commentBox = form.querySelector('.comment-box');
+
+                                                radios.forEach(radio => {
+                                                    radio.addEventListener('change', function () {
+                                                        if (this.value === 'Returned') {
+                                                            commentBox.style.display = 'block';
+                                                        } else {
+                                                            commentBox.style.display = 'none';
+                                                        }
+                                                    });
+
+                                                    // Show on load if "Returned" is pre-selected
+                                                    if (radio.checked && radio.value === 'Returned') {
+                                                        commentBox.style.display = 'block';
+                                                    }
+                                                });
+                                            });
+                                        });
+                                    </script>
+
                             @endif
                         @endif
                     @endif
                     {{-- end of dean approval --}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1358,6 +1637,21 @@
                     {{-- instructors notification end --}}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     {{-- dean submit to registrar start --}}
                     @if (
                             $gradesByDepartment->isNotEmpty() &&
@@ -1389,6 +1683,20 @@
                     {{-- dean submit to registrar end --}}
 
                 @endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 @if (
                         ($isRegistrar && $hasPendingApproval) // Registrar can only see departments with pending approvals
@@ -1424,26 +1732,136 @@
                             @endforeach
 
                             <!-- 🔥 Registrar Approval Decision -->
-                            <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
-                                <div style="display: flex; gap: 5px; align-items: center;">
-                                    <input style="margin: 0" type="radio" id="registrar_approved_{{ $department }}"
-                                        name="registrar_status" value="Approved" required>
-                                    <label style="color: var(--color-green)" for="registrar_approved_{{ $department }}">✔️ Approved</label>
-                                </div>
+                            <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px;">
+                                <style>
+                                    .registrar-radio-group {
+                                        display: flex;
+                                        gap: 20px;
+                                        align-items: center;
+                                    }
 
-                                <div style="display: flex; gap: 5px; align-items: center;">
-                                    <input style="margin: 0" type="radio" id="registrar_rejected_{{ $department }}"
-                                        name="registrar_status" value="Rejected" required>
-                                    <label style="color: var(--color-red)" for="registrar_rejected_{{ $department }}">❌ Rejected</label>
+                                    .registrar-radio {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        cursor: pointer;
+                                        position: relative;
+                                        font-weight: 500;
+                                        user-select: none;
+                                    }
+
+                                    .registrar-radio input[type="radio"] {
+                                        opacity: 0;
+                                        position: absolute;
+                                        cursor: pointer;
+                                    }
+
+                                    .registrar-radio span.radio-mark {
+                                        height: 18px;
+                                        width: 18px;
+                                        border-radius: 50%;
+                                        border: 2px solid #ccc;
+                                        display: inline-block;
+                                        transition: border-color 0.3s, background-color 0.3s;
+                                        position: relative;
+                                    }
+
+                                    .registrar-radio input[type="radio"]:checked + span.radio-mark {
+                                        border-color: #4CAF50;
+                                        background-color: #4CAF50;
+                                    }
+
+                                    .registrar-radio.green input[type="radio"]:checked + span.radio-mark {
+                                        border-color: var(--color-green);
+                                        background-color: var(--color-green);
+                                    }
+
+                                    .registrar-radio.red input[type="radio"]:checked + span.radio-mark {
+                                        border-color: var(--color-red);
+                                        background-color: var(--color-red);
+                                    }
+
+                                    .registrar-radio span.radio-mark::after {
+                                        content: "";
+                                        position: absolute;
+                                        top: 3px;
+                                        left: 3px;
+                                        width: 8px;
+                                        height: 8px;
+                                        border-radius: 50%;
+                                        background: white;
+                                        display: none;
+                                    }
+
+                                    .registrar-radio input[type="radio"]:checked + span.radio-mark::after {
+                                        display: block;
+                                    }
+
+                                    .registrar-radio-label {
+                                        color: inherit;
+                                    }
+
+                                    .registrar-radio.green .registrar-radio-label {
+                                        color: var(--color-green);
+                                    }
+
+                                    .registrar-radio.red .registrar-radio-label {
+                                        color: var(--color-red);
+                                    }
+
+                                    .registrar-comment-box {
+                                        display: none;
+                                        margin-bottom: 10px;
+                                    }
+                                </style>
+
+                                <div class="registrar-radio-group">
+                                    <label class="registrar-radio green">
+                                        <input type="radio" name="registrar_status" value="Approved" required>
+                                        <span class="radio-mark"></span>
+                                        <span class="registrar-radio-label">✔️ Approved</span>
+                                    </label>
+
+                                    <label class="registrar-radio red">
+                                        <input type="radio" name="registrar_status" value="Rejected" required>
+                                        <span class="radio-mark"></span>
+                                        <span class="registrar-radio-label">❌ Rejected</span>
+                                    </label>
                                 </div>
                             </div>
 
                             <!-- Optional Comment for Rejection -->
-                            <div style="margin-bottom: 10px;">
-                                <textarea style="background: var(--ckcm-color2); color: var(--color1); padding: 5px; width: 100%;"
-                                    name="registrar_comment" rows="3" class="form-control"
-                                    placeholder="Add a comment (optional, only if rejected)..."></textarea>
+                            <div class="registrar-comment-wrapper">
+                                <div class="registrar-comment-box">
+                                    <textarea style="background: var(--color9b); color: var(--color1); padding: 10px; width: 100%; border:1px dashed var(--color7); "
+                                        name="registrar_comment" rows="3" class="form-control" placeholder="Add a comment (optional, only if rejected)..."></textarea>
+                                </div>
                             </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    document.querySelectorAll('form').forEach(form => {
+                                        const registrarRadios = form.querySelectorAll('input[name="registrar_status"]');
+                                        const registrarCommentBox = form.querySelector('.registrar-comment-box');
+
+                                        registrarRadios.forEach(radio => {
+                                            radio.addEventListener('change', function () {
+                                                if (this.value === 'Rejected') {
+                                                    registrarCommentBox.style.display = 'block';
+                                                } else {
+                                                    registrarCommentBox.style.display = 'none';
+                                                }
+                                            });
+
+                                            // Show comment box if "Rejected" is pre-selected on load
+                                            if (radio.checked && radio.value === 'Rejected') {
+                                                registrarCommentBox.style.display = 'block';
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+
 
                             <button type="submit" class="save-btn">
                                 <i class="fa-solid fa-check"></i> Submit Decision
@@ -1452,6 +1870,10 @@
                     @endif
                 @endif
                 {{-- registrar approval section end --}}
+
+
+
+
 
             @endforeach
 

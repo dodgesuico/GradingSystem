@@ -30,12 +30,12 @@ return new class extends Migration
                 $table->decimal('semi_finals', 5,2);
                 $table->decimal('final', 5,2);
                 $table->string('remarks')->nullable();
-                $table->string('status')->nullable();
-                $table->string('submit_status')->nullable();
-                $table->string('dean_status')->nullable();
-                $table->string('registrar_status')->nullable();
-                $table->string('dean_comment')->nullable();
-                $table->string('registrar_comment')->nullable();
+                $table->text('status')->nullable();
+                $table->text('submit_status')->nullable();
+                $table->text('dean_status')->nullable();
+                $table->text('registrar_status')->nullable();
+                $table->text('dean_comment')->nullable();
+                $table->text('registrar_comment')->nullable();
                 $table->timestamps();
             });
         }
