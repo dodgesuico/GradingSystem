@@ -543,17 +543,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
         <!-- Add New Student Modal -->
         <div id="addStudentModal" class="modal">
             <div class="modal-content">
@@ -1160,17 +1149,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
                             {{-- instructors view --}}
                             @if ($deanStatus == 'Returned')
                                 <!-- ❌ Instructor sees notification if grades are returned -->
@@ -1290,20 +1268,6 @@
 
                                 @endif
                             @endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

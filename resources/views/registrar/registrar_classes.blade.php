@@ -63,7 +63,9 @@
 
         <div style="display:flex; flex-direction:row; justify-content:space-between;width:100%;">
             <h2 style="margin:10px 0; ">Class List</h2>
-            <button class="add-btn" id="openModal"><i class="fa-solid fa-plus"></i> Add Classes</button>
+            @if (Auth::check() && (in_array('dean', explode(',', Auth::user()->role))))
+                <button class="add-btn" id="openModal"><i class="fa-solid fa-plus"></i> Add Classes</button>
+            @endif
         </div>
 
 
@@ -118,9 +120,21 @@
                                 <td>{{ $class->schedule }}</td>
                                 <td class="status {{ strtolower($class->status) }}">{{ $class->status }}</td>
                                 <td style="text-align: center">
-                                    <a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a> |
-                                    <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})"><i class="fa-solid fa-pen-to-square"></i> Edit</button> |
-                                    <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})"><i class="fa-solid fa-trash"></i> Delete</button>
+                                    <a href="{{ route('class.show', $class->id) }}" class="view-btn"><i class="fa-solid fa-up-right-from-square"></i> View Class</a>
+
+                                    @php
+                                        $isOwner = auth()->user()->name === $class->added_by;
+                                    @endphp
+
+                                    @if ($isOwner)
+                                        |
+                                        <button class="edit-btn" onclick="openEditClassModal({{ $class->id }})">
+                                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                                        </button> |
+                                        <button class="delete-btn" onclick="openDeleteClassModal({{ $class->id }})">
+                                            <i class="fa-solid fa-trash"></i> Delete
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                             @include('registrar.registrar_classes_edit_and_delete')
