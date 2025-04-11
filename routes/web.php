@@ -14,6 +14,7 @@ use App\Http\Controllers\AllGradesController;
 use App\Http\Controllers\MygradesController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ClassArchiveController;
+use App\Http\Controllers\NotifiController;
 use App\Models\ClassArchive;
 use Illuminate\Contracts\Routing\Registrar;
 
@@ -99,6 +100,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/users', [UserController::class, 'show'])->name('user.show');
     Route::post('/users', [UserController::class, 'editUser'])->name('user.edituser');
+
+    Route::get('/notification', [NotifiController::class, 'notif']);
 
 
     // Dean

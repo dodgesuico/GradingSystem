@@ -8,6 +8,7 @@ use App\Models\Percentage;
 use App\Models\QuizzesAndScores;
 use App\Models\Classes_Student;
 use App\Models\Classes;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -63,6 +64,30 @@ class RegistrarController extends Controller
         $class->added_by = $request->added_by;
 
         if ($class->save()) {
+            // Fetch logged in user info
+            $user = Auth::user();
+
+            $instructor_name = $class->instructor; // this is a name like "Dave"
+            $instructor = User::where('name', $instructor_name)->first();
+
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class Added',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $instructor->studentID ?? null,
+                'target_by_name'  => $instructor->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
             return redirect(route("registrar_classes"))->with("success", "Class Created Successfully");
         }
 
@@ -92,6 +117,30 @@ class RegistrarController extends Controller
         $class->status = $request->status;
 
         if ($class->save()) {
+
+            $user = Auth::user();
+
+            $instructor_name = $class->instructor; // this is a name like "Dave"
+            $instructor = User::where('name', $instructor_name)->first();
+
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class Edited',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $instructor->studentID ?? null,
+                'target_by_name'  => $instructor->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
             return redirect(route("registrar_classes"))->with("success", "Class Edited Successfully");
         }
 
@@ -101,6 +150,30 @@ class RegistrarController extends Controller
     public function DeleteClass(Request $request, Classes $class)
     {
         try {
+
+            $user = Auth::user();
+
+            $instructor_name = $class->instructor; // this is a name like "Dave"
+            $instructor = User::where('name', $instructor_name)->first();
+
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class Deleted',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $instructor->studentID ?? null,
+                'target_by_name'  => $instructor->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
             $class->delete(); // Delete the class from the database
             return redirect()->route('registrar_classes')->with('success', 'Class deleted successfully.');
         } catch (\Exception $e) {
@@ -581,9 +654,36 @@ class RegistrarController extends Controller
                 'updated_at' => now(),
             ]);
 
-
         Classes::where('id', $classID)->update(['status' => 'Grades Submitted, Waiting for dean\'s approval']);
 
+        $user = Auth::user();
+
+        $class = Classes::find($classID);
+
+        $users = User::where('department', $department)->get();
+
+        $dean = $users->first(function ($user) {
+            $roles = explode(',', $user->role); // assuming role is stored as comma-separated
+            return in_array('dean', array_map('trim', $roles));
+        });
+
+
+        // Store notification
+        DB::table('notif_table')->insert([
+            'notif_type'      => 'Class grades submitted to Dean of ' . $department  . ' Department',
+            'class_id'        => $class->id,
+            'class_subject_code' => $class->subject_code,
+            'class_descriptive_title' => $class->descriptive_title,
+            'department'      => $user->department ?? null, // Optional if you store department
+            'added_by_id'     => $user->studentID,
+            'added_by_name'   => $user->name,
+            'target_by_id'    => $dean->studentID ?? null,
+            'target_by_name'  => $dean->name ?? null,
+            'status_from_added'    => 'unchecked',
+            'status_from_target'    => 'unchecked',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return back()->with('success', "Grades for $department have been submitted to the its corresponding Dean!");
     }
@@ -609,6 +709,36 @@ class RegistrarController extends Controller
 
 
         Classes::where('id', $classID)->update(['status' => 'Grades has been submitted to the registrar, Waiting for approval']);
+
+        $user = Auth::user();
+
+        $class = Classes::find($classID);
+
+        $users = User::all();
+
+        $registrar = $users->first(function ($user) {
+            $roles = explode(',', $user->role); // assuming role is stored as comma-separated
+            return in_array('registrar', array_map('trim', $roles));
+        });
+
+
+        // Store notification
+        DB::table('notif_table')->insert([
+            'notif_type'      => 'Class grades submitted to the Registrar ',
+            'class_id'        => $class->id,
+            'class_subject_code' => $class->subject_code,
+            'class_descriptive_title' => $class->descriptive_title,
+            'department'      => $user->department ?? null, // Optional if you store department
+            'added_by_id'     => $user->studentID,
+            'added_by_name'   => $user->name,
+            'target_by_id'    => $registrar->studentID ?? null,
+            'target_by_name'  => $registrar->name ?? null,
+            'status_from_added'    => 'unchecked',
+            'status_from_target'    => 'unchecked',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
 
         return back()->with('success', "Grades for $department have been submitted to the Registrar!");
     }
@@ -817,6 +947,31 @@ class RegistrarController extends Controller
                     $classIDs[] = $grade['classID'];
                 }
             }
+
+            $user = Auth::user();
+
+            $class = Classes::find($grade['classID']);
+
+            $instructor_name = $class->instructor; // this is a name like "Dave"
+            $instructor = User::where('name', $instructor_name)->first();
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class grades approved by the registrar, check your archive',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $instructor->studentID ?? null,
+                'target_by_name'  => $instructor->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
 
             // ✅ Check if the class still has students
             $classHasStudents = Classes_Student::whereIn('classID', $classIDs)->exists();

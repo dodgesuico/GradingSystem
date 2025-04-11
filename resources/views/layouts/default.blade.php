@@ -162,8 +162,111 @@
             {{-- for fullscreen and toggle navbar --}}
             <div class="content-header">
                 <i class="fa-solid fa-bars" id="menuToggle"></i>
+                <i id="notificationBell" class="fa-solid fa-bell notification-bell" onclick="toggleDropdown()"></i>
                 <i id="fullscreen-icon" class="fa-solid fa-expand" title="Expand"></i>
             </div>
+
+            <style>
+                .notification-container {
+                    position: relative;
+                    display: inline-block;
+                }
+
+                .notification-bell {
+                    cursor: pointer;
+                    font-size: 20px;
+                }
+
+                .notification-dropdown {
+                    display: none;
+                    position: absolute;
+                    right: 500;
+                    background-color: white;
+                    min-width: 800px;
+                    height: 500px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                    z-index: 99;
+                }
+
+                .notification-item {
+                    padding: 10px;
+                    border-bottom: 1px solid #eee;
+                }
+
+                .notification-item:last-child {
+                    border-bottom: none;
+                }
+
+                .notification-dropdown.show {
+                    display: block;
+                }
+            </style>
+
+            @php
+                $notifications = collect(); // default empty
+
+                if (Auth::check()) {
+                    $studentID = Auth::user()->studentID;
+
+                    $notifications = DB::table('notif_table')
+                        ->where(function ($query) use ($studentID) {
+                            $query->where('added_by_id', $studentID)
+                                ->orWhere('target_by_id', $studentID);
+                        })
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                }
+
+            @endphp
+
+            <div class="notification-container">
+                <div id="notificationDropdown" class="notification-dropdown">
+                    @if ($notifications->isEmpty())
+                        <div class="notification-item">No notifications</div>
+                    @else
+                        @foreach ($notifications as $notif)
+                            <div class="notification-item">
+                                <strong>{{ ucfirst($notif->notif_type) }}</strong><br>
+                                Department: {{ $notif->department }}<br>
+                                Class ID: {{ $notif->class_id }}<br>
+                                Class Subject Code: {{ $notif->class_subject_code }} <br>
+                                Class Descriptive Title: {{ $notif->class_descriptive_title }} <br>
+                                From:  {{ $notif->added_by_name }} <br>
+                                To: {{ $notif->target_by_name }} <br>
+                                {{ $notif->created_at }}
+
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+
+
+            <script>
+                const bell = document.getElementById("notificationBell");
+
+                function toggleDropdown() {
+                    document.getElementById("notificationDropdown").classList.toggle("show");
+                }
+
+                // Optional: close dropdown if clicked outside
+                document.addEventListener("click", function (event) {
+                    const dropdown = document.getElementById("notificationDropdown");
+
+                    // Now uses the actual `bell` constant we declared
+                    if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                        dropdown.classList.remove("show");
+                    }
+                });
+            </script>
+
+
+
+
+
             <script>
                 $(document).ready(function() {
                     // Handle navbar state from localStorage
