@@ -6,10 +6,10 @@
 
     {{-- start of dashboard --}}
     <div class="dashboard">
-        <div class="header-container">
+        <div class="header-container" style="margin-bottom: 20px:">
 
             <h1>Class Details</h1>
-            <h2>{{ $class->descriptive_title }}</h2>
+            <h3 style="font-size: 1.5rem; color: var(--color1); margin-top: 10px;">{{ $class->descriptive_title }}</h3>
 
 
             <div class="sub-header-container">
@@ -121,7 +121,7 @@
 
 
                 <div style="display:flex; flex-direction:row; justify-content:space-between">
-                    <h2 style="margin:10px 0;">Class Students List</h2>
+                    <h3 style="margin:10px 0; font-size: 1.5rem;">Class Students List</h3>
 
                     @if ((Auth::user() && str_contains(Auth::user()->role, 'dean')) || str_contains(Auth::user()->role, 'instructor'))
                         <button class="add-btn" onclick="openAddStudentModal()">
@@ -233,7 +233,7 @@
 
                 {{-- start of grading and score --}}
 
-                <h2 class="grading-title" style="margin: 20px 0;">Grading & Scores</h2>
+                <h2 class="grading-title" style="margin: 50px 0 10px 0 ;">Grading & Scores</h2>
 
                 <div class="grading-tabs">
                     @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $term)
@@ -246,9 +246,9 @@
 
                 @foreach (['Prelim', 'Midterm', 'Semi-Finals', 'Finals'] as $term)
                     <div id="grading-content-{{ $term }}" class="grading-content"
-                        style="display: none; background-color: var(--color9b); padding: 20px; border: 1px solid var(--color7);">
+                        style="display: none; background-color: var(--color9b); padding: 20px; margin-bottom:  50px;">
 
-                        <h3>Grading</h3>
+                        <h3 style="color: var(--color1); font-size: 1.3rem;">Grading</h3>
                         <form action="{{ route('class.addPercentageAndScores', ['class' => $class->id]) }}" method="POST">
                             @csrf
                             @method('PUT')
@@ -314,14 +314,15 @@
 
 
                             </div>
-                            <button type="submit" class="save-btn" style="margin: 5px 0 0 0"><i
+                            <button type="submit" class="save-btn" style="margin: 5px 0 10px 0"><i
                                     class="fa-solid fa-floppy-disk"></i> Save Grading and Total Score</button>
-                            <em style="color: var(--color5); margin-left: 10px;">Note: Do not forget to save first
+                                    <br>
+                            <em style="color: var(--ckcm-color4); font-size: 1.1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Note: Do not forget to save first
                                 before entering the student scores.</em>
                         </form>
 
 
-                        <h3 style="margin:5px 0 10px 0">{{ $term }} Scores (Raw)</h3>
+                        <h3 style="margin:30px 0 10px 0; color: var(--color1); font-size: 1.3rem;">{{ $term }} Scores (Raw)</h3>
                         <form action="{{ route('class.addquizandscore', ['class' => $class->id]) }}" method="post">
                             @csrf
                             @method('PUT')
@@ -491,7 +492,8 @@
 
                             <button type="submit" class="save-btn" style="margin: 10px 0"><i
                                     class="fa-solid fa-arrows-rotate"></i> Calculate and Update</button>
-                            <em style="color: var(--color5); margin-left: 10px;">Note: Do not exceed with the total
+                                    <br>
+                                    <em style="color: var(--ckcm-color4); font-size: 1.2rem;"><i class="fa-solid fa-triangle-exclamation"></i> Note: Do not exceed with the total
                                 score.</em>
                         </form>
                     </div>
@@ -522,11 +524,11 @@
                             color: var(--color6);
                             padding: 10px;
                             border-radius: 0;
-                            font-size: 1.3rem;
+                            font-size: 1.5rem;
                         }
 
                         .grading-tab.active {
-                            border: 1px solid var(--color7);
+                            border: 0;
                             border-bottom: 0;
                             background-color: var(--color9b);
                             color: var(--ckcm-color4);
@@ -547,7 +549,7 @@
         <div id="addStudentModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Add New Student</h2>
+                    <h3 style="font-size: 1.5rem; ">Add New Student</h3>
                     <button class="close" onclick="closeAddStudentModal()">&times;</button>
                 </div>
 
@@ -909,47 +911,7 @@
 
 
 
-        <h2 style="margin: 10px 0; ">Grades</h2>
-
-        @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty() && Auth::user()->name === $classes->instructor)
-            <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
-                @csrf
-                @method('POST')
-
-                @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
-                    @foreach ($studentsByDepartment as $student)
-                        <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
-                            value="{{ $student->classID }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
-                            value="{{ $student->studentID }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][name]"
-                            value="{{ $student->name }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
-                            value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
-                            value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
-                            value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][final]"
-                            value="{{ $studentGrades[$student->studentID]['Finals'] }}">
-                        <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
-                            value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
-                    @endforeach
-                @endforeach
-
-                <button type="submit" class="btn btn-danger" style="margin: 5px 0">
-                    <i class="fa-brands fa-osi"></i> Initialize
-                </button>
-
-                <p style="color: var(--color-red)">Initialize first before locking the grades</p>
-            </form>
-        @endif
-
-        <div style="margin-bottom: 10px;">
-            <button onclick="toggleRawColumns()" class="toggle-btn">
-                <i class="fa-solid fa-eye"></i> Show Raw Columns
-            </button>
-        </div>
+        <h2 style="margin: 10px 0 0 0; font-size: 2rem; ">Grades</h2>
 
 
         <div class="grade-sheet-container">
@@ -957,6 +919,13 @@
                 $loggedInUserDepartment = Auth::user()->department;
                 $isRegistrar = in_array('registrar', explode(',', Auth::user()->role)); // Check if user is a registrar
             @endphp
+
+
+            <div style="margin: 10px 0; width: 100%; display: flex; align-items: right; justify-content: right;">
+            <button onclick="toggleRawColumns()" class="toggle-btn">
+                <i class="fa-solid fa-eye"></i> Show Raw Columns
+            </button>
+            </div>
 
 
             @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
@@ -1039,6 +1008,8 @@
                     </h3>
 
 
+
+
                     <form action="{{ route('finalgrade.lock') }}" method="POST">
                         @csrf
                         @method('POST')
@@ -1046,7 +1017,7 @@
                             <thead>
                                 <tr>
                                     <th>Student</th>
-                                    <th>Department</th>
+                                    {{-- <th>Department</th> --}}
                                     <th>Prelim</th>
                                     <th class="raw-column" style="display: none;">Midterm (Raw)</th>
                                     <th>Midterm</th>
@@ -1061,20 +1032,20 @@
                                 @foreach ($studentsByDepartment as $student)
                                     <tr>
                                         <td>{{ $student->name }}</td>
-                                        <td>{{ $student->department }}</td>
-                                        <td>{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
+                                        {{-- <td>{{ $student->department }}</td> --}}
+                                        <td style="width: 10%">{{ number_format($studentGrades[$student->studentID]['Prelim'], 2) }}</td>
                                         <td class="raw-column" style="display: none;">
                                             {{ number_format($studentGrades[$student->studentID]['Midterm Raw'], 2) }}
                                         </td>
-                                        <td>{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
+                                        <td style="width: 10%">{{ number_format($studentGrades[$student->studentID]['Midterm'], 2) }}</td>
                                         <td class="raw-column" style="display: none;">
                                             {{ number_format($studentGrades[$student->studentID]['Semi-Finals Raw'], 2) }}
                                         </td>
-                                        <td>{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
+                                        <td style="width: 10%">{{ number_format($studentGrades[$student->studentID]['Semi-Finals'], 2) }}</td>
                                         <td class="raw-column" style="display: none;">
                                             {{ number_format($studentGrades[$student->studentID]['Finals Raw'], 2) }}
                                         </td>
-                                        <td>{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
+                                        <td style="width: 10%">{{ number_format($studentGrades[$student->studentID]['Finals'], 2) }}</td>
                                         <td><strong>{{ $studentGrades[$student->studentID]['Remarks'] }}</strong></td>
 
                                         <!-- Hidden inputs -->
@@ -1131,6 +1102,16 @@
                 @endif
 
 
+
+
+
+
+
+
+
+
+
+
                 {{-- submit and lock grades section --}}
                 @if (isset($gradesByDepartment) && $gradesByDepartment->isNotEmpty() && $gradesByDepartment->first()->status)
 
@@ -1152,7 +1133,7 @@
                             {{-- instructors view --}}
                             @if ($deanStatus == 'Returned')
                                 <!-- ❌ Instructor sees notification if grades are returned -->
-                                <div class="alert alert-danger" style="margin-top: 10px;">
+                                <div class="alert alert-danger" style="margin-top: 10px; font-size: 1.4rem;">
                                     <i class="fa-solid fa-exclamation-circle"></i>
                                     The final grades have been <strong> returned by the Dean</strong>. Please review and resubmit.
                                 </div>
@@ -1216,7 +1197,7 @@
                             {{-- instructors view --}}
                             @if ($registrarStatus == 'Rejected')
                                 <!-- ❌ Instructor sees notification if grades are returned -->
-                                <div class="alert alert-danger" style="margin-top: 10px;">
+                                <div class="alert alert-danger" style="margin-top: 10px; font-size: 1.4rem;">
                                     <i class="fa-solid fa-exclamation-circle"></i>
                                     The final grades have been <strong> rejected by the Registrar</strong>. Please review and resubmit.
                                 </div>
@@ -1299,6 +1280,21 @@
                     {{-- end of submit and lock grades section --}}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     {{-- dean approval section --}}
                     @if (
                         $gradesByDepartment->isNotEmpty() &&
@@ -1315,7 +1311,7 @@
 
                             @if ($registrarStatus == 'Rejected')
                                 <!-- ❌ Instructor sees notification if grades are returned -->
-                                <div class="alert alert-danger" style="margin-top: 10px;">
+                                <div class="alert alert-danger" style="margin-top: 10px; font-size: 1.4rem;">
                                     <i class="fa-solid fa-exclamation-circle"></i>
                                     The final grades have been <strong>returned by the Registrar</strong>. Please review and resubmit.
                                 </div>
@@ -1365,6 +1361,14 @@
 
                                 @endif
                             @endif
+
+
+
+
+
+
+
+
 
                             @if ($department == $userDepartment)
                                 <h4 style="margin: 10px 0; color: var(--ckcm-color4); font-size: 1.2rem;">Dean's Decision
@@ -1550,7 +1554,7 @@
 
                             @if (in_array('instructor', explode(',', $user->role)) && $user->name === $classInstructor)
                                 <!-- ✅ Instructor sees notification instead of submit button -->
-                                <div class="alert alert-success" style="margin-top: 10px;">
+                                <div class="alert alert-success" style="margin-top: 10px; font-size: 1.4rem;">
                                     <i class="fa-solid fa-check-circle"></i>
                                     The final grades have been <strong>approved by the Dean</strong> of {{ $department }}.
                                 </div>
@@ -1566,7 +1570,7 @@
                                         $gradesByDepartment->first()->registrar_status == 'Approved'
                                     )
                                     <!-- ✅ Instructor sees notification instead of submit button -->
-                                    <div class="alert alert-success" style="margin-top: 10px;">
+                                    <div class="alert alert-success" style="margin-top: 10px; font-size: 1.4rem;">
                                         <i class="fa-solid fa-check-circle"></i>
                                         The final grades have been approved by the <strong> Registrar </strong>.
                                     </div>
@@ -1581,7 +1585,7 @@
                                             $gradesByDepartment->first()->registrar_status == 'Rejected'
                                         )
                                         <!-- ✅ Instructor sees notification instead of submit button -->
-                                        <div class="alert alert-success" style="margin-top: 10px;">
+                                        <div class="alert alert-success" style="margin-top: 10px; font-size: 1.4rem;">
                                             <i class="fa-solid fa-check-circle"></i>
                                             The final grades have been approved by the <strong> Registrar </strong>.
                                         </div>
@@ -1843,6 +1847,55 @@
 
 
 
+              {{-- initialize grades --}}
+              @if ($finalGrades->where('status', 'Locked')->isEmpty() && $classes_student->isNotEmpty() && Auth::user()->name === $classes->instructor)
+              <form action="{{ route('initialize.grade') }}" method="POST" style="display:inline;">
+                  @csrf
+                  @method('POST')
+
+                  @foreach ($classes_student->groupBy('department') as $department => $studentsByDepartment)
+                      @foreach ($studentsByDepartment as $student)
+                          <input type="hidden" name="grades[{{ $student->studentID }}][classID]"
+                              value="{{ $student->classID }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][studentID]"
+                              value="{{ $student->studentID }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][name]"
+                              value="{{ $student->name }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][prelim]"
+                              value="{{ $studentGrades[$student->studentID]['Prelim'] }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][midterm]"
+                              value="{{ $studentGrades[$student->studentID]['Midterm'] }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][semi_finals]"
+                              value="{{ $studentGrades[$student->studentID]['Semi-Finals'] }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][final]"
+                              value="{{ $studentGrades[$student->studentID]['Finals'] }}">
+                          <input type="hidden" name="grades[{{ $student->studentID }}][remarks]"
+                              value="{{ $studentGrades[$student->studentID]['Remarks'] }}">
+                      @endforeach
+                  @endforeach
+
+                  <button type="submit" class="initialize-btn" style="margin: 10px 0 0 0; ">
+                      <i class="fa-brands fa-osi"></i> Initialize Grades
+                  </button>
+                  <style>
+                      .initialize-btn{
+                      color: var(--ckcm-color4);
+                      border: 1px solid var(--ckcm-color4);
+                      }
+                      .initialize-btn:hover{
+                          transition: ease 0.3s;
+                          transform: translateY(-5px);
+                          background: var(--ckcm-color4);
+                          color: var(--color1);
+
+                      }
+             </style>
+
+                  <p style="color: var(--ckcm-color4)"><i class="fa-solid fa-triangle-exclamation"></i> Initialize first before locking the grades</p>
+              </form>
+              @endif
+              {{-- end of grades initialization --}}
+
 
         </div>
 
@@ -1965,10 +2018,10 @@
 
 
 <style>
-    table td {}
 
     .grades-container td {
         padding: 0;
+
     }
 
     .content-container {
@@ -1981,7 +2034,7 @@
         flex-grow: 1;
         width: 100%;
         padding: 5px;
-        border: 1px solid var(--color8);
+        border: 1px solid var(--color6);
     }
 
     .cell-content input {
@@ -2006,8 +2059,8 @@
         width: 100%;
         margin: 10px 0;
         gap: 10px;
-        border: 1px solid var(--color7);
-        background: var(--ckcm-color1)
+        border: 1px solid var(--color6);
+        background: #15191F;
     }
 
     .calculation-container {
@@ -2023,6 +2076,7 @@
     .calculation-container h4 {
         color: var(--ckcm-color4);
         margin-bottom: 5px;
+        font-size: 1.2rem;
     }
 
     .calculation-content {
@@ -2037,9 +2091,13 @@
 
     .calculation-content input {
         background-color: var(--ckcm-color2);
-        padding: 5px;
+        padding: 6px;
+        font-size: 1.2rem;
         border: 1px solid var(--ckcm-color2);
         color: var(--color2);
+        border-radius: 2px;
+        text-align: center;
+        border:1px solid var(--color6)
     }
 </style>
 
@@ -2089,8 +2147,16 @@
     }
 
     .dashboard h2 {
-        color: var(--color5);
-    }
+        color: var(--ckcm-color4);
+border: 1px solid var(--color6);
+padding: 10px;
+text-align: center;
+margin-top: 10px;
+background: var(--color9b);
+border-left: 0;
+border-right: 0;
+
+}
 
     .dashboard p {
         font-size: 1.2rem;
@@ -2111,7 +2177,8 @@
 
 
     h3 {
-        color: var(--ckcm-color4)
+        color: var(--ckcm-color4);
+        font-size: 1.2rem;
     }
 </style>
 
