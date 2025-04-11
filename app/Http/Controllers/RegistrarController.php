@@ -765,6 +765,30 @@ class RegistrarController extends Controller
         if ($request->dean_status == 'Returned') {
             $updateData['submit_status'] = 'Returned';
 
+            $user = Auth::user();
+
+            $class = Classes::find($request->classID);
+
+            $instructor_name = $class->instructor; // this is a name like "Dave"
+            $instructor = User::where('name', $instructor_name)->first();
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class grades has been rejected by the dean of' . $request->department . ' , please review them',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $instructor->studentID ?? null,
+                'target_by_name'  => $instructor->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
             // 🔥 Update class status to "Rejected"
             Classes::where('id', $request->classID)->update(['status' => 'Rejected']);
         }
@@ -772,6 +796,31 @@ class RegistrarController extends Controller
         // ✅ If "Confirmed", update submit_status & class status
         if ($request->dean_status == 'Confirmed') {
             $updateData['submit_status'] = 'Submitted';
+
+
+            $user = Auth::user();
+
+            $class = Classes::find($request->classID);
+
+            $instructor_name = $class->instructor; // this is a name like "Dave"
+            $instructor = User::where('name', $instructor_name)->first();
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class grades has been approved by the dean of ' . $request->department . ' department ',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $instructor->studentID ?? null,
+                'target_by_name'  => $instructor->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // 🔥 Update class status to "Approved"
             Classes::where('id', $request->classID)->update(['status' => 'Dean approved the submitted grade']);
@@ -786,6 +835,7 @@ class RegistrarController extends Controller
 
         return back()->with('success', 'Dean’s decision has been submitted successfully!');
     }
+
 
     public function submitDecisionRegistrar(Request $request)
     {
@@ -808,6 +858,35 @@ class RegistrarController extends Controller
         if ($request->registrar_status == 'Rejected') {
             $updateData['registrar_status'] = 'Rejected';
             $updateData['dean_status'] = 'Returned';
+
+            $user = Auth::user();
+
+            $class = Classes::find($request->classID);
+
+            $users = User::where('department', $request->department)->get();
+
+            $dean = $users->first(function ($user) {
+                $roles = explode(',', $user->role); // assuming role is stored as comma-separated
+                return in_array('dean', array_map('trim', $roles));
+            });
+
+            // Store notification
+            DB::table('notif_table')->insert([
+                'notif_type'      => 'Class grades has been rejected by the registar, please review them.',
+                'class_id'        => $class->id,
+                'class_subject_code' => $class->subject_code,
+                'class_descriptive_title' => $class->descriptive_title,
+                'department'      => $user->department ?? null, // Optional if you store department
+                'added_by_id'     => $user->studentID,
+                'added_by_name'   => $user->name,
+                'target_by_id'    => $dean->studentID ?? null,
+                'target_by_name'  => $dean->name ?? null,
+                'status_from_added'    => 'unchecked',
+                'status_from_target'    => 'unchecked',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
             // 🔥 Update class status to "Rejected"
             Classes::where('id', $request->classID)->update(['status' => 'Rejected']);
         }
