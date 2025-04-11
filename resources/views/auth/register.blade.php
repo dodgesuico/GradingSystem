@@ -10,8 +10,14 @@
         <h2>Register</h2>
 
         <form action="{{ route('register.post') }}" method="POST">
-            
+
             @csrf
+
+               <!-- Email Input -->
+            <div class="input-group">
+                <label for="name">Student ID</label>
+                <input type="number" id="email" name="studentID" required>
+            </div>
 
             <!-- Email Input -->
             <div class="input-group">
@@ -20,11 +26,17 @@
             </div>
 
 
+            <div class="input-group">
+                <label for="email">Gender</label>
+                <input type="text" id="email" name="gender" required>
+            </div>
+
             <!-- Email Input -->
             <div class="input-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
+
 
             <div class="input-group">
                 <label for="department">Program</label>
@@ -71,7 +83,7 @@
 
             <!-- Register & Forgot Password Links -->
             <div class="links">
-                <a href="{{ route('login') }}">Already have an account?</a> | 
+                <a href="{{ route('login') }}">Already have an account?</a> |
                 <a href="#">Forgot password?</a>
             </div>
         </form>

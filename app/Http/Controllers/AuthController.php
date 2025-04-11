@@ -55,7 +55,9 @@ class AuthController extends Controller
     function RegisterPost(Request $request)
     {
         $request->validate([
+            "studentID" => "required",
             "name" => "required",
+            "gender" => "required",
             "email" => "required|email",
             "department" => "",
             "password" => "required|min:4",
@@ -64,7 +66,9 @@ class AuthController extends Controller
         ]);
 
         $user = new User();
+        $user->studentID = $request->studentID;
         $user->name = $request->name;
+        $user->gender = $request->gender;
         $user->email = $request->email;
         $user->department = $request->department;
         $user->password = $request->password;
